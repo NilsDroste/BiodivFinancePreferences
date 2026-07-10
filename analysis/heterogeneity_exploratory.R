@@ -270,9 +270,9 @@ plot_df <- all_exp |>
   )
 
 instr_colors <- c(
-  "Donation"      = "tomato3",
-  "Certification" = "goldenrod3",
-  "Offsetting"    = "steelblue"
+  "Donation"      = "#D55E00",
+  "Certification" = "#E69F00",
+  "Offsetting"    = "#0072B2"
 )
 
 p_coef <- ggplot(plot_df,

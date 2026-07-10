@@ -355,13 +355,13 @@ print(coeftest(fp3_sens, vcov = vcovHC(fp3_sens, "HC3")))
 
 # 7a. Distribution of voluntary_pref
 p_dist <- ggplot(anal_data, aes(x = voluntary_pref)) +
-  geom_histogram(binwidth = 0.1, fill = "steelblue", colour = "white") +
+  geom_histogram(binwidth = 0.1, fill = "#0072B2", colour = "white") +
   geom_vline(xintercept = mean(anal_data$voluntary_pref),
-             linetype = "dashed", colour = "red") +
+             linetype = "dashed", colour = "#D55E00") +
   annotate("text",
            x = mean(anal_data$voluntary_pref) + 0.03, y = Inf,
            label = paste0("mean = ", round(mean(anal_data$voluntary_pref), 2)),
-           vjust = 2, hjust = 0, colour = "red", size = 3.5) +
+           vjust = 2, hjust = 0, colour = "#D55E00", size = 3.5) +
   scale_x_continuous(labels = scales::percent, breaks = seq(0, 1, 0.2)) +
   labs(title = "Distribution of voluntary preference score",
        subtitle = "Share of mixed-instrument tasks where voluntary option chosen",
@@ -389,7 +389,7 @@ p_cell <- anal_data |>
   geom_col(alpha = 0.85) +
   geom_errorbar(aes(ymin = mn - 1.96*se, ymax = mn + 1.96*se), width = 0.25) +
   geom_text(aes(label = paste0("n=", n)), vjust = -0.6, size = 3) +
-  scale_fill_manual(values = c("Low" = "tomato3", "High" = "steelblue"),
+  scale_fill_manual(values = c("Low" = "#D55E00", "High" = "#0072B2"),
                     name = "Env. att.") +
   scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, .15))) +
   labs(title = "Voluntary preference by environmental attitude × donation",
@@ -407,8 +407,8 @@ p_interact <- anal_data |>
   geom_jitter(alpha = 0.2, size = 0.8, width = 30, height = 0.02) +
   geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
   scale_colour_manual(
-    values = c("Low env. att." = "tomato3", "Medium" = "goldenrod",
-               "High env. att." = "steelblue"),
+    values = c("Low env. att." = "#D55E00", "Medium" = "#E69F00",
+               "High env. att." = "#0072B2"),
     name = NULL) +
   scale_x_continuous(labels = scales::label_comma()) +
   scale_y_continuous(labels = scales::percent) +
@@ -424,9 +424,9 @@ p_env <- ggplot(anal_data,
                     fill   = factor(gave_binary))) +
   geom_jitter(alpha = 0.2, size = 0.8, width = 0.1, height = 0.02) +
   geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
-  scale_colour_manual(values = c("0" = "tomato3", "1" = "steelblue"),
+  scale_colour_manual(values = c("0" = "#D55E00", "1" = "#0072B2"),
                       labels = c("Did not donate", "Donated"), name = NULL) +
-  scale_fill_manual(values  = c("0" = "tomato3", "1" = "steelblue"),
+  scale_fill_manual(values  = c("0" = "#D55E00", "1" = "#0072B2"),
                     labels  = c("Did not donate", "Donated"), name = NULL) +
   scale_y_continuous(labels = scales::percent) +
   labs(title = "Voluntary preference vs. environmental attitude by donation status",

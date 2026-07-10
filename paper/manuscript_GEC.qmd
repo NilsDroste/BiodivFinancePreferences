@@ -526,17 +526,17 @@ don <- full_data |>
   transmute(donation = yourdonation, share = yourdonation / 1000)
 
 p_hist <- ggplot(don, aes(x = donation)) +
-  geom_histogram(binwidth = 50, fill = "steelblue", colour = "white") +
-  geom_vline(xintercept = mean(don$donation), linetype = "dashed", colour = "red") +
+  geom_histogram(binwidth = 50, fill = "#0072B2", colour = "white") +
+  geom_vline(xintercept = mean(don$donation), linetype = "dashed", colour = "#D55E00") +
   annotate("text", x = mean(don$donation) + 35, y = Inf,
            label = paste0("mean = SEK ", round(mean(don$donation))),
-           vjust = 2, hjust = 0, colour = "red", size = 3) +
+           vjust = 2, hjust = 0, colour = "#D55E00", size = 3) +
   scale_x_continuous(breaks = seq(0, 1000, 250)) +
   labs(x = "Donation (SEK)", y = "Count") +
   theme_minimal(base_size = 10)
 
 p_share <- ggplot(don, aes(x = share)) +
-  stat_ecdf(colour = "steelblue", linewidth = 1) +
+  stat_ecdf(colour = "#0072B2", linewidth = 1) +
   scale_x_continuous(labels = scales::percent, breaks = seq(0, 1, .25)) +
   scale_y_continuous(labels = scales::percent) +
   labs(x = "Share donated", y = "Cumulative %") +
@@ -559,13 +559,13 @@ The mean voluntary preference score is $\overline{\text{VP}} = 0.431$ (SD = 0.32
 #| fig-height: 3.5
 
 ggplot(anal_data, aes(x = voluntary_pref)) +
-  geom_histogram(binwidth = 1/7, fill = "steelblue", colour = "white",
+  geom_histogram(binwidth = 1/7, fill = "#0072B2", colour = "white",
                  boundary = 0) +
   geom_vline(xintercept = mean(anal_data$voluntary_pref),
-             linetype = "dashed", colour = "red") +
+             linetype = "dashed", colour = "#D55E00") +
   annotate("text", x = mean(anal_data$voluntary_pref) + 0.03, y = Inf,
            label = paste0("mean = ", round(mean(anal_data$voluntary_pref), 2)),
-           vjust = 2, hjust = 0, colour = "red", size = 3) +
+           vjust = 2, hjust = 0, colour = "#D55E00", size = 3) +
   scale_x_continuous(labels = scales::percent, breaks = seq(0, 1, 0.25),
                      limits = c(-0.05, 1.05)) +
   labs(x = "Voluntary preference score (VP)", y = "Count") +
@@ -704,9 +704,9 @@ ggplot(anal_data, aes(x = donation, y = voluntary_pref, colour = env_lab)) +
   geom_jitter(alpha = 0.15, size = 0.7, width = 25, height = 0.02) +
   geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
   scale_colour_manual(
-    values = c("Low env. att." = "#d73027",
-               "Medium"       = "#fee090",
-               "High env. att." = "#4575b4"),
+    values = c("Low env. att." = "#D55E00",
+               "Medium"       = "#E69F00",
+               "High env. att." = "#0072B2"),
     name = NULL) +
   scale_x_continuous(labels = scales::label_comma()) +
   scale_y_continuous(labels = scales::percent, limits = c(-0.1, 1.1)) +
@@ -1105,9 +1105,9 @@ subgroup_order <- rev(c(
 ))
 
 instr_colors <- c(
-  "Donation"      = "tomato3",
-  "Certification" = "goldenrod3",
-  "Offsetting"    = "steelblue"
+  "Donation"      = "#D55E00",
+  "Certification" = "#E69F00",
+  "Offsetting"    = "#0072B2"
 )
 
 all_exp |>
