@@ -1076,3 +1076,23 @@ lcm_tbl |>
 The posterior class characterisation provides weak convergent support for the VP regression: respondents assigned to the strongly mandatory-preferring Class 1 have marginally higher mean env\_z (+0.094) and don\_z (+0.033) than those in Class 2 ($-$0.041 and $-$0.015 respectively), consistent with the VP regression direction (higher env\_z and don\_z predict lower VP, i.e., stronger mandatory preference). The differences are small, however, indicating that the LC classes are defined primarily by preference intensity and price sensitivity rather than by environmental attitudes or donation behaviour.
 
 Taken together, the LC results provide convergent validity to the primary CL and MXL findings: there is no latent segment of the Swedish population that prefers voluntary biodiversity financing instruments, and the aggregate mandatory preference is not an artefact of averaging over a voluntary-preference minority.
+
+## I. Exploratory subgroup heterogeneity {.unnumbered}
+
+*These analyses were not pre-registered and should be treated as exploratory.*
+
+Figure I.1 extends the pre-registered subgroup analysis (Appendix E) to three further dimensions: party vote intention (q16), trust in the state as a biodiversity finance administrator (q2_1), and belief in Swedish policy consequentiality (q14, "Sweden will follow through on its biodiversity policy targets"). Subgroup conditional logit models follow the same specification as the main CL. Code is in `analysis/heterogeneity_exploratory.R`.
+
+**Party vote (q16).** All political blocs prefer mandatory instruments over voluntary ones, but the preferred mandatory instrument differs. Left-bloc voters (S/V/MP, n = 796) strongly prefer the state tax option (donation: $\hat\beta = -0.779^{***}$; certification: $-0.362^{***}$; offsetting: $0.013$). Centre-right voters (M/C/KD/L, n = 523) and Sweden Democrats (SD, n = 287) prefer corporate offsetting over tax (offsetting: $0.360^{***}$ and $0.262^{**}$ respectively), while showing no preference between donation or certification and tax. The within-mandatory political divide — state extraction versus corporate liability — does not alter the main finding: no political bloc expresses a preference for voluntary instruments.
+
+**State trust (q2_1).** Respondents with high trust in the state strongly prefer tax (donation: $-0.760^{***}$; offsetting: $0.001$). Respondents with low state trust show a positive coefficient on offsetting ($0.299^{***}$) and marginal preference for certification and donation over tax — but offsetting, a mandatory corporate accountability mechanism, remains their top choice. Low state trust does not produce voluntary instrument preference; it shifts preference within mandatory instruments toward corporate liability and away from state extraction. This nuances the boundary-conditions argument: institutional distrust appears to redirect mandatory preferences rather than eliminate them.
+
+**Policy consequentiality (q14).** Mandatory preference is completely stable across consequentiality beliefs. Respondents skeptical that Sweden will implement its biodiversity targets show strong aversion to donation ($-0.411^{***}$) and slight aversion to certification ($-0.147^{**}$), closely mirroring the high-consequentiality subgroup. The mandatory/voluntary distinction is not driven by optimism about Swedish policy delivery.
+
+```{r}
+#| label: fig-het-exp
+#| fig-cap: "Exploratory subgroup heterogeneity: instrument coefficients relative to tax baseline (95% CI). Panel A: party vote intention (q16); Panel B: trust in state as biodiversity finance administrator (q2_1, tercile); Panel C: belief that Sweden will follow through on biodiversity policy targets (q14, median split). All analyses exploratory (not pre-registered)."
+#| out-width: "90%"
+#| fig-align: center
+knitr::include_graphics(here::here("paper", "fig_heterogeneity_exploratory.pdf"))
+```

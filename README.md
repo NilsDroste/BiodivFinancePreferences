@@ -53,6 +53,7 @@ install.packages(c(
 | `analysis/heterogeneity_analysis.R` | Subgroup CL models by gender, income, environmental attitude |
 | `analysis/instrument_pref_analysis.R` | Instrument-level WTP calculations |
 | `analysis/lcm_analysis.R` | 2-class latent class MNL via Apollo (Appendix H) |
+| `analysis/heterogeneity_exploratory.R` | Exploratory subgroup CL models by party vote, state trust, policy consequentiality (Appendix I) |
 
 Run in the order listed. `analysis.R` must run first as it produces objects used downstream.
 
