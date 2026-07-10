@@ -244,7 +244,7 @@ Implicit WTP for attribute level $k$ relative to baseline is $\widehat{\text{WTP
 
 **Mixed logit (MXL).** To capture preference heterogeneity, we estimate a random-parameters logit with normal distributions on $\beta_{\text{don}}, \beta_{\text{cert}}, \beta_{\text{off}}, \beta_{\text{ind}}, \beta_{\text{pland}}, \beta_{\text{pmon}}$, with price and opt-out ASC fixed [@McFaddenTrain2000; @Train2009]. Estimated via maximum simulated likelihood with 500 Halton draws using logitr [@Helveston2023].
 
-## Exploratory analyses
+## Voluntary preference and donation analyses
 
 The following analyses are not preregistered and should be interpreted as exploratory.
 
@@ -511,7 +511,7 @@ anal_data <- resp_level |>
   )
 ```
 
-## Exploratory: Donation experiment
+## Dictator game donation
 
 @fig-donation shows the distribution of dictator game donations. 16.7% of respondents donated nothing, and 83.3% donated a positive amount. Among the full sample the mean donation is 411 SEK (SD = 357 SEK) out of the 1,000 SEK prize, with a right-skewed distribution and a median of 400 SEK (40% of the prize). The high participation rate is consistent with the salient incentive structure: with a ≈4.8% win probability, the expected cost of donating the median amount was approximately SEK 19. Mean trust in NGOs is 2.93/5 (SD = 0.99) and mean policy consequentiality is 2.91/5 (SD = 1.01), suggesting that most respondents hold moderate beliefs about how responsive Swedish policy is to conservation priorities.
 
@@ -576,7 +576,7 @@ p_bracket <- ggplot(bracket_df,
 p_dens + p_bracket
 ```
 
-## Exploratory: Voluntary preference score {#sec-vp}
+## Voluntary preference score {#sec-vp}
 
 Of the 2,101 respondents, 1,863 had at least one mixed-instrument task with a non-opt-out response; 238 respondents opted out of every mixed task they encountered and are excluded from the VP analysis. Among respondents with VP data, the average number of informative mixed tasks is 3.6 per respondent (out of 8 total). The distribution of mixed-task counts is: 1 task (n = 113, 6.1%), 2 tasks (n = 272, 14.6%), 3 tasks (n = 515), 4 tasks (n = 603), 5 tasks (n = 226), 6 tasks (n = 24), and 7 tasks (n = 110). Respondents with only 1–2 informative mixed tasks have a near-binary VP score, carrying substantially more measurement noise. We therefore report a sensitivity analysis that excludes the 385 respondents with fewer than 3 mixed tasks ($n = 1{,}478$).
 
@@ -584,58 +584,62 @@ The mean voluntary preference score is $\overline{\text{VP}} = 0.431$ (SD = 0.32
 
 ```{r}
 #| label: fig-vpdist
-#| fig-cap: "Distribution of voluntary preference score (VP). Each lollipop shows the share of respondents whose VP falls in a 1/7-width bin. Blue: always chose mandatory (VP = 0, 22.1%); orange: always chose voluntary (VP = 1, 12.0%); grey: mixed responses."
+#| fig-cap: "Distribution of voluntary preference score (VP = share of mixed-instrument DCE tasks where the voluntary option was chosen). Blue area: respondents who lean mandatory (VP ≤ 0.5, 67%); orange area: respondents who lean voluntary (VP > 0.5, 33%). Dashed line marks the mean (0.43). Vertical line at VP = 0.5 is the indifference threshold."
 #| eval: true
 #| fig-width: 5.5
 #| fig-height: 3.5
 
-vp_df <- anal_data |>
-  mutate(vp_bin = round(voluntary_pref * 7) / 7) |>
-  count(vp_bin) |>
-  mutate(
-    pct = n / sum(n),
-    cat = case_when(
-      vp_bin == 0 ~ "Always mandatory (VP = 0)",
-      vp_bin == 1 ~ "Always voluntary (VP = 1)",
-      TRUE        ~ "Mixed"
-    ),
-    cat = factor(cat, levels = c("Always mandatory (VP = 0)",
-                                  "Mixed",
-                                  "Always voluntary (VP = 1)"))
-  )
+vp_mean   <- mean(anal_data$voluntary_pref)
+pct_mand  <- round(mean(anal_data$voluntary_pref <= 0.5) * 100)
+pct_vol   <- round(mean(anal_data$voluntary_pref >  0.5) * 100)
 
-vp_mean <- mean(anal_data$voluntary_pref)
+dens      <- density(anal_data$voluntary_pref, from = 0, to = 1, n = 512)
+dens_df   <- tibble(x = dens$x, y = dens$y)
+y_at_half <- approx(dens$x, dens$y, xout = 0.5)$y
+y_label   <- max(dens$y) * 0.45
 
-ggplot(vp_df, aes(x = vp_bin, y = pct, colour = cat)) +
-  geom_segment(aes(xend = vp_bin, yend = 0), linewidth = 1.2) +
-  geom_point(size = 4) +
+dens_mand <- dens_df |> filter(x <= 0.5) |>
+  add_row(x = 0.5, y = y_at_half) |> arrange(x)
+dens_vol  <- dens_df |> filter(x >= 0.5) |>
+  add_row(x = 0.5, y = y_at_half) |> arrange(x)
+
+ggplot() +
+  geom_area(data = dens_mand, aes(x = x, y = y),
+            fill = "#0072B2", alpha = 0.55) +
+  geom_area(data = dens_vol,  aes(x = x, y = y),
+            fill = "#D55E00", alpha = 0.55) +
+  geom_line(data = dens_df,   aes(x = x, y = y),
+            colour = "grey20", linewidth = 0.5) +
+  geom_vline(xintercept = 0.5, colour = "grey30", linewidth = 0.7) +
+  annotate("text", x = 0.515, y = max(dens$y) * 0.96,
+           label = "indifference\n(VP = 0.5)",
+           hjust = 0, size = 2.7, colour = "grey40") +
   geom_vline(xintercept = vp_mean, linetype = "dashed",
-             colour = "grey40", linewidth = 0.6) +
-  annotate("text", x = vp_mean + 0.03, y = Inf,
+             colour = "grey30", linewidth = 0.55) +
+  annotate("text", x = vp_mean - 0.02, y = max(dens$y) * 0.75,
            label = paste0("mean = ", round(vp_mean, 2)),
-           vjust = 2, hjust = 0, size = 3, colour = "grey40") +
-  scale_colour_manual(
-    values = c("Always mandatory (VP = 0)" = "#0072B2",
-               "Mixed"                     = "grey60",
-               "Always voluntary (VP = 1)" = "#D55E00"),
-    name = NULL
+           hjust = 1, size = 2.7, colour = "grey30") +
+  annotate("text", x = 0.20, y = y_label,
+           label = paste0(pct_mand, "% lean\nmandatory"),
+           colour = "#0072B2", size = 3.2, fontface = "bold", hjust = 0.5) +
+  annotate("text", x = 0.78, y = y_label,
+           label = paste0(pct_vol, "% lean\nvoluntary"),
+           colour = "#D55E00", size = 3.2, fontface = "bold", hjust = 0.5) +
+  scale_x_continuous(
+    breaks = c(0, 0.25, 0.5, 0.75, 1),
+    labels = c("0\n(always\nmandatory)", "0.25", "0.5", "0.75",
+               "1\n(always\nvoluntary)"),
+    limits = c(-0.01, 1.01)
   ) +
-  scale_x_continuous(labels = scales::percent,
-                     breaks = seq(0, 1, by = 1/7),
-                     limits = c(-0.05, 1.05)) +
-  scale_y_continuous(labels = scales::percent,
-                     expand = expansion(mult = c(0, 0.08))) +
-  labs(x = "Voluntary preference score (VP)", y = "% of respondents") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.06))) +
+  labs(x = "Voluntary preference score (VP)", y = "Density") +
   theme_minimal(base_size = 10) +
-  theme(
-    panel.grid.minor   = element_blank(),
-    panel.grid.major.x = element_blank(),
-    legend.position    = "bottom",
-    legend.key.size    = unit(0.4, "cm")
-  )
+  theme(panel.grid.minor   = element_blank(),
+        panel.grid.major.x = element_blank(),
+        axis.text.x        = element_text(size = 8, lineheight = 0.85))
 ```
 
-## Exploratory: Strategic voluntary preference test {#sec-strategic}
+## Strategic voluntary preference test {#sec-strategic}
 
 @tbl-2x2 reports mean voluntary preference scores within the 2×2 cross-classification of environmental attitude (median split on Q11) and donation behaviour (donated > 0 vs. zero). The pattern is the opposite of the strategic voluntary preference prediction: respondents with high environmental concern show *lower* voluntary preference (VP = 0.385–0.392) than those with low environmental concern (VP = 0.486–0.549). The "strategic" cell — high environmental concern combined with no donation — shows the *lowest* mean VP of all four cells (0.385, 95% CI (0.317, 0.453), n = 84), not the highest. Its 95% CI does not overlap with the adjacent low-concern/no-donate cell (0.549, 95% CI (0.502, 0.596)), providing clear descriptive evidence against the strategic hypothesis even before regression. We note the strategic cell is underpowered (n = 84); the regression analysis in @sec-strategic provides a more powerful test. The power analysis in Appendix D confirms that the continuous specification achieves sufficient power to detect interactions as small as $|\hat\beta_3| \approx 0.021$; the observed estimate of $-0.002$ is an order of magnitude below this threshold, ruling out even small strategic effects.
 
