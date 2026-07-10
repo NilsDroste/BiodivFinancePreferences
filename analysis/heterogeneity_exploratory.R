@@ -307,3 +307,7 @@ ggsave(
 )
 
 cat("\nFigure saved to paper/fig_heterogeneity_exploratory.pdf\n")
+
+# Save results for manuscript inline plotting
+saveRDS(all_exp, here("analysis", "heterogeneity_exploratory.rds"))
+cat("Results saved to analysis/heterogeneity_exploratory.rds\n")

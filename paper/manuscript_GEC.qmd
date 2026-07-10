@@ -1092,7 +1092,64 @@ Figure I.1 extends the pre-registered subgroup analysis (Appendix E) to three fu
 ```{r}
 #| label: fig-het-exp
 #| fig-cap: "Exploratory subgroup heterogeneity: instrument coefficients relative to tax baseline (95% CI). Panel A: party vote intention (q16); Panel B: trust in state as biodiversity finance administrator (q2_1, tercile); Panel C: belief that Sweden will follow through on biodiversity policy targets (q14, median split). All analyses exploratory (not pre-registered)."
-#| out-width: "90%"
-#| fig-align: center
-knitr::include_graphics(here::here("paper", "fig_heterogeneity_exploratory.pdf"))
+#| fig-width: 6.5
+#| fig-height: 7.5
+#| eval: true
+
+all_exp <- readRDS(here::here("analysis", "heterogeneity_exploratory.rds"))
+
+subgroup_order <- rev(c(
+  "Left (S/V/MP)", "Centre-right", "SD", "No pref / DK",
+  "High state trust", "Mid state trust", "Low state trust",
+  "High consequentiality", "Low consequentiality"
+))
+
+instr_colors <- c(
+  "Donation"      = "tomato3",
+  "Certification" = "goldenrod3",
+  "Offsetting"    = "steelblue"
+)
+
+all_exp |>
+  mutate(
+    ci_lo      = Coef - 1.96 * SE,
+    ci_hi      = Coef + 1.96 * SE,
+    Instrument = recode(Attr,
+      don  = "Donation",
+      cert = "Certification",
+      off  = "Offsetting"
+    ),
+    Instrument = factor(Instrument, levels = c("Donation", "Certification", "Offsetting")),
+    Dimension  = case_when(
+      Label %in% c("Left (S/V/MP)", "Centre-right", "SD", "No pref / DK")
+        ~ "A.  Party vote (q16)",
+      Label %in% c("Low state trust", "Mid state trust", "High state trust")
+        ~ "B.  State trust (q2_1)",
+      TRUE
+        ~ "C.  Policy consequentiality (q14)"
+    ),
+    Label = factor(Label, levels = subgroup_order)
+  ) |>
+  ggplot(aes(x = Coef, y = Label, color = Instrument, xmin = ci_lo, xmax = ci_hi)) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey50", linewidth = 0.4) +
+  geom_pointrange(position = position_dodge(width = 0.55),
+                  linewidth = 0.5, size = 0.35) +
+  scale_color_manual(values = instr_colors) +
+  facet_wrap(~Dimension, ncol = 1, scales = "free_y") +
+  labs(
+    x     = "Coefficient relative to tax baseline (95% CI)",
+    y     = NULL,
+    color = NULL,
+    caption = "Tax is the omitted baseline (coefficient = 0). Exploratory analyses, not pre-registered."
+  ) +
+  theme_bw(base_size = 10) +
+  theme(
+    legend.position  = "bottom",
+    legend.key.size  = unit(0.4, "cm"),
+    strip.background = element_blank(),
+    strip.text       = element_text(face = "bold", hjust = 0, size = 9),
+    panel.grid.minor = element_blank(),
+    plot.caption     = element_text(size = 7, hjust = 0, colour = "grey40"),
+    axis.text.y      = element_text(size = 8)
+  )
 ```
