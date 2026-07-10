@@ -1,0 +1,49 @@
+# Survey microdata — GDPR
+data/
+
+# Open-ended responses — excluded from deposit (see README)
+analysis/q17_for_coding.csv
+
+# Fitted model objects (large, reproducible from scripts)
+analysis/*.rds
+analysis/CL_full_iterations.csv
+analysis/LCM_2class_iterations.csv
+
+# HB approach not reported in paper
+analysis/hb_wtp_feasibility.R
+analysis/hb_wtp_stage2.rds
+
+# Pilot analysis (pilot data not deposited)
+analysis/pilot_analysis.R
+
+# Internal helper scripts not needed for replication
+analysis/_mxl_runner.R
+analysis/_table.R
+
+# Old manuscript versions and internal notes
+paper/manuscript.qmd
+paper/manuscript_EE.qmd
+paper/manuscript_GEC_anon.qmd
+paper/manuscript.fdb_latexmk
+feedback/
+claude/
+design/Survey design.docx
+
+# Generated outputs
+paper/*.pdf
+paper/*.tex
+paper/manuscript_GEC_files/
+paper/manuscript_files/
+Rplots.pdf
+
+# Internal project files
+.claude/
+"Guide for authors*.pdf"
+analysis/analysis.qmd
+paper/manuscript.html
+paper/manuscript_GEC_anon_files/
+
+# OS / editor
+.DS_Store
+.Rhistory
+.RData

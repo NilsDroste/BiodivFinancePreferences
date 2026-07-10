@@ -1,0 +1,1078 @@
+---
+title: "Mandatory by Popular Demand: Biodiversity Finance Preferences in Sweden"
+author:
+  - name: Nils Droste
+    affiliations: Department of Food and Resource Economics, University of Copenhagen
+    email: nd@ifro.ku.dk
+  - name: Jens Christiansen
+    affiliations: Lund University Centre for Sustainability Studies (LUCSUS)
+    email: jens.christiansen@lucsus.lu.se
+  - name: Yohei Mitani
+    affiliations: Graduate School of Global Environmental Studies, Kyoto University
+    email: mitani.yohei.7w@kyoto-u.ac.jp
+date: today
+abstract: |
+  Three decades of global environmental governance have pivoted toward voluntary, market-based, and non-state instruments, resting on an untested behavioral assumption: that environmental concern can be channeled through private, voluntary choice at scale. We test this assumption using a most-likely case design. Sweden ranks at the global ceiling for social trust, environmental identity, and per-capita conservation spending, the most structurally favorable context for voluntary instrument support. If voluntary preference fails even here, the behavioral assumption fails at its own best case. Using a pre-registered discrete choice experiment ($n = 2{,}101$) combined with an incentivised dictator game, we find that Swedish citizens consistently prefer mandatory biodiversity financing instruments over voluntary alternatives: corporate offsetting carries the highest mean utility and public monitoring commands a willingness-to-pay premium of approximately SEK 1,600 per year. We find no evidence of strategic voluntary preference: donation behaviour and environmental concern each independently predict stronger mandatory instrument preference, with no significant interaction ($p = 0.792$), and open-ended responses confirm a public-goods consequentialist logic rather than free-riding. We theorize that voluntary instrument preference, where it appears globally, reflects a constrained, defensive response to institutional weakness rather than endorsement of voluntary governance as first-best design. Our findings challenge the narrative that voluntary frameworks represent a mature evolution in environmental policy, and suggest that reliance on voluntary instruments under the Kunming-Montreal Global Biodiversity Framework may be structurally misaligned with citizen preferences even in the most favorable contexts.
+keywords:
+  - voluntary governance
+  - biodiversity financing
+  - most-likely case design
+  - discrete choice experiment
+  - public-goods consequentialism
+  - collective action
+  - Kunming-Montreal Global Biodiversity Framework
+format:
+  pdf:
+    number-sections: true
+    fontsize: 12pt
+    geometry: margin=2.5cm
+    keep-tex: true
+    include-in-header:
+      - text: |
+          \usepackage{threeparttable}
+  docx:
+    number-sections: true
+bibliography: references.bib
+execute:
+  eval: false
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| eval: true
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+```
+
+```{=html}
+<style>
+table.table { width: 100% !important; max-width: 100%; }
+table.table td, table.table th { word-break: break-word; overflow-wrap: break-word; }
+</style>
+```
+
+# Introduction {#sec-intro}
+
+Over the past three decades, global environmental governance has undergone a pronounced shift away from state-led mandatory regulation toward voluntary, market-based, and non-state instruments. Private donations to conservation organisations, consumer certification schemes, voluntary corporate offsetting, and biodiversity credit markets have been promoted as flexible, decentralised alternatives to the gridlock of multilateral state treaties. This turn rests on a behavioral assumption that has rarely been examined directly: that citizens with high environmental concern can be effectively mobilised through private, voluntary mechanisms. The Kunming-Montreal Global Biodiversity Framework (GBF), which commits governments to mobilising at least USD 200 billion per year for nature by 2030, reflects this assumption in its heavy reliance on private and voluntary finance alongside public funding [@CBD2022]. The design question of whether that finance flows through mandatory or voluntary channels has direct consequences for who bears the cost, how credible conservation commitments are perceived, and whether targets can be reached.
+
+We test this behavioral assumption using a most-likely case design. For voluntary instruments to enjoy public support, the ideal conditions are: high social trust (so people believe others will also contribute voluntarily, reducing free-rider concerns), high environmental concern (motivation to act), and high individual willingness to pay (capacity and inclination to contribute). Sweden meets all three conditions at or near their global maximum. On the World Values Survey measure of generalized social trust ("most people can be trusted"), Scandinavian countries consistently rank highest globally. Sweden's per-capita conservation spending, environmental policy stringency, and public environmental identity are among the highest in the world. If the behavioral assumption underlying voluntary governance fails in Sweden, it fails at its own best case, producing a globally informative lower bound on the viability of voluntary instruments.
+
+An important conceptual distinction sharpens the design logic: individual environmental *willingness* (the capacity and inclination to act voluntarily) and *structural instrument preference* (whether one prefers voluntary or mandatory policy architecture) are not the same thing. Sweden is the ceiling for the former. We test the latter. Even when individual willingness is maximized, do citizens prefer to route conservation finance through voluntary or mandatory channels? The answer has implications far beyond Sweden: it tests whether the behavioral assumption underlying the global voluntary governance turn is sound in principle, not merely in practice.
+
+We test this using a large-scale online survey ($n = 2{,}101$) that combines a pre-registered discrete choice experiment (DCE) with an incentivised dictator game. The DCE presents respondents with paired choices between biodiversity conservation programmes differing in four attributes: financing instrument (tax, donation, certification, offsetting), land ownership type, monitoring regime, and annual cost. The dictator game asks respondents to allocate a portion of a real SEK 1,000 prize to Naturskyddsföreningen (the Swedish Society for Nature Conservation), providing an incentivised, revealed-preference measure of personal voluntary giving, the behavioral correlate of individual willingness. We then construct a respondent-level voluntary preference score from DCE choices and regress it on actual donation behaviour, environmental attitudes, and their interaction, asking whether the most environmentally motivated and personally generous citizens endorse voluntary policy instruments or demand mandatory ones.
+
+Our pre-registered results show that both mandatory instruments are preferred over voluntary alternatives: corporate offsetting ($\beta = +0.146$, $p < 0.001$) and tax payment (baseline) outperform voluntary donation ($\beta = -0.376$, $p < 0.001$) and market certification ($\beta = -0.082$, $p < 0.05$), with offsetting emerging as the highest-utility instrument overall. Public monitoring commands the largest attribute premium (WTP ≈ SEK 1,600/year). Our main finding from the exploratory analysis is that the strategic voluntary preference hypothesis is not supported: both donation behaviour and environmental concern independently predict stronger mandatory instrument preference (APE$_{\text{don}} = -0.030$, $p < 0.001$; APE$_{\text{env}} = -0.042$, $p < 0.001$), with no significant interaction ($p = 0.792$). The most committed, personally generous respondents do not endorse voluntary instruments to free-ride; they demand binding collective mechanisms to ensure the collective action problem is solved. Voluntary preference, in this sample, reflects neither strategic free-riding nor environmental passivity; it reflects, at most, a minority position among the least environmentally engaged.
+
+These findings speak directly to the governance theory of the voluntary turn. We develop a theoretical extension distinguishing the *unconstrained normative preference* for voluntary instruments (which our data tests) from a *constrained defensive preference* that may emerge in lower-trust, lower-capacity contexts. Voluntary instrument preference, where it appears globally, may be better understood as a symptom of institutional weakness than as evidence that voluntary governance is the first-best design solution.
+
+The paper proceeds as follows. Section 2 develops the conceptual framework. Section 3 describes the survey design and data. Section 4 presents the econometric methods. Section 5 reports results. Section 6 discusses implications, boundary conditions, and limitations. Section 7 concludes.
+
+# Conceptual Framework {#sec-theory}
+
+## Mandatory versus voluntary biodiversity financing
+
+The shift toward voluntary environmental governance has been documented across climate, biodiversity, and forest policy domains. Non-state market-driven governance systems, voluntary corporate sustainability commitments, and private certification schemes have proliferated since the early 1990s, partly as a response to treaty gridlock and partly as an ideological preference for decentralised, flexible instruments over state coercion. Scholars of global environmental politics have traced this turn and identified the behavioral assumption at its core: that sufficiently high environmental concern, once activated, can be channeled into voluntary action at the scale required to address collective problems [@Cashore2002; @BernsteinCashore2007; @Stavins2003; @Ring2010]. The GBF's Target 19, which sets a USD 200 billion annual target for nature finance with substantial roles for private voluntary flows, represents the current institutional expression of this assumption [@CBD2022; @OECD2020]. Even where voluntary sustainability standards are in place, they are frequently weakened by industry dominance of standard-setting processes, raising questions about their effectiveness as governance tools [@vanderVen2022].
+
+Biodiversity conservation can be financed through a spectrum of instruments ranging from purely mandatory to purely voluntary. At the mandatory end, tax-funded conservation programmes and corporate biodiversity offsetting obligations impose costs through the fiscal and regulatory system. At the voluntary end, private donations to conservation NGOs and consumer purchases of certified biodiversity-friendly products rely on individual and firm-level willingness to pay above the market price. Direct payment schemes occupy an intermediate position, compensating landowners voluntarily for conservation actions that would otherwise be underprovided [@FerraroKiss2002]. Stated preference research in Scandinavian forestry contexts shows that inducing voluntary conservation participation requires substantial financial incentives: forest owners demand significant compensation to permanently forgo timber harvesting, and participation rates remain limited even at high payment levels [@MitaniLindhjem2015].
+
+The economic case for mandatory instruments rests on the public good nature of biodiversity [@Samuelson1954]: in the absence of coercion or sufficiently strong social norms, conservation will be underprovided relative to the social optimum because individual incentives to free-ride dominate [@Ferraro2011]. Voluntary instruments can supplement mandatory funding but are typically insufficient as standalone mechanisms at the scale required to meet global biodiversity targets. The empirical question of which instruments citizens *prefer*, independent of their efficiency properties, has direct political economy relevance: instrument design requires social acceptance, and understanding the distribution of preferences across financing mechanisms informs feasible policy packages [@Eriksson2006; @Bristow2010; @Klenert2018]. A small but growing literature uses stated preference methods to elicit public preferences between mandatory and voluntary environmental financing instruments [@StithouScarpa2012], though applications to biodiversity conservation remain rare.
+
+The stated preference literature on biodiversity financing has rarely treated the mandatory versus voluntary distinction as a primary experimental attribute, and cross-national comparisons of instrument-type preferences remain limited. In environmental governance more broadly, @Kolcava2021 use a conjoint experiment to show that Swiss citizens support corporate voluntary measures only when backed by strong government monitoring and a conditional trigger for mandatory intervention when targets are missed — a preference for co-regulation with a mandatory backstop consistent with the public-goods consequentialism hypothesis we develop here. Studies from Nordic, UK, and broader European contexts document positive but heterogeneous WTP for biodiversity outcomes, consistently higher in high-income countries [@JacobsenHanley2009; @Hanley2001], but the institutional channel through which finance is raised is seldom varied. Where instrument type and public acceptability have been studied, institutional trust and distributional perceptions emerge as dominant moderators [@Bristow2010; @Klenert2018]. This gap motivates a most-likely case design. Sweden's combination of among-the-highest social trust scores globally [@WVS2022], high per-capita conservation expenditure and environmental policy stringency [@OECD2020], and strong environmental identity constitutes the context most structurally favorable to voluntary instrument support. A null finding on voluntary preference in Sweden carries globally informative inferential weight: it establishes a lower bound on the behavioral assumption underlying voluntary governance.
+
+## Warm glow, public goods, and the voluntary preference anomaly
+
+@Andreoni1990 showed that individuals may derive utility directly from the act of giving ("warm glow") independently of the public good impact of their contribution. @KahnemanKnetsch1992 extended this logic, showing that WTP elicited in surveys often reflects the *purchase of moral satisfaction*, a desire to signal concern, rather than welfare derived from the good itself. Both mechanisms separate personal donation behaviour from stated preferences about aggregate financing: a person may donate small amounts for warm glow reasons while simultaneously preferring mandatory schemes that ensure adequate provision. Conversely, a person who expresses preference for voluntary schemes in the abstract need not intend to donate themselves — they may simply hold a normative belief that voluntarism is the appropriate role for civil society, or wish to avoid being personally obligated.
+
+This distinction creates the possibility of a systematic disconnect between DCE instrument preferences and incentivised donation behaviour. If DCE respondents do not experience the preference elicitation as personally consequential, specifically if they perceive that their stated preferences will not determine which instrument is actually implemented, then their responses may reflect socially desirable or ideologically consistent positions rather than genuine willingness to bear costs [@Carson2007; @Vossler2012]. The literature on hypothetical bias documents that stated WTP consistently exceeds incentivised WTP, typically by a factor of two to three [@ListGallet2001; @Murphy2005], and that consequentiality beliefs moderate this divergence [@Vossler2012].
+
+## Strategic voluntary preference
+
+The broader value-action gap literature documents that stated environmental concern often fails to translate into pro-environmental behaviour, and that this gap is not random but structured by social norms, perceived costs, and the framing of responsibility [@KollmussAgyeman2002; @Stern2000]. We extend this reasoning to the specific domain of biodiversity financing instrument preferences.
+
+We define **strategic voluntary preference** as the stated preference for voluntary instruments by individuals who would not bear the cost of such instruments in practice. Formally, let $V_i^{DCE}$ be respondent $i$'s preference for voluntary over mandatory instruments as revealed by DCE choices, and $G_i$ be their actual donation in the incentivised game. Strategic voluntary preference corresponds to $V_i^{DCE}$ being high while $G_i$ is low, conditional on high environmental concern $E_i$.
+
+The conditioning on $E_i$ is essential. A respondent with low environmental concern who prefers voluntary instruments and does not donate is simply someone who does not value conservation strongly; their low donation is consistent with their (low) stated preferences. The interesting and theoretically meaningful cell is high $E_i$, low $G_i$, high $V_i^{DCE}$: someone who cares about biodiversity (as stated), does not give personally (as revealed), and endorses voluntary mechanisms in the DCE. This pattern implies that stated DCE preferences for voluntary instruments are not grounded in personal commitment to voluntary giving.
+
+The alternative hypothesis of **genuine consequentialist preference** predicts that respondents with high environmental concern and high actual donation will prefer *mandatory* instruments in the DCE, because they understand that voluntary mechanisms are insufficient for public goods provision and are themselves willing to give regardless of the mechanism. This would manifest as a *positive* association between donation and mandatory preference among environmentally concerned respondents.
+
+These two hypotheses generate opposite predictions for the sign of the interaction between donation behaviour and environmental concern in explaining DCE voluntary preference.
+
+An important boundary condition on the strategic free-rider interpretation is the distinction between *strategic economic behaviour* and *genuine ideological preferences for institutional design*. A respondent who prefers voluntary instruments not because they intend to free-ride, but because they hold a principled belief in civil society over state coercion, reflected in low trust in the state ($Q2\_1$) and high trust in NGOs ($Q2\_3$), is expressing an ideological preference that is internally consistent regardless of their personal giving. The strategic free-rider story applies specifically to the subset of respondents who express high environmental concern, prefer voluntary instruments, and do not donate — and for whom this pattern cannot be explained by systematic anti-statist ideology. The trust measures included in the regression (trust in state, trust in NGOs) serve to partial out this ideological channel, making the remaining high-$E$/no-$G$/high-VP cell more diagnostic of strategic rather than ideological motivation.
+
+## From policy preference to personal giving: expected correlations
+
+The DCE and the dictator game measure different objects. The DCE elicits preferences over *societal policy programmes*: respondents choose which funding mechanism should, in their view, govern biodiversity conservation at the national level. The dictator game measures *personal charitable giving*: how much of a private windfall the respondent is willing to donate to a conservation NGO. These are distinct decisions, and the conceptual framework must specify why and how they should be correlated.
+
+We distinguish three theoretical mechanisms, each generating a different prediction for the joint distribution of DCE voluntary preference (VP) and actual donation ($G$):
+
+**Warm-glow voter.** A respondent with a strong giving identity derives utility from the act of conservation irrespective of how it is financed. Such a respondent donates generously ($G$ high) and may prefer any instrument that directs resources to conservation. This predicts a *positive* main effect of donation on VP: donors are more tolerant of voluntary instruments because they identify with them.
+
+**Public-goods consequentialist.** A respondent who understands the collective action problem inherent in biodiversity conservation recognises that voluntary instruments, while valued individually, are insufficient to achieve adequate provision at scale. Such a respondent donates ($G$ high) *and* prefers mandatory instruments ($\text{VP}$ low). The negative association between giving and voluntary preference will be strongest among environmentally concerned respondents who most acutely perceive the underprovision problem. This predicts a *negative* main effect of donation on VP and a *negative* interaction between donation and environmental concern.
+
+**Strategic free-rider.** A respondent with high environmental concern but low actual giving ($E_i$ high, $G_i$ low) endorses voluntary instruments in the DCE precisely because voluntary mechanisms impose no personal cost while signalling concern. This predicts a *positive* VP conditional on high $E_i$ and low $G_i$; the strategic cell is the highest-VP cell. Unlike the consequentialist case, the negative interaction between $G$ and $E$ arises not from public-goods reasoning but from the absence of personal commitment among the environmentally concerned.
+
+The regression design discriminates between the public-goods consequentialist and the strategic free-rider via the sign of the main donation effect: consequentialists show a *negative* main effect (donors prefer mandatory regardless of concern level), while strategic free-riders show a near-zero or positive main effect (giving and voluntary preference are orthogonal or weakly positive in the aggregate; the negative pattern appears only among the highly concerned). Both mechanisms predict a negative interaction between $G$ and $E$, so the interaction coefficient alone cannot discriminate; it is the combination of main effect sign and interaction that characterises the underlying mechanism.
+
+## Hypothetical bias and consequentiality
+
+A related mechanism is hypothetical bias: DCE respondents who perceive their choices as inconsequential, believing that no real policy will follow from the survey, may state preferences that do not reflect genuine willingness to pay [@Hausman2012]. We measure policy consequentiality directly via Q14 ("How likely is it that Sweden will follow through on its biodiversity policy commitments?") and include it as a covariate to partial out this channel. If hypothetical bias is the primary mechanism, policy consequentiality should moderate the donation–voluntary preference association.
+
+A second, distinct mechanism predicts a *positive* association between Q14 and VP that does not involve hypothetical bias. A respondent who believes Sweden has a strong record of policy follow-through may perceive voluntary instruments as genuinely *viable* policy options — that is, they may believe that voluntary programmes in Sweden would in practice mobilise sufficient private contribution to achieve conservation goals. Under this "viable voluntarism" mechanism, high policy consequentiality increases trust in voluntary instruments specifically, leading to higher VP. This prediction is falsifiable: if viable voluntarism drives the Q14–VP association, the effect should be attenuated among respondents with low trust in NGOs and civil society (who would perceive voluntary mechanisms as less capable even in a high-compliance context). An exploratory test of the Q14 × trust\_ngo interaction in the fractional probit yields a non-significant negative coefficient ($\hat\beta = -0.016$, $p = 0.598$), which does not support the viable voluntarism attenuation prediction. The post-hoc Q14 finding therefore remains unexplained by either mechanism, and we flag it as requiring dedicated investigation in future work.
+
+# Study Design and Data {#sec-data}
+
+## Survey and sample
+
+Data were collected via an online survey of Swedish citizens administered by Lysio Research in April–May 2026. The survey was pre-registered prior to data collection (AsPredicted #273748, February 2026; updated #287153, April 2026 to add response quality checks). We aimed for approximately 2,000 respondents representative of the Swedish population in terms of age, gender, and region.
+
+The final analysis sample comprises $n = 2{,}101$ respondents. Response quality criteria preregistered in #287153 (extreme response times, straight-lining) were implemented by the panel provider prior to data delivery. The sample is 48.8% female, with a median age of 43. Income is distributed as: low (0–20,000 SEK/month, 16.5\%), middle (20,000–100,000 SEK/month, 63.8\%), and higher (\textgreater{}100,000 SEK/month, 19.8\%; comprising 7.9\% in 100,000–300,000, 5.5\% in 300,000–500,000, and 6.4\% above 500,000 SEK/month).
+
+## Knowledge and attitude questions
+
+Prior to the DCE, respondents completed six questions assessing their familiarity with biodiversity financing concepts and their environmental attitudes:
+
+- **Q1**: Matching exercise linking instrument examples to categories (tax, donation, certification, offsetting)
+- **Q2**: Trust in funding handlers: state, private market, NGOs (Likert 1–5)
+- **Q3**: Matching exercise linking land management examples to ownership types
+- **Q4**: Desired biodiversity protection level by land type (Likert 1–5)
+- **Q5**: Matching exercise linking audit examples to monitoring types
+- **Q6**: Preferred monitoring type: public administration vs. private audit (Likert 1–5)
+
+Environmental importance (Q11) and biodiversity knowledge (Q12) are measured on 1–5 scales and serve as key covariates in the exploratory analysis.
+
+## Discrete choice experiment
+
+The DCE employed a $4 \times 3 \times 2 \times 4$ full factorial design with four attributes:
+
+| Attribute | Levels |
+|---|---|
+| Financing instrument | Tax payment; Voluntary donation; Market certification; Mandatory offsetting |
+| Land ownership | Public land; Industrial private land; Small-scale private land |
+| Monitoring type | Public administration; Private audit |
+| Annual cost (SEK/year) | 492; 2,460; 4,920; 7,380 |
+
+: DCE attribute levels {#tbl-attributes}
+
+The 96 choice sets were blocked into 12 groups of 8, with each respondent completing 8 choice tasks. Each task presented two policy options and a status quo ("neither/none"). Respondents were assigned to blocks based on a blocking variable (`ordning` ∈ {1, 2}) that determines which set of response columns is used.
+
+Market certification was presented to respondents as a voluntary consumer-choice mechanism: producers obtain a biodiversity-friendly label and consumers pay a premium for certified products, with no regulatory obligation on either party. This distinguishes it from mandatory offsetting, which imposes a legal compliance requirement on firms. The baseline category for the conditional logit is: tax payment + small-scale private land + private audit.
+
+## Dictator game donation experiment
+
+Following the DCE, respondents participated in an incentivised dictator game. They were informed that 100 participants would be randomly selected to each receive a SEK 1,000 prize. Each potential winner could allocate any integer amount from SEK 0 to SEK 1,000 to Naturskyddsföreningen (the Swedish Society for Nature Conservation), keeping the remainder. With 100 winners out of 2,101 respondents, each participant faced a 100/2,101 ≈ 4.8% probability of winning, making the expected cost of donating SEK 400 (the eventual median) approximately SEK 19. The non-trivial win probability and real monetary stakes distinguish this from a purely hypothetical choice and render the design incentive-compatible in expectation. All respondents stated a donation amount; payoffs were realised for the 100 randomly selected winners. The donation variable (`yourdonation`) ranges from 0 to 1,000 SEK and serves as the revealed-preference measure of personal willingness to contribute voluntarily to conservation financing.
+
+The observed giving rate of 83.3% (1,750 of 2,101 respondents donated a positive amount) is notably higher than the approximately 63% average reported in @Engel2011's meta-analysis of dictator game experiments. We attribute this divergence to three features of the study. First, the recipient is a conservation NGO and the framing is explicitly environmental, which likely activates environmental identity and warm-glow motives among our sample. Second, the Swedish online panel over-represents individuals with pro-environmental preferences (mean Q11 = 3.64/5). Third, online panel studies systematically recruit more socially aware participants than laboratory convenience samples. The high giving rate reflects the composition of this particular sample and should not be taken as representative of the general Swedish population for the purposes of estimating aggregate voluntary conservation finance; however, it does not invalidate the within-sample comparison between higher and lower donors that underpins the VP analysis.
+
+## Summary statistics
+
+```{r}
+#| label: tbl-sumstats
+#| tbl-cap: "Summary statistics ($n = 2{,}101$)"
+#| eval: true
+
+sumstats <- tibble(
+  Variable = c(
+    "Dictator game donation (SEK)",
+    "Donated (\\%)",
+    "Environmental importance (Q11, 1--5)",
+    "Biodiversity knowledge (Q12, 1--5)",
+    "Trust: state (Q2\\_1, 1--5)",
+    "Trust: NGOs (Q2\\_3, 1--5)",
+    "Trust: market (Q2\\_2, 1--5)",
+    "Policy consequentiality (Q14, 1--5)",
+    "Voluntary preference score (VP)",
+    "Female (\\%)",
+    "Income: low (0--20k SEK/month, \\%)",
+    "Income: mid (20--100k SEK/month, \\%)",
+    "Income: high ($>$100k SEK/month, \\%)"
+  ),
+  Mean = c(
+    "411", "83.3",
+    "3.64", "3.08", "3.28", "2.93", "2.46", "2.91",
+    "0.431",
+    "48.8", "16.5", "63.8", "19.8"
+  ),
+  SD = c(
+    "357", "---",
+    "1.05", "0.94", "1.12", "0.99", "0.97", "1.01",
+    "0.320",
+    "---", "---", "---", "---"
+  ),
+  Min = c("0","---","1","1","1","1","1","1","0","---","---","---","---"),
+  Max = c("1,000","---","5","5","5","5","5","5","1","---","---","---","---")
+)
+
+sumstats |>
+  kableExtra::kbl(booktabs = TRUE, escape = FALSE, longtable = FALSE,
+                  col.names = c("Variable", "Mean", "SD", "Min", "Max"),
+                  align = c("l","r","r","r","r")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            full_width = TRUE, font_size = 10) |>
+  kableExtra::pack_rows("Incentivised dictator game", 1, 2) |>
+  kableExtra::pack_rows("Attitude and knowledge scales", 3, 8) |>
+  kableExtra::pack_rows("DCE revealed preference", 9, 9) |>
+  kableExtra::pack_rows("Demographics", 10, 13) |>
+  kableExtra::footnote(
+    general = c(
+      "Donation: SEK 0--1,000 from a SEK 1,000 prize (Naturskyddsfoereningen).",
+      "VP: share of mixed DCE tasks where voluntary option chosen (opt-outs excluded).",
+      "Income (monthly household SEK): low = 0--20,000; mid = 20,000--100,000;",
+      "high = 100,000+ (cats 3--5: 100k--300k, 300k--500k, >500k)."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+# Methods {#sec-methods}
+
+## Pre-registered confirmatory analyses
+
+The pre-registered analyses (AsPredicted #287153) specify two choice models estimated on the DCE data.
+
+**Conditional logit (CL).** The standard multinomial logit specifies utility for respondent $i$ choosing alternative $j$ in choice set $t$ as:
+
+$$U_{ijt} = \beta_{\text{don}} D_{jt} + \beta_{\text{cert}} C_{jt} + \beta_{\text{off}} O_{jt} + \beta_{\text{ind}} I_{jt} + \beta_{\text{pland}} L_{jt} + \beta_{\text{pmon}} M_{jt} + \beta_{\text{price}} p_{jt} + \text{ASC}_n \cdot \mathbf{1}[j = \text{neither}] + \varepsilon_{ijt}$$
+
+where $D$, $C$, $O$ are dummies for donation, certification, and offsetting (tax = baseline); $I$, $L$ are dummies for industrial and public land (small-scale private = baseline); $M$ is a dummy for public monitoring (private audit = baseline); $p$ is annual cost in kSEK; $\text{ASC}_n$ is an alternative-specific constant for the opt-out. The conditional logit was first proposed by @McFadden1974 and remains the workhorse of discrete choice analysis. Models are estimated using Apollo [@Hess2021] and logitr [@Helveston2023].
+
+Implicit WTP for attribute level $k$ relative to baseline is $\widehat{\text{WTP}}_k = -\hat\beta_k / (\hat\beta_{\text{price}} / 1000)$ in SEK/year.
+
+**Mixed logit (MXL).** To capture preference heterogeneity, we estimate a random-parameters logit with normal distributions on $\beta_{\text{don}}, \beta_{\text{cert}}, \beta_{\text{off}}, \beta_{\text{ind}}, \beta_{\text{pland}}, \beta_{\text{pmon}}$, with price and opt-out ASC fixed [@McFaddenTrain2000; @Train2009]. Estimated via maximum simulated likelihood with 500 Halton draws using logitr [@Helveston2023].
+
+## Exploratory analyses
+
+The following analyses are not preregistered and should be interpreted as exploratory.
+
+### Voluntary preference score
+
+For each respondent, we define a voluntary preference score from DCE choices. We classify instruments as *voluntary* (donation, certification) or *mandatory* (tax, offsetting). For each choice task presenting one voluntary and one mandatory option ("mixed task"), we record whether the respondent chose the voluntary option. Opt-out choices in mixed tasks are excluded as uninformative about the voluntary/mandatory distinction. The voluntary preference score is:
+
+$$\text{VP}_i = \frac{\sum_{t \in \mathcal{T}_i} \mathbf{1}[\text{chose voluntary}_{it}]}{|\mathcal{T}_i|}$$
+
+where $\mathcal{T}_i$ is the set of mixed tasks completed by respondent $i$ with a non-opt-out choice. This score lies in [0, 1] and has a direct revealed-preference interpretation: the share of opportunities to express a voluntary preference that were actually exercised.
+
+### Regression analysis
+
+We estimate a series of OLS regressions of $\text{VP}_i$ on actual donation behaviour and environmental attitudes:
+
+$$\text{VP}_i = \alpha + \beta_1 \tilde{G}_i + \beta_2 \tilde{E}_i + \beta_3 \tilde{G}_i \times \tilde{E}_i + \mathbf{X}_i' \boldsymbol{\gamma} + \varepsilon_i$$
+
+where $\tilde{G}_i$ is standardised donation amount (z-score of `yourdonation`), $\tilde{E}_i$ is standardised environmental importance (z-score of Q11), and $\mathbf{X}_i$ includes trust in NGOs (Q2\_3), trust in the state (Q2\_1), policy consequentiality (Q14), biodiversity knowledge (Q12), gender, and income category. Heteroskedasticity-robust (HC3) standard errors are used throughout.
+
+The coefficient of primary interest is $\beta_3$. Under the strategic preference hypothesis, $\beta_3 < 0$: the association between environmental concern and voluntary preference is attenuated or reversed among those who actually give (consequentialist givers prefer mandatory instruments; non-givers with high environmental concern endorse voluntary instruments strategically). Under the genuine preference hypothesis, $\beta_3 > 0$ or $\approx 0$: givers and non-givers with similar environmental concern have similar DCE preferences.
+
+We report four models: M1 (main effects only), M2 (with interaction), M3 (full covariates), and M4 (robustness: binary donated indicator replacing continuous donation).
+
+### Illustrative 2×2 analysis
+
+Following the framing of @Andreoni1990 and @KollmussAgyeman2002, we tabulate mean voluntary preference scores within a 2×2 cross-classification by environmental attitude (median split on Q11) and donation behaviour (donated any positive amount vs. zero). Cell means and 95% confidence intervals are reported.
+
+# Results {#sec-results}
+
+## Pre-registered: Sample characteristics and DCE overview
+
+The full-launch sample comprises $n = 2{,}101$ respondents generating 16,808 choice observations across 8 tasks per respondent. The sample is 48.8% female with a median age of 43. Income is distributed as: 16.5% low (0–20k SEK/month), 63.8% middle (20–100k), and 19.8% higher income (\textgreater{}100k). Summary statistics for key variables are reported in @tbl-sumstats.
+
+In the dictator game, 83.3% of respondents (1,750 of 2,101) donated a positive amount, with a mean donation of 411 SEK (SD = 357 SEK) out of a possible 1,000 SEK. This indicates substantial but far from universal personal willingness to fund conservation voluntarily. The mean environmental importance score is 3.64 out of 5 (Q11; SD = 1.05), indicating moderately high average environmental concern in the Swedish sample.
+
+## Pre-registered: Conditional logit results {#sec-cl}
+
+@tbl-cl reports the pre-registered conditional logit estimates. The alternative-specific constant for the opt-out is strongly negative ($\hat\alpha = -1.226$, $p < 0.001$), confirming that respondents strongly prefer either conservation programme option over the status quo.
+
+Among financing instruments, the pattern clearly distinguishes mandatory from voluntary mechanisms. Relative to the tax baseline, corporate offsetting carries a significant positive coefficient ($\hat\beta_{\text{off}} = +0.146$, $p < 0.001$), making it the highest-utility financing instrument overall. Both voluntary instruments have negative coefficients: donation ($\hat\beta_{\text{don}} = -0.376$, $p < 0.001$) and market certification ($\hat\beta_{\text{cert}} = -0.082$, $p = 0.011$). Thus the instrument utility ranking is: offsetting $>$ tax $>$ certification $>$ donation. Industrial land ownership does not significantly differ from the small-scale private baseline ($p = 0.74$), while public land ($\hat\beta_{\text{pland}} = +0.190$) and public monitoring ($\hat\beta_{\text{pmon}} = +0.315$) both carry large positive effects (both $p < 0.001$). The price coefficient is $\hat\beta_{\text{price}} = -0.195$ per kSEK/year ($p < 0.001$). The model fit is McFadden $R^2 = 0.091$.
+
+```{r}
+#| label: tbl-cl
+#| tbl-cap: "Conditional logit results with implicit WTP (pre-registered, $n = 16{,}808$ choice observations)"
+#| eval: true
+
+cl_tbl <- tibble(
+  Parameter = c(
+    "ASC (neither/opt-out)",
+    "Donation (vs. tax)",
+    "Certification (vs. tax)",
+    "Offsetting (vs. tax)",
+    "Industrial land (vs. small-scale)",
+    "Public land (vs. small-scale)",
+    "Public monitoring (vs. private audit)",
+    "Annual cost (kSEK/year)",
+    "",
+    "Log-likelihood",
+    "McFadden R²",
+    "N observations"
+  ),
+  Coeff = c(
+    "-1.226*** (0.036)",
+    "-0.376*** (0.032)",
+    "-0.082*   (0.032)",
+    "+0.146*** (0.034)",
+    "+0.010    (0.030)",
+    "+0.190*** (0.028)",
+    "+0.315*** (0.024)",
+    "-0.195*** (0.005)",
+    "", "-16,790.8", "0.091", "16,808"
+  ),
+  WTP = c(
+    "-6,290 (184)",
+    "-1,930*** (172)",
+    "-419*   (164)",
+    "+748*** (177)",
+    "+50     (153)",
+    "+972*** (144)",
+    "+1,618*** (125)",
+    "---",
+    "", "", "", ""
+  )
+)
+
+cl_tbl |>
+  kableExtra::kbl(booktabs = TRUE, escape = TRUE, longtable = FALSE,
+                  col.names = c("Parameter", "Coeff (SE)", "WTP SEK/yr (SE)"),
+                  align = c("l","r","r")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            full_width = TRUE, font_size = 10) |>
+  kableExtra::footnote(
+    general = c(
+      "Baseline: tax + small-scale private land + private audit.",
+      "Price in kSEK/year; WTP in SEK/year (ratio estimator). SE in parentheses.",
+      "† p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+The implicit WTP estimates confirm the utility ranking and reveal the magnitudes. Relative to the tax baseline, respondents require compensation of SEK 1,930/year (SE = 172) to accept donation-financed programmes, and SEK 419/year (SE = 164) to accept certification. By contrast, they are willing to pay a premium of SEK 748/year (SE = 177) for offsetting. Public monitoring commands the largest positive WTP at SEK 1,618/year (SE = 125), indicating strong demand for accountability regardless of instrument type.
+
+## Pre-registered: Mixed logit results {#sec-mxl}
+
+The mixed logit results (MXL; @tbl-mxl) confirm the conditional logit ranking in mean preferences while revealing substantial preference heterogeneity. Mean coefficients closely mirror the CL estimates, with offsetting positive ($\hat\mu_{\text{off}} = +0.241$, $p < 0.001$), donation strongly negative ($\hat\mu_{\text{don}} = -0.692$, $p < 0.001$), and certification mildly negative ($\hat\mu_{\text{cert}} = -0.184$, $p < 0.001$). The McFadden $R^2$ rises to 0.165 from the CL's 0.091, indicating that accounting for taste heterogeneity substantially improves fit.
+
+All six random parameters have large and highly significant standard deviations. The SD of the donation coefficient ($\hat\sigma_{\text{don}} = 1.419$, $p < 0.001$) implies that approximately 31.3\% of Swedish respondents ($\Phi(\hat\mu_{\text{don}}/\hat\sigma_{\text{don}}) = \Phi(-0.488)$) prefer donation-financed programmes over the tax baseline. Similarly, 45.2\% prefer certification over tax, while 56.3\% prefer offsetting over tax. For land and monitoring attributes, 59.7\% prefer public land and 60.2\% prefer public monitoring. The MXL WTP for donation is $-$SEK 2,408/year (SE = 201), for offsetting $+$SEK 837/year (SE = 207), and for public monitoring $+$SEK 1,373/year (SE = 164).
+
+```{r}
+#| label: tbl-mxl
+#| tbl-cap: "Mixed logit results --- mean and SD of random parameters with WTP (pre-registered, $n = 16{,}808$)"
+#| eval: true
+
+mxl_tbl <- tibble(
+  Parameter = c(
+    "ASC (neither/opt-out)",
+    "Donation (vs. tax)",
+    "Certification (vs. tax)",
+    "Offsetting (vs. tax)",
+    "Industrial land (vs. small-scale)",
+    "Public land (vs. small-scale)",
+    "Public monitoring (vs. private audit)",
+    "Annual cost (kSEK/year)",
+    "",
+    "Log-likelihood",
+    "McFadden R²",
+    "N observations"
+  ),
+  Mean = c(
+    "-1.738*** (0.047)",
+    "-0.692*** (0.056)",
+    "-0.184*** (0.054)",
+    "+0.241*** (0.059)",
+    "+0.119*   (0.049)",
+    "+0.306*** (0.049)",
+    "+0.394*** (0.047)",
+    "-0.287*** (0.007)",
+    "", "-15,411.9", "0.165", "16,808"
+  ),
+  SD = c(
+    "---",
+    "1.419*** (0.069)",
+    "1.515*** (0.067)",
+    "1.505*** (0.086)",
+    "1.167*** (0.063)",
+    "1.239*** (0.061)",
+    "1.530*** (0.053)",
+    "---",
+    "", "", "", ""
+  ),
+  Share = c(
+    "---", "31.3%", "45.2%", "56.3%",
+    "54.1%", "59.7%", "60.2%", "---",
+    "", "", "", ""
+  ),
+  WTP = c(
+    "-6,054 (184)",
+    "-2,408*** (201)",
+    "-641***  (186)",
+    "+837***  (207)",
+    "+415*    (171)",
+    "+1,064*** (170)",
+    "+1,373*** (164)",
+    "---",
+    "", "", "", ""
+  )
+)
+
+mxl_tbl |>
+  kableExtra::kbl(booktabs = TRUE, escape = TRUE, longtable = FALSE,
+                  col.names = c("Parameter", "Mean (SE)", "SD (SE)",
+                                "Share+", "WTP SEK/yr (SE)"),
+                  align = c("l","r","r","r","r")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            full_width = TRUE, font_size = 10) |>
+  kableExtra::footnote(
+    general = c(
+      "Baseline: tax + small-scale private land + private audit.",
+      "Random parameters: normal distribution; price and ASC fixed. 500 Halton draws.",
+      "Share+ = P(coeff > 0) = Phi(mean/|SD|). WTP in SEK/year. SE in parentheses.",
+      "† p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+## Pre-registered: Heterogeneity by sociodemographics {#sec-het}
+
+Full subgroup results (separate CL models by gender, income, and environmental attitude; AsPredicted \#287153, Q8) are reported in Appendix E. Three findings stand out.
+
+*Gender.* Preferences are nearly identical between female and male respondents. None of the gender differences exceed one standard error.
+
+*Income.* Aversion to donation-funded programmes increases monotonically with income: WTP ranges from $-$SEK 1,383/year in the lowest income group to $-$SEK 2,645/year in the highest, consistent with a perception that mandatory instruments provide more equitable cost-sharing.
+
+*Environmental attitude.* The starkest heterogeneity is by environmental concern. Among respondents with below-median environmental importance scores, the donation coefficient is essentially zero (+0.053, n.s.), implying near-indifference between donation and tax financing. By contrast, respondents with high environmental concern show a strongly negative donation coefficient ($-$0.659, $p < 0.001$; WTP $-$SEK 3,572/year). It is primarily environmentally engaged citizens who drive the strong preference for mandatory instruments — a pattern that directly complements the VP regression findings in @sec-strategic.
+
+```{r}
+#| label: data-prep
+#| eval: true
+#| include: false
+
+library(readxl); library(patchwork)
+
+data_path   <- file.path("..", "data", "Full launch database", "4178_excel_databas.xlsx")
+design_path <- file.path("..", "design", "Trial 3 - factorial grouped, svensk.xlsx")
+
+full_data  <- read_excel(data_path, sheet = 2)
+price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
+design_raw <- read_excel(design_path, sheet = 1)
+names(design_raw) <- c(
+  "cs","block","a_source","a_src_txt","a_land","a_land_txt",
+  "a_monitor","a_mon_txt","a_price","a_price_txt",
+  "b_source","b_src_txt","b_land","b_land_txt",
+  "b_monitor","b_mon_txt","b_price","b_price_txt"
+)
+design <- design_raw |>
+  select(cs, block, a_source, a_land, a_monitor, a_price, b_source, b_land, b_monitor, b_price) |>
+  group_by(block) |> mutate(task = row_number()) |> ungroup() |>
+  mutate(a_price_sek = price_map[as.character(a_price)],
+         b_price_sek = price_map[as.character(b_price)])
+
+choices_ord1 <- full_data |> filter(ordning == 1) |>
+  select(id, block, choice1:choice8) |>
+  pivot_longer(choice1:choice8, names_to = "col", values_to = "choice") |>
+  mutate(task = as.integer(substr(col, 7, 7)))
+choices_ord2 <- full_data |> filter(ordning == 2) |>
+  select(id, block, choice12, choice22, choice32, choice42,
+         choice52, choice62, choice72, choice82) |>
+  pivot_longer(-c(id, block), names_to = "col", values_to = "choice") |>
+  mutate(task = as.integer(substr(col, 7, 7)))
+
+resp <- bind_rows(choices_ord1, choices_ord2) |>
+  filter(!is.na(choice)) |>
+  left_join(design, by = c("block", "task")) |>
+  mutate(choice_num = case_when(choice == "a" ~ 1L, choice == "b" ~ 2L, TRUE ~ 3L))
+
+resp_level <- resp |>
+  mutate(
+    a_vol = a_source %in% c(1L, 2L), b_vol = b_source %in% c(1L, 2L),
+    a_man = a_source %in% c(0L, 3L), b_man = b_source %in% c(0L, 3L),
+    mixed_task = (a_vol & b_man) | (a_man & b_vol),
+    chose_vol  = case_when(
+      !mixed_task | choice == "3" ~ NA_real_,   # opt-out coded as "3", not "neither"
+      (a_vol & choice == "a") | (b_vol & choice == "b") ~ 1, TRUE ~ 0
+    )
+  ) |>
+  filter(mixed_task, !is.na(chose_vol)) |>
+  group_by(id) |>
+  summarise(voluntary_pref = mean(chose_vol), n_mixed = n(), .groups = "drop")
+
+covars <- full_data |>
+  transmute(id, donation = yourdonation, gave = as.integer(yourdonation > 0),
+            env_import = q11, income = q8, gender = q10)
+
+anal_data <- resp_level |>
+  left_join(covars, by = "id") |>
+  filter(!is.na(donation), !is.na(env_import), !is.na(income), !is.na(gender)) |>
+  mutate(
+    env_t   = ntile(env_import, 3),
+    env_lab = factor(env_t, labels = c("Low env. att.", "Medium", "High env. att."))
+  )
+```
+
+## Exploratory: Donation experiment
+
+@fig-donation shows the distribution of dictator game donations. 16.7% of respondents donated nothing, and 83.3% donated a positive amount. Among the full sample the mean donation is 411 SEK (SD = 357 SEK) out of the 1,000 SEK prize, with a right-skewed distribution and a median of 400 SEK (40% of the prize). The high participation rate is consistent with the salient incentive structure: with a ≈4.8% win probability, the expected cost of donating the median amount was approximately SEK 19. Mean trust in NGOs is 2.93/5 (SD = 0.99) and mean policy consequentiality is 2.91/5 (SD = 1.01), suggesting that most respondents hold moderate beliefs about how responsive Swedish policy is to conservation priorities.
+
+```{r}
+#| label: fig-donation
+#| fig-cap: "Distribution of dictator game donations (left) and CDF of share donated (right)"
+#| eval: true
+#| fig-width: 7
+#| fig-height: 3.2
+
+don <- full_data |>
+  transmute(donation = yourdonation, share = yourdonation / 1000)
+
+p_hist <- ggplot(don, aes(x = donation)) +
+  geom_histogram(binwidth = 50, fill = "steelblue", colour = "white") +
+  geom_vline(xintercept = mean(don$donation), linetype = "dashed", colour = "red") +
+  annotate("text", x = mean(don$donation) + 35, y = Inf,
+           label = paste0("mean = SEK ", round(mean(don$donation))),
+           vjust = 2, hjust = 0, colour = "red", size = 3) +
+  scale_x_continuous(breaks = seq(0, 1000, 250)) +
+  labs(x = "Donation (SEK)", y = "Count") +
+  theme_minimal(base_size = 10)
+
+p_share <- ggplot(don, aes(x = share)) +
+  stat_ecdf(colour = "steelblue", linewidth = 1) +
+  scale_x_continuous(labels = scales::percent, breaks = seq(0, 1, .25)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Share donated", y = "Cumulative %") +
+  theme_minimal(base_size = 10)
+
+p_hist + p_share
+```
+
+## Exploratory: Voluntary preference score {#sec-vp}
+
+Of the 2,101 respondents, 1,863 had at least one mixed-instrument task with a non-opt-out response; 238 respondents opted out of every mixed task they encountered and are excluded from the VP analysis. Among respondents with VP data, the average number of informative mixed tasks is 3.6 per respondent (out of 8 total). The distribution of mixed-task counts is: 1 task (n = 113, 6.1%), 2 tasks (n = 272, 14.6%), 3 tasks (n = 515), 4 tasks (n = 603), 5 tasks (n = 226), 6 tasks (n = 24), and 7 tasks (n = 110). Respondents with only 1–2 informative mixed tasks have a near-binary VP score, carrying substantially more measurement noise. We therefore report a sensitivity analysis that excludes the 385 respondents with fewer than 3 mixed tasks ($n = 1{,}478$).
+
+The mean voluntary preference score is $\overline{\text{VP}} = 0.431$ (SD = 0.320), indicating that respondents chose the voluntary option in 43.1% of relevant opportunities. The distribution is bimodal: 22.1% of respondents always chose the mandatory option (VP = 0) and 12.0% always chose the voluntary option (VP = 1). @fig-vpdist shows the full distribution.
+
+```{r}
+#| label: fig-vpdist
+#| fig-cap: "Distribution of voluntary preference score. VP = share of mixed-instrument DCE tasks where the voluntary option was chosen."
+#| eval: true
+#| fig-width: 5.5
+#| fig-height: 3.5
+
+ggplot(anal_data, aes(x = voluntary_pref)) +
+  geom_histogram(binwidth = 1/7, fill = "steelblue", colour = "white",
+                 boundary = 0) +
+  geom_vline(xintercept = mean(anal_data$voluntary_pref),
+             linetype = "dashed", colour = "red") +
+  annotate("text", x = mean(anal_data$voluntary_pref) + 0.03, y = Inf,
+           label = paste0("mean = ", round(mean(anal_data$voluntary_pref), 2)),
+           vjust = 2, hjust = 0, colour = "red", size = 3) +
+  scale_x_continuous(labels = scales::percent, breaks = seq(0, 1, 0.25),
+                     limits = c(-0.05, 1.05)) +
+  labs(x = "Voluntary preference score (VP)", y = "Count") +
+  theme_minimal(base_size = 10)
+```
+
+## Exploratory: Strategic voluntary preference test {#sec-strategic}
+
+@tbl-2x2 reports mean voluntary preference scores within the 2×2 cross-classification of environmental attitude (median split on Q11) and donation behaviour (donated > 0 vs. zero). The pattern is the opposite of the strategic voluntary preference prediction: respondents with high environmental concern show *lower* voluntary preference (VP = 0.385–0.392) than those with low environmental concern (VP = 0.486–0.549). The "strategic" cell — high environmental concern combined with no donation — shows the *lowest* mean VP of all four cells (0.385, 95% CI (0.317, 0.453), n = 84), not the highest. Its 95% CI does not overlap with the adjacent low-concern/no-donate cell (0.549, 95% CI (0.502, 0.596)), providing clear descriptive evidence against the strategic hypothesis even before regression. We note the strategic cell is underpowered (n = 84); the regression analysis in @sec-strategic provides a more powerful test. The power analysis in Appendix D confirms that the continuous specification achieves sufficient power to detect interactions as small as $|\hat\beta_3| \approx 0.021$; the observed estimate of $-0.002$ is an order of magnitude below this threshold, ruling out even small strategic effects.
+
+```{r}
+#| label: tbl-2x2
+#| tbl-cap: "Mean voluntary preference (VP) by environmental attitude × donation behaviour"
+#| eval: true
+
+tibble(
+  `Environmental attitude` = c("Low", "Low", "High", "High"),
+  `Donation behaviour`     = c("Did not donate", "Donated",
+                                "Did not donate", "Donated"),
+  `Mean VP`  = c(0.549, 0.486, 0.385, 0.392),
+  `SD`       = c(0.321, 0.324, 0.319, 0.310),
+  `n`        = c(176L, 492L, 84L, 1111L),
+  `95% CI`   = c(
+    "(0.502, 0.596)",
+    "(0.457, 0.515)",
+    "(0.317, 0.453)",
+    "(0.374, 0.410)"
+  )
+) |>
+  kableExtra::kbl(booktabs = TRUE, digits = 3, longtable = FALSE,
+                  align = c("l", "l", "r", "r", "r", "r")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            full_width = TRUE, font_size = 9) |>
+  kableExtra::pack_rows("Low environmental attitude", 1, 2) |>
+  kableExtra::pack_rows("High environmental attitude", 3, 4) |>
+  kableExtra::footnote(
+    general = c(
+      "High/Low env. att. = median split on Q11 (Environmental importance, 1--5).",
+      "Donated = donation > 0 (SEK 1,000 dictator game prize). 95% CI = mean +/- 1.96*SD/sqrt(n).",
+      "The focal strategic cell (High env. att. + Did not donate, n = 84) is underpowered;",
+      "its 95% CI (0.317, 0.453) does not overlap with the adjacent Low/Did-not-donate cell (0.502, 0.596)."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+Because VP $\in [0,1]$ with 22.1% mass at zero and 12.0% at one, @tbl-reg reports fractional probit (Papke–Wooldridge) models estimated via quasi-binomial GLM with logit link and HC3 robust standard errors; we report average partial effects (APEs) obtained by multiplying each coefficient by the sample mean of $\hat\mu_i(1-\hat\mu_i) = 0.240$. OLS models (which yield nearly identical APE magnitudes, as expected when the DV is not heavily boundary-clustered) are reported in Appendix D for comparison. Because the donation distribution is right-skewed (median 500 SEK, mean 431 SEK, SD 353 SEK), we also estimated the main specification replacing `donation_z` with a log-transformed and standardised alternative ($\log(\text{donation}+1)$, then z-scored). Results are substantively unchanged: log-donation APE $= -0.023$ ($p = 0.008$), environmental concern APE $= -0.046$ ($p < 0.001$), interaction APE $= -0.005$ ($p = 0.541$).
+
+Both main effects are negative and highly significant. The main effect of donation is negative (FP3: $\hat\beta = -0.126$, SE = 0.034, $p < 0.001$; APE = $-0.030$): higher donors show stronger preferences for mandatory instruments. The main effect of environmental concern is also negative (FP3: $\hat\beta = -0.176$, SE = 0.041, $p < 0.001$; APE = $-0.042$): environmentally concerned respondents prefer mandatory instruments. The interaction coefficient is small and statistically indistinguishable from zero in both the full sample (FP3: $-0.009$, SE = 0.034, $p = 0.792$; APE = $-0.002$) and the sensitivity sample excluding respondents with fewer than 3 mixed tasks (FP3$_{\text{sens}}$: $-0.033$, SE = 0.037, $p = 0.376$). There is therefore no evidence that the effect of donation on voluntary preference is amplified among environmentally concerned respondents or vice versa. The FP4 robustness check using a binary donation indicator confirms: the binary donated indicator is non-significant ($p = 0.372$), while environmental concern remains significant ($p = 0.003$), consistent with the continuous specification showing that the donation effect is driven by intensity of giving rather than participation alone.
+
+Among covariates, trust in the state is the strongest predictor (FP3: APE = $-0.034$, $p < 0.001$): respondents who trust state institutions show stronger preferences for mandatory instruments, consistent with support for government-led conservation financing. Trust in NGOs is not significantly associated with voluntary preference (APE = $0.006$, $p = 0.461$). Policy consequentiality (Q14) is positively and marginally associated with voluntary preference (APE = $0.014$, $p = 0.064$): respondents who believe Swedish policy commitments will be followed through tend to choose voluntary instruments slightly more often, possibly because they perceive voluntary mechanisms as credible in a high-compliance context.
+
+```{r}
+#| label: tbl-reg
+#| tbl-cap: "Fractional probit (Papke--Wooldridge) regressions: voluntary preference score (VP)"
+#| eval: true
+
+reg_tbl <- tibble(
+  Variable = c(
+    "Intercept",
+    "Donation (z)",
+    "Env. importance (z)",
+    "Donation x Env.",
+    "Donated (0/1)",
+    "Donated x Env.",
+    "Trust: NGOs",
+    "Trust: state",
+    "Policy conseq.",
+    "Bio. knowledge",
+    "Female",
+    "Income: mid",
+    "Income: high",
+    "Dev. R²",
+    "N"
+  ),
+  FP1 = c(
+    "-0.261*** (0.030)", "-0.139*** (0.033)", "-0.190*** (0.034)",
+    rep("", 10),
+    "0.031", "1863"
+  ),
+  FP2 = c(
+    "-0.257*** (0.032)", "-0.136*** (0.034)", "-0.193*** (0.035)",
+    "-0.012  (0.035)",
+    rep("", 9),
+    "0.031", "1863"
+  ),
+  FP3 = c(
+    "-0.030  (0.204)", "-0.126*** (0.034)", "-0.176*** (0.041)",
+    "-0.009  (0.034)",
+    "", "",
+    "0.024  (0.033)", "-0.142*** (0.030)",
+    "0.058†  (0.031)", "0.009  (0.038)",
+    "0.052 (0.063)", "-0.074 (0.089)", "-0.110 (0.107)",
+    "0.043", "1863"
+  ),
+  FP4 = c(
+    "0.077  (0.220)", "", "-0.236** (0.079)",
+    "",
+    "-0.090  (0.101)", "0.031 (0.085)",
+    "0.010  (0.033)", "-0.145*** (0.030)",
+    "0.068*  (0.031)", "0.013  (0.038)",
+    "0.060 (0.063)", "-0.091 (0.088)", "-0.136 (0.106)",
+    "0.037", "1863"
+  )
+)
+
+reg_tbl |>
+  kableExtra::kbl(booktabs = TRUE, escape = TRUE, longtable = FALSE,
+                  col.names = c("", "FP1", "FP2", "FP3", "FP4"),
+                  align = c("l", "r", "r", "r", "r")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            font_size = 8, full_width = TRUE) |>
+  kableExtra::footnote(
+    general = c(
+      "DV: VP score. Quasi-binomial GLM (logit link). HC3 robust SE in parentheses.",
+      "APE = coef x 0.240 (mean scale factor). FP1: main effects. FP2: + interaction.",
+      "FP3: full covariates. FP4: binary donated indicator (robustness).",
+      "OLS results (near-identical APEs) in Appendix D. † p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+@fig-interact visualises the interaction.
+
+```{r}
+#| label: fig-interact
+#| fig-cap: "Voluntary preference vs. donation amount by environmental attitude tercile. Lines are OLS fits with 95\\% confidence bands. Convergent slopes would indicate no interaction; divergence is consistent with a dose--response mechanism."
+#| eval: true
+#| fig-width: 6
+#| fig-height: 4
+
+ggplot(anal_data, aes(x = donation, y = voluntary_pref, colour = env_lab)) +
+  geom_jitter(alpha = 0.15, size = 0.7, width = 25, height = 0.02) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
+  scale_colour_manual(
+    values = c("Low env. att." = "#d73027",
+               "Medium"       = "#fee090",
+               "High env. att." = "#4575b4"),
+    name = NULL) +
+  scale_x_continuous(labels = scales::label_comma()) +
+  scale_y_continuous(labels = scales::percent, limits = c(-0.1, 1.1)) +
+  labs(x = "Dictator game donation (SEK)", y = "Voluntary preference (VP)") +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "bottom")
+```
+
+# Discussion {#sec-discussion}
+
+## Interpretation of main findings
+
+Our central finding is that both donation behaviour and environmental concern independently predict stronger preferences for mandatory instruments, with no significant interaction between the two (FP3: APE$_{\text{don}} = -0.030$, $p < 0.001$; APE$_{\text{env}} = -0.042$, $p < 0.001$; interaction APE = $-0.002$, $p = 0.792$). The data fail to support the strategic voluntary preference hypothesis: the pattern is the opposite of what the free-rider story predicts.
+
+The strategic hypothesis predicted that high environmental concern combined with zero donation would produce the highest voluntary preference — these respondents would endorse voluntary schemes they personally intend to free-ride on. The data show exactly the opposite: the high-env-att, no-donation cell has the lowest mean VP (0.385), substantially lower than low-env-att respondents who did not donate (0.549), with non-overlapping confidence intervals. Environmentally concerned Swedes prefer mandatory instruments regardless of their personal giving behaviour.
+
+The absence of a significant interaction implies that the effect of donation on instrument preference does not depend on environmental concern, and vice versa. Both dimensions independently shift preferences toward mandatory instruments by roughly the same magnitude (~0.03–0.04 on the VP scale per standard deviation). This is consistent with a simple additive interpretation: respondents who care more about the environment prefer mandatory instruments, and respondents who give more also prefer mandatory instruments, independently. The warm-glow voter mechanism (predicting a positive main effect of donation) and the strategic free-rider mechanism (predicting a positive interaction) are both rejected. The public-goods consequentialist mechanism predicted negative main effects of both donation and environmental concern, which is precisely what we find, though we note that the absence of an interaction means the mechanism cannot be attributed specifically to the combination of high concern and high giving.
+
+This finding aligns with the warm glow framework of @Andreoni1990 in an unexpected way: rather than warm glow driving preference for voluntary instruments (where personal giving is valued intrinsically), warm glow and public good reasoning appear to operate in parallel. Committed donors can experience warm glow from personal giving *and* simultaneously prefer mandatory collective mechanisms for conservation policy. The two motives are separable and both present in the Swedish sample.
+
+## Qualitative corroboration
+
+The survey included an open-ended field asking respondents for any further comments (*q17*). Of 415 responses, 344 were non-trivial (excluding greetings and "no comment" entries). We read all responses and identified approximately 26 respondents who explicitly articulated reasons for preferring mandatory instruments, and 5 who articulated reasons for opposing them. This is not a systematic content analysis (the subsample is self-selected and small), but the behavioral correspondence provides notable triangulation: the pro-mandatory commenters have a mean VP of 0.278 (46% always chose mandatory in all mixed DCE tasks), against 22.1% in the full analytical sample; the anti-mandatory commenters have a mean VP of 0.631, against 0.431 overall. Stated reasoning and incentivised DCE choices align.
+
+The dominant expressed mechanism is **scale insufficiency**: voluntary schemes will not raise enough because most people will not participate without compulsion. A respondent who scored VP = 0 across all mixed tasks wrote: *"Relying on donations means choosing not to care whether we reach the goals."* Another noted: *"I'm positive about environmental organisations, but the amounts become too small if you rely on people's generosity."* A third added: *"Market mechanisms don't work; simply put, not enough money will be collected. Just look at FairTrade."* Perhaps the most precise articulation came from a respondent who also scored VP = 0: *"I would personally pay more for products with a biodiversity certification. But I don't think many people will do so — they'll choose the cheaper option. So I don't think it's an effective method."* This respondent has internalised the public-goods problem and resolved it through instrument choice, precisely what the regression detects in aggregate. A further respondent connected the public-goods logic to incentive structures: *"I don't believe in voluntary regulation for companies given that it usually conflicts with their primary purpose of delivering returns to shareholders."*
+
+A second cluster cited **state signalling and legitimacy**: *"Tax-financed compensations give a signal that the state has a direction; it nudges a general will to protect important nature."* Anti-mandatory commenters, by contrast, focused on institutional distrust of the state rather than any objection to mandatory mechanisms in principle: *"I wouldn't trust that the money actually goes where it's supposed to."* This concern does not oppose mandatory finance but objects to the specific channel, and which is consistent with their somewhat elevated VP rather than a ceiling score.
+
+Together, these responses suggest that the aggregate preference for mandatory instruments in this sample reflects deliberate consequentialist reasoning, most prominently the recognition that voluntary participation will be insufficient to reach conservation goals — rather than hypothetical posturing or social desirability. The free-text evidence cannot be causal, but the alignment between stated reasoning and incentivised behavior strengthens confidence in the quantitative findings.
+
+## Implications for DCE validity
+
+Our design addresses a long-standing critique of stated preference methods: that hypothetical choices may not predict real behaviour [@Hausman2012; @ListGallet2001; @Murphy2005]. By pairing the DCE with an incentivised game within the same survey, we provide a within-sample test of preference consistency. The voluntary preference score constructed from DCE choices is a purely behavioural measure (chosen options, not stated importance ratings), which reduces social desirability bias but retains the attribute-confounding inherent in observational DCE data.
+
+A limitation is that the dictator game and DCE measure different objects: personal charitable giving versus policy instrument preferences. The mapping from one to the other assumes that a person who is personally unwilling to donate voluntarily would also free-ride under a voluntary policy scheme — a reasonable assumption but not directly testable without a corresponding real-world policy outcome.
+
+## Implications for biodiversity finance design
+
+The pre-registered DCE results, replicated across conditional and mixed logit specifications, reveal a clear public preference for mandatory instruments over voluntary ones. Notably, corporate offsetting emerges as the highest-utility financing mechanism (β = +0.146 in CL, +0.241 in MXL, both p < 0.001), preferred even over tax payment. This suggests that Swedish citizens are willing to shift the financial burden to corporate actors when those actors are held obligated, which is consistent with a "polluter pays" norm prevalent in Scandinavian environmental attitudes. Tax payment remains preferred over both voluntary instruments, consistent with the welfare-state orientation of Swedish public opinion and relatively high trust in government institutions.
+
+Two mechanisms could explain the offsetting premium. First, a *cost-incidence* effect: respondents may prefer corporate offsetting because they perceive the cost as falling on firms rather than households, regardless of whether this perception is accurate. Notably, the survey explicitly informed respondents that "market prices would increase as a consequence" of mandatory offsetting, ruling out naive fiscal illusion as the sole driver. Despite this disclosure, the offsetting premium is positive across all income groups. The income gradient is non-monotonic (WTP: low-income +SEK 648, mid-income +SEK 809, high-income +SEK 566), offering at best mixed evidence for a cost-incidence channel: if lower-income respondents were particularly sensitive to corporate cost pass-through, their offsetting premium should be largest, which is not observed. Second, a *market credibility* effect: respondents who trust private markets are substantially more likely to value offsetting. Subgroup CL models stratified by trust-in-market (Q2\_2 tercile) show a clear gradient: WTP for offsetting rises from +SEK 712/year (low market trust) to +SEK 1,117/year (high market trust). Certification follows the same pattern even more starkly: low-trust respondents show a strongly negative WTP for certification (--SEK 1,519/year), while high-trust respondents are near-indifferent (WTP +SEK 444/year). Together these results suggest that the offsetting premium reflects a combination of corporate cost-shifting and institutional trust in private environmental governance, both of which may be especially salient in the Swedish context of active ESG policy.
+
+The voluntary preference analysis adds nuance: while the *mean* preference favours mandatory instruments, 31.3% of respondents have a positive coefficient for donation and 45.2% for certification (MXL estimates), indicating genuine pluralism in financing philosophy. Whether this minority preference for voluntary instruments reflects genuine preferences or strategic position-taking has direct implications for policy design. Instruments that rely on voluntary participation will fall short of provision targets if a significant fraction of apparent supporters are strategic free-riders — but our analysis suggests that endorsers of voluntary instruments in this sample do tend to donate more in practice, arguing against strategic free-riding.
+
+## Institutional trust and the boundary conditions of the crucial case design
+
+While our most-likely case design provides lower-bound evidence that highly motivated citizens consistently prefer mandatory instruments when a reliable state alternative exists, these findings must be contextualized against varying global institutional landscapes. The observed preference for mandatory regulation in Sweden is anchored in high levels of social trust and institutional capacity. This raises a critical comparative question: how do preference structures behave in contexts where such trust is absent?
+
+We theorize that the relationship between environmental concern and instrument preference is non-linear and mediated by perceived state capacity. In high social trust, high state capacity contexts, citizens display public-goods consequentialism: they recognise that individual virtue cannot scale to solve collective action problems and prefer state coercion because they trust the regulatory apparatus to enforce compliance equitably. This is precisely what our data capture. The mechanism runs: [High Social Trust + High State Capacity] $\rightarrow$ Public-Goods Consequentialism $\rightarrow$ Mandatory Preference.
+
+In settings marked by weak state capacity or low institutional trust, this preference structure may invert. Where the state is perceived as ineffective or captured, environmentally concerned actors may prefer voluntary, private, or NGO-led instruments — not because these are structurally superior for solving collective action problems, but as a rational bypass of a distrusted state to ensure their environmental effort has marginal utility. The mechanism runs: [Low Social Trust + Weak State Capacity] $\rightarrow$ Defensive Subvention $\rightarrow$ Constrained Voluntary Preference.
+
+Crucially, we argue this inversion represents a *constrained, defensive* preference born of institutional failure rather than an endorsement of voluntary governance's structural efficacy. Bypassing a distrusted state via private donations or certified market offsets is a tactical choice to preserve marginal utility, not a reflection of an ideal policy architecture. A low-trust citizen who prefers voluntary instruments is not expressing that voluntary governance is better at solving collective action problems; they are expressing that they do not trust the state to implement mandatory mechanisms fairly.
+
+This distinction carries direct implications for global biodiversity governance. The pervasive shift toward voluntary, market-based mechanisms under the GBF is frequently justified as matching decentralised citizen preferences. Our findings challenge this narrative: citizens in the context most structurally favorable to voluntary instrument support consistently prefer the re-centering of public authority. Voluntary instruments appear, in this light, as a second-best patch, and devolving governance to voluntary architectures may be better understood as institutional resignation than as progressive policy design. The Brazilian Cerrado offers a landscape-scale illustration: voluntary soy moratoria that achieved partial effectiveness in the Amazon were not extended to the Cerrado, where weaker regulatory infrastructure and monitoring contributed to continued biodiversity loss — a case in which the absence of a mandatory backstop proved decisive [@BrandaoCardosoGarrett2025]. Wherever state capacity is sufficient, relying on voluntary frameworks is likely misaligned with citizen preferences; in lower-capacity contexts, the priority should be building the institutional infrastructure that makes mandatory mechanisms legitimate and effective, rather than cementing voluntary markets as a permanent substitute.
+
+## Limitations
+
+Several limitations should be noted. First, the analysis sample is large but was recruited via an online panel, which may oversample individuals with higher digital literacy and environmental awareness, which likely contributes to the high giving rate (83.3%) relative to laboratory dictator game benchmarks. Second, voluntary preference scores are computed only from mixed-instrument tasks and exclude opt-out choices, which may introduce selection. Third, the preregistration covers the CL and MXL models but not the donation-based heterogeneity analysis; the latter should be interpreted as exploratory and hypothesis-generating rather than confirmatory. Fourth, the instrument coding as voluntary vs. mandatory is a simplification: certification can be seen as semi-mandatory if it becomes the de facto market standard, and offsetting markets vary in their voluntary vs. regulated character.
+
+Fifth, the survey presents the DCE before the dictator game. Completing the DCE — which repeatedly frames biodiversity conservation as a policy priority and makes financing mechanisms salient — may have primed respondents to donate more generously than they would in the absence of the DCE framing. If the priming effect were heterogeneous, this would create an endogeneity problem: $G_i$ would be a function of the DCE treatment itself, biasing the VP regression. We conduct an exploratory check by regressing donation amount on the VP score (number of voluntary DCE choices relative to mixed tasks), conditional on environmental concern and all covariates. If DCE exposure primed more voluntary-minded respondents to donate more, the VP coefficient should be positive. Instead, the coefficient is negative and statistically significant ($\hat\gamma = -94$ SEK, SE = 24, $p < 0.001$): respondents who chose voluntary options more often in the DCE donated *less* in the dictator game, conditional on environmental concern and other covariates. This is the mirror image of the forward regression (higher donors prefer mandatory instruments) and argues against positive priming — the DCE did not cause voluntary-minded respondents to donate more. The mean donation rate (83.3%) may still be elevated relative to a no-DCE baseline, but this level effect would shift the intercept of the donation distribution upward equally for all respondents; it would not alter the gradient between higher and lower donors that drives the VP regression coefficient. The slope-based inference on which the strategic preference test rests is therefore structurally robust to order-induced priming of the donation level. We cannot rule out more subtle forms of priming, and future studies should randomise the order of DCE and donation task between subjects to test this mechanism directly.
+
+# Conclusion {#sec-conclusion}
+
+The dominant paradigm of global environmental governance has, for three decades, bet heavily on voluntary instruments, specifically private donations, market certification, corporate offsetting, and non-state initiatives, to fill the gap left by gridlocked multilateral treaties. This bet rests on a behavioral assumption: that environmental concern, once activated, channels naturally into voluntary action at scale. We have tested that assumption at its own best case.
+
+In Sweden, where social trust, environmental identity, and per-capita conservation spending rank among the world's highest, citizens consistently prefer mandatory biodiversity financing instruments over voluntary alternatives. Corporate offsetting and tax payment are preferred over donation and certification across all pre-registered model specifications. Public monitoring commands a WTP of approximately SEK 1,600 per year, suggesting that citizens place high value on state oversight and verification — a direct economic expression of regulatory legitimacy.
+
+Critically, the behavioral logic underlying voluntary governance is rejected even in this most-favorable context. Environmentally committed and personally generous respondents prefer mandatory instruments, not because they want to free-ride on voluntary schemes, but because they recognise that voluntary participation cannot guarantee adequate provision at scale. The most motivated actors demand binding collective mechanisms, the assurance that voluntary instruments cannot provide.
+
+We theorize that voluntary instrument preference, where it appears globally, reflects a constrained, defensive choice born of institutional weakness rather than an unconstrained normative endorsement of voluntary governance. Citizens bypass distrusted states via private channels not because private channels are better, but because mandatory mechanisms are unavailable or untrustworthy in their context. The implication for GBF implementation is direct: in high-capacity state contexts, voluntary frameworks are structurally misaligned with citizen preferences; in lower-capacity contexts, the long-run priority is building the institutional infrastructure to make mandatory mechanisms legitimate.
+
+Future research should replicate these findings in lower social trust contexts to test the predicted preference inversion, and should pre-register the interaction hypothesis to enable confirmatory testing with adequate statistical power in the key subgroup cells. If mandatory preference persists across institutional contexts, the case for re-centering biodiversity finance architecture around binding public mechanisms becomes considerably stronger.
+
+# Author Contributions {.unnumbered}
+
+ **Nils Droste**: Conceptualization, Funding acquisition, Methodology, Supervision, Writing — original draft, Writing — review and editing. **Jens Christiansen**: Conceptualization, Data curation, Formal analysis, Investigation, Methodology, Project administration, Writing — review and editing. **Yohei Mitani**: Conceptualization, Methodology, Writing — review and editing.
+
+# Declaration of Generative AI and AI-Assisted Technologies in the Manuscript Preparation Process {.unnumbered}
+
+During the preparation of this work the authors used Claude (Anthropic) to assist with manuscript drafting and revision, literature identification, and R code development for statistical analyses. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+
+# Data Availability {.unnumbered}
+
+The survey was conducted under ethics approval from Etikprövningsmyndigheten (ID 2025-04420-01). Participants provided informed consent to online publication of anonymized data. The anonymized survey dataset, analysis code, and DCE design matrix will be deposited in a public repository upon acceptance; the repository DOI will be provided at that stage. Free-text responses are excluded from the public deposit to preclude re-identification.
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+# Appendix {.unnumbered}
+
+## A. Survey instrument overview {.unnumbered}
+
+### A.1 Financing instrument descriptions shown to respondents {.unnumbered}
+
+Prior to the DCE tasks, respondents read the following definitions (shown in Swedish on screen):
+
+> **Tax payment:** An increase in your net tax contribution, with an explicit purpose of supporting biodiversity conservation and restoration.
+
+> **Voluntary donation:** A voluntary private donation to civil society organisations that work with restoring and conserving biodiversity.
+
+> **Market certification:** A higher price for a certified commodity, which is produced in a biodiversity-friendly way.
+
+> **Mandatory offsetting:** The state requires companies to offset their biodiversity impact and market prices would increase as a consequence.
+
+Following these definitions, respondents completed matching exercises (Q1) linking real-world examples to each instrument type, ensuring that DCE preferences were elicited from respondents who had actively processed the instrument concepts. The definitions above were also accessible during the DCE tasks.
+
+### A.2 Land ownership and monitoring descriptions {.unnumbered}
+
+> **Public lands:** Biodiversity protection on publicly owned land by creating protected areas.
+
+> **Industrial scale corporate owner:** Biodiversity protection on large scale industrial land by paying the landowner for setting aside land from production.
+
+> **Small scale private owner:** Biodiversity protection on small scale private land by paying the landowner for setting aside land for biodiversity.
+
+> **Public administration (monitoring):** Public monitoring and enforcement by a state authority or agency.
+
+> **Private, independent audit (monitoring):** Monitoring by the private landowner and a third-party auditor, such as a consultancy.
+
+## B. DCE design matrix {.unnumbered}
+
+[TABLE: Attribute levels by block and task number; full design matrix available in `design/Trial 3 - factorial grouped, svensk.xlsx`]
+
+## C. Preregistration details {.unnumbered}
+
+This study was pre-registered at AsPredicted prior to data collection:
+
+- Original registration: #273748, February 15, 2026 (available at aspredicted.org/im78mi.pdf)
+- Updated registration: #287153, April 23, 2026, adding response quality exclusion criteria (available at aspredicted.org/zs4y9e.pdf)
+
+Pre-registered analyses: conditional logit and mixed logit models (Sections 4.1 and 5.1–5.2). All other analyses in this paper are exploratory and were not preregistered.
+
+## D. Robustness checks and power analysis {.unnumbered}
+
+**OLS results (primary specification in fractional probit; OLS for comparison).** The OLS models M1–M4 described in the pre-revision manuscript are retained here for comparison. The average partial effects (APEs) of the fractional probit models in @tbl-reg and the OLS coefficients are nearly identical (within rounding), confirming that the bounded distribution of VP does not substantially distort the OLS estimates in this application.
+
+**Sensitivity: n_mixed ≥ 3.** Rerunning the primary fractional probit model (FP3) on the subsample of respondents with at least 3 informative mixed tasks ($n = 1{,}478$, dropping 385 respondents with fewer than 3 mixed tasks) yields coefficient estimates consistent with the full sample: donation effect $\hat\beta_1 = -0.102$ (SE = 0.035, $p = 0.003$), environmental concern $\hat\beta_2 = -0.218$ (SE = 0.042, $p < 0.001$), interaction $\hat\beta_3 = -0.033$ (SE = 0.037, $p = 0.376$). The interaction remains non-significant and the main effects strengthen, confirming that the additive pattern is not an artefact of measurement noise.
+
+**Power analysis.** Under the OLS model for VP with $n = 1{,}863$, $\overline{\text{VP}} = 0.431$, and $\text{SD}(\text{VP}) = 0.320$ (and standardised predictors), the minimum detectable effect size for the interaction at 80% power ($\alpha = 0.05$, two-sided) is $|\hat\beta_3| \approx 0.021$. The observed interaction estimate ($\hat\beta_3 = -0.002$) is an order of magnitude below this threshold, indicating the study had adequate power to detect medium-sized interactions but found no evidence of even a small effect. The null interaction result is therefore informative: we can reasonably rule out interactions of the magnitude originally hypothesised.
+
+## E. Subgroup heterogeneity table {.unnumbered}
+
+```{r}
+#| label: tbl-het
+#| tbl-cap: "Pre-registered: CL instrument coefficients by subgroup (vs. tax baseline)"
+#| eval: true
+
+het_tbl <- tibble(
+  Subgroup = c(
+    "Full sample",
+    "Female", "Male",
+    "Income: low", "Income: mid", "Income: high",
+    "Low env. att.", "High env. att."
+  ),
+  N = c(
+    "16,808", "8,208", "8,600",
+    "2,768", "10,720", "3,320",
+    "6,560", "10,248"
+  ),
+  Don = c(
+    "-0.376*** (0.032)",
+    "-0.365*** (0.046)", "-0.388*** (0.045)",
+    "-0.252**  (0.080)", "-0.386*** (0.040)", "-0.443*** (0.071)",
+    "+0.053    (0.052)", "-0.659*** (0.042)"
+  ),
+  DonWTP = c(
+    "-1,929",
+    "-1,851", "-2,009",
+    "-1,383", "-1,867", "-2,645",
+    "+240", "-3,572"
+  ),
+  Cert = c(
+    "-0.082*  (0.032)",
+    "-0.096*  (0.046)", "-0.069   (0.045)",
+    "+0.044   (0.080)", "-0.096*  (0.040)", "-0.135†  (0.071)",
+    "+0.169** (0.052)", "-0.242*** (0.041)"
+  ),
+  Off = c(
+    "+0.146*** (0.034)",
+    "+0.146**  (0.049)", "+0.146**  (0.048)",
+    "+0.118    (0.084)", "+0.167*** (0.043)", "+0.095    (0.077)",
+    "+0.223*** (0.056)", "+0.089*   (0.044)"
+  )
+)
+
+het_tbl |>
+  kableExtra::kbl(booktabs = TRUE, escape = TRUE, longtable = FALSE,
+                  col.names = c("Subgroup", "N obs", "Donation (SE)",
+                                "WTP SEK/yr", "Certification (SE)",
+                                "Offsetting (SE)"),
+                  align = c("l","r","r","r","r","r")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            font_size = 9, full_width = TRUE) |>
+  kableExtra::pack_rows("Gender", 2, 3) |>
+  kableExtra::pack_rows("Income", 4, 6) |>
+  kableExtra::pack_rows("Environmental attitude", 7, 8) |>
+  kableExtra::footnote(
+    general = c(
+      "Separate CL models per subgroup; instrument coefficients vs. tax baseline.",
+      "WTP = coef / |price coef| * 1000 SEK/year. HC3 SEs in parentheses.",
+      "Income: low = 0--20k SEK/month; mid = 20--100k; high = >100k (cats 3--5).",
+      "Env. att.: median split on Q11 (Environmental importance, 1-5).",
+      "† p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+## F. Theoretical framework: strategic hypothesis {.unnumbered}
+
+We sketch the strategic voluntary preference hypothesis in a simple expected-utility framework to clarify what the fractional probit interaction test identifies.
+
+Let respondent $i$ hold environmental valuation $b_i \geq 0$ and private willingness to contribute $c_i \geq 0$, revealed by the dictator-game donation $G_i$. Consider a DCE choice between two instruments:
+
+- **Mandatory** ($m$): achieves the conservation target with certainty; respondent pays a uniform cost $\tau$.
+- **Voluntary** ($v$): achieves fractional provision $Q_v \in (0,1)$ (the target is underprovided because participation is voluntary); the free-riding respondent pays nothing.
+
+Utility comparisons give a preference for voluntary iff $b_i Q_v > b_i - \tau$, i.e., $\tau > b_i(1 - Q_v)$.
+
+The **strategic free-rider** has high $b_i$ but $G_i = 0$ (not willing to contribute personally, as revealed by the dictator game). If they believe others will contribute enough that $Q_v$ is non-negligible, they may prefer voluntary in the DCE while free-riding in practice — especially when $\tau$ is large. This predicts that among non-donors, higher environmental concern $b_i$ produces stronger voluntary preference. For donors ($G_i > 0$), the free-rider advantage disappears because they pay under voluntary as well, making the direction ambiguous.
+
+The strategic hypothesis therefore predicts a positive interaction: $\beta_3 > 0$ in
+
+$$\text{VP}_i = \alpha + \beta_1 G_i + \beta_2 B_i + \beta_3 (G_i \times B_i) + \mathbf{X}_i'\boldsymbol{\gamma} + \varepsilon_i,$$
+
+where $G_i$ is the observed donation (proxy for $c_i$) and $B_i$ is stated environmental concern (proxy for $b_i$).
+
+The **public-goods consequentialist** mechanism predicts $\beta_1 < 0$, $\beta_2 < 0$, $\beta_3 \approx 0$: both donation and concern independently shift preferences toward mandatory instruments, because more engaged respondents understand that voluntary provision will underperform. This predicts two additive main effects with no interaction.
+
+We find APE$_1 = -0.030$ ($p < 0.001$), APE$_2 = -0.042$ ($p < 0.001$), APE$_3 = -0.002$ ($p = 0.792$) — consistent with the consequentialist mechanism and inconsistent with strategic free-riding.
+
+## G. WTP-based robustness check {.unnumbered}
+
+As an alternative outcome measure, we replace the VP score with individual-level WTP for donation relative to tax ($\widehat{\text{WTP}}_{\text{don},i}$, SEK/year), estimated by importance-sampling conditional means from the fitted MXL. For each respondent, we draw $S = 1{,}000$ parameter vectors from the population distribution $\mathcal{N}(\hat\mu, \hat\sigma^2)$, weight each draw by the respondent's likelihood of observed choices across all eight tasks, and take the importance-weighted mean as the individual posterior mean coefficient. WTP is then $\widehat{\text{WTP}}_{\text{don},i} = -\hat\beta_{\text{don},i} / (\hat\beta_{\text{price}}/1{,}000)$. Negative values indicate preference for mandatory instruments (tax) over donation.
+
+Individual WTP estimates have mean $-$SEK 2,145/year (SD = 3,040; median $-$SEK 2,216), and correlate with the VP score at $r = 0.531$ across the same 1,863 respondents, confirming the two measures capture the same underlying preference dimension.
+
+Stage-2 OLS regressing $\widehat{\text{WTP}}_{\text{don},i}$ on the same covariates as the VP model (HC3 SEs) yields: donation APE $\approx -$SEK 120 ($p = 0.122$), environmental concern $\approx -$SEK 312 ($p = 0.001$), interaction $\approx -$SEK 68 ($p = 0.364$). The environmental concern effect replicates strongly; the donation effect is directionally consistent but falls below conventional significance, reflecting the substantially higher variance of individual WTP estimates relative to VP scores. The null interaction replicates. These results support the VP-based findings for the env_z dimension and are consistent with the null on strategic behaviour, while suggesting that the donation signal, though robust under VP, may be weaker than it appears — an important caveat for future work using this two-stage design.
+
+## H. Latent class model: convergent validity {.unnumbered}
+
+As a further convergent validity check, we estimate a 2-class latent class multinomial logit (LC-MNL) on the DCE data using Apollo [@Hess2021]. LC models do not impose parametric assumptions on the distribution of unobserved heterogeneity (as the MXL does) and instead recover discrete latent segments with distinct preference vectors. If the data contain a mandatory-preference segment and a voluntary-preference segment, the LC model should recover them, and the segment membership pattern should align with the VP regression findings: the mandatory-preference class should be characterised by higher environmental concern and higher dictator game donations.
+
+**Specification.** We estimate an unconditional 2-class LC-MNL with the same within-class utility specification as the CL (six attribute dummies plus price, plus an ASC for the opt-out). Class membership is unconditional at the estimation stage (a single intercept $\delta_0$ determining the log-odds of class membership). After estimation, we characterise the two classes by (i) their within-class utility vectors and (ii) the mean env\_z and don\_z of respondents assigned to each class by their posterior modal class membership probability. The analysis code is in `analysis/lcm_analysis.R`.
+
+The utility specification for alternative $j \in \{a, b, \text{neither}\}$ in class $k$ is:
+
+$$V_{ijt}^{(k)} = \beta_{\text{don}}^{(k)} D_{jt} + \beta_{\text{cert}}^{(k)} C_{jt} + \beta_{\text{off}}^{(k)} O_{jt} + \beta_{\text{ind}}^{(k)} I_{jt} + \beta_{\text{pland}}^{(k)} L_{jt} + \beta_{\text{pmon}}^{(k)} M_{jt} + \beta_{\text{price}}^{(k)} p_{jt} + \text{ASC}^{(k)} \cdot \mathbf{1}[j=\text{neither}]$$
+
+with class membership probability $\pi_1 = 1/(1+e^{\delta_0})$ and $\pi_2 = e^{\delta_0}/(1+e^{\delta_0})$.
+
+**Results.** Table H.1 reports estimated within-class utilities (robust standard errors), class shares, and WTP. The model fit improves substantially over the CL (LL = $-16{,}647.5$ vs CL LL = $-16{,}790.8$; 16 additional parameters).
+
+```{r}
+#| label: tbl-lcm
+#| tbl-cap: "2-class LC-MNL: within-class coefficients (robust SE), WTP, and class characterisation"
+#| eval: true
+
+lcm_tbl <- tibble(
+  Parameter = c(
+    "ASC (neither/opt-out)",
+    "Donation (vs. tax)",
+    "Certification (vs. tax)",
+    "Offsetting (vs. tax)",
+    "Industrial land (vs. small-scale)",
+    "Public land (vs. small-scale)",
+    "Public monitoring (vs. private audit)",
+    "Annual cost (kSEK/year)",
+    "",
+    "Log-likelihood",
+    "Class share",
+    "N assigned (modal)",
+    "Mean env\\_z (posterior)",
+    "Mean don\\_z (posterior)"
+  ),
+  C1_coef = c(
+    "-9.814*  (5.039)",
+    "-1.682*** (0.514)",
+    "-0.212   (0.539)",
+    "+0.333   (0.332)",
+    "-0.535** (0.222)",
+    "+0.672*** (0.208)",
+    "+1.017*** (0.176)",
+    "-0.958*** (0.134)",
+    "",
+    "-16,647.5",
+    "30.5\\%",
+    "638",
+    "+0.094",
+    "+0.033"
+  ),
+  C1_wtp = c(
+    "---",
+    "-1,756",
+    "-222",
+    "+347",
+    "-558",
+    "+702",
+    "+1,062",
+    "---",
+    "", "", "", "", "", ""
+  ),
+  C2_coef = c(
+    "-0.320*** (0.098)",
+    "-0.174*   (0.088)",
+    "-0.117   (0.102)",
+    "+0.086†  (0.066)",
+    "+0.123*   (0.056)",
+    "+0.161*** (0.052)",
+    "+0.283*** (0.040)",
+    "-0.092*** (0.025)",
+    "",
+    "---",
+    "69.5\\%",
+    "1,463",
+    "-0.041",
+    "-0.015"
+  ),
+  C2_wtp = c(
+    "---",
+    "-1,897",
+    "-1,277",
+    "+941",
+    "+1,344",
+    "+1,754",
+    "+3,089",
+    "---",
+    "", "", "", "", "", ""
+  )
+)
+
+lcm_tbl |>
+  kableExtra::kbl(booktabs = TRUE, escape = FALSE, longtable = FALSE,
+                  col.names = c("Parameter",
+                                "Coeff (Rob. SE)", "WTP SEK/yr",
+                                "Coeff (Rob. SE)", "WTP SEK/yr"),
+                  align = c("l","r","r","r","r")) |>
+  kableExtra::add_header_above(c(" " = 1,
+                                  "Class 1 — strong mandatory (30.5\\%)" = 2,
+                                  "Class 2 — moderate mandatory (69.5\\%)" = 2),
+                                escape = FALSE) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"),
+                            bootstrap_options = c("condensed"),
+                            full_width = TRUE, font_size = 9) |>
+  kableExtra::pack_rows("Model fit and class composition", 10, 14) |>
+  kableExtra::footnote(
+    general = c(
+      "Baseline: tax + small-scale private land + private audit.",
+      "Robust SEs in parentheses. WTP in SEK/year (ratio estimator).",
+      "Class share from unconditional membership (delta\\_0 = 0.826, SE = 0.046).",
+      "Posterior env\\_z and don\\_z: mean standardised values for respondents",
+      "  assigned to each class by modal posterior probability.",
+      "Final LL reported for the combined model (both classes jointly).",
+      "Hessian at optimum has mixed eigenvalues (saddle-point warning);",
+      "  robust SEs reported throughout. Qualitative findings robust to re-starts.",
+      "† p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
+    ),
+    general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
+  )
+```
+
+**Interpretation.** The LC model does not recover a voluntary-preference segment. Both classes have negative WTP for donation-financed programmes relative to the tax baseline (Class 1: $-$SEK 1,756/year; Class 2: $-$SEK 1,897/year), and both assign positive WTP to offsetting. The heterogeneity the LC model captures is in the *intensity* of mandatory preference and in price sensitivity, not in its direction. Class 1 (30.5%) is characterised by a very negative opt-out ASC (near-certain choice of a programme option over the status quo), very high price sensitivity ($\hat\beta_{\text{price}} = -0.958$), and a strong negative utility for donation. Class 2 (69.5%) has more moderate parameters consistent with the CL mean estimates.
+
+The posterior class characterisation provides weak convergent support for the VP regression: respondents assigned to the strongly mandatory-preferring Class 1 have marginally higher mean env\_z (+0.094) and don\_z (+0.033) than those in Class 2 ($-$0.041 and $-$0.015 respectively), consistent with the VP regression direction (higher env\_z and don\_z predict lower VP, i.e., stronger mandatory preference). The differences are small, however, indicating that the LC classes are defined primarily by preference intensity and price sensitivity rather than by environmental attitudes or donation behaviour.
+
+Taken together, the LC results provide convergent validity to the primary CL and MXL findings: there is no latent segment of the Swedish population that prefers voluntary biodiversity financing instruments, and the aggregate mandatory preference is not an artefact of averaging over a voluntary-preference minority.
