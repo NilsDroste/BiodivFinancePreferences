@@ -274,13 +274,13 @@ Following the framing of @Andreoni1990 and @KollmussAgyeman2002, we tabulate mea
 
 # Results {#sec-results}
 
-## Pre-registered: Sample characteristics and DCE overview
+## Sample characteristics and DCE overview
 
 The full-launch sample comprises $n = 2{,}101$ respondents generating 16,808 choice observations across 8 tasks per respondent. The sample is 48.8% female with a median age of 43. Income is distributed as: 16.5% low (0–20k SEK/month), 63.8% middle (20–100k), and 19.8% higher income (\textgreater{}100k). Summary statistics for key variables are reported in @tbl-sumstats.
 
 In the dictator game, 83.3% of respondents (1,750 of 2,101) donated a positive amount, with a mean donation of 411 SEK (SD = 357 SEK) out of a possible 1,000 SEK. This indicates substantial but far from universal personal willingness to fund conservation voluntarily. The mean environmental importance score is 3.64 out of 5 (Q11; SD = 1.05), indicating moderately high average environmental concern in the Swedish sample.
 
-## Pre-registered: Conditional logit results {#sec-cl}
+## Conditional logit results {#sec-cl}
 
 @tbl-cl reports the pre-registered conditional logit estimates. The alternative-specific constant for the opt-out is strongly negative ($\hat\alpha = -1.226$, $p < 0.001$), confirming that respondents strongly prefer either conservation programme option over the status quo.
 
@@ -349,7 +349,7 @@ cl_tbl |>
 
 The implicit WTP estimates confirm the utility ranking and reveal the magnitudes. Relative to the tax baseline, respondents require compensation of SEK 1,930/year (SE = 172) to accept donation-financed programmes, and SEK 419/year (SE = 164) to accept certification. By contrast, they are willing to pay a premium of SEK 748/year (SE = 177) for offsetting. Public monitoring commands the largest positive WTP at SEK 1,618/year (SE = 125), indicating strong demand for accountability regardless of instrument type.
 
-## Pre-registered: Mixed logit results {#sec-mxl}
+## Mixed logit results {#sec-mxl}
 
 The mixed logit results (MXL; @tbl-mxl) confirm the conditional logit ranking in mean preferences while revealing substantial preference heterogeneity. Mean coefficients closely mirror the CL estimates, with offsetting positive ($\hat\mu_{\text{off}} = +0.241$, $p < 0.001$), donation strongly negative ($\hat\mu_{\text{don}} = -0.692$, $p < 0.001$), and certification mildly negative ($\hat\mu_{\text{cert}} = -0.184$, $p < 0.001$). The McFadden $R^2$ rises to 0.165 from the CL's 0.091, indicating that accounting for taste heterogeneity substantially improves fit.
 
@@ -434,7 +434,7 @@ mxl_tbl |>
   )
 ```
 
-## Pre-registered: Heterogeneity by sociodemographics {#sec-het}
+## Heterogeneity by sociodemographics {#sec-het}
 
 Full subgroup results (separate CL models by gender, income, and environmental attitude; AsPredicted \#287153, Q8) are reported in Appendix E. Three findings stand out.
 
