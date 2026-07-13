@@ -291,14 +291,14 @@ cat("\n--- M4 (n_mixed >= 3) ---\n")
 print(coeftest(m4_sens, vcov = vcovHC(m4_sens, "HC3")))
 
 # ------------------------------------------------------------------------------
-# 5c. Fractional probit (Papke-Wooldridge) — primary specification per R2
+# 5c. Fractional logit (Papke-Wooldridge) — primary specification per R2
 #
 # glm with quasibinomial(link="logit") implements the Papke-Wooldridge (1996)
-# fractional response estimator. HC3 robust SEs account for
-# quasi-likelihood (not classical MLE) standard errors.
+# fractional logit estimator (logit link, not probit). HC3 robust SEs account
+# for quasi-likelihood (not classical MLE) standard errors.
 # ------------------------------------------------------------------------------
 
-cat("\n=== Fractional probit (Papke-Wooldridge): primary specification ===\n")
+cat("\n=== Fractional logit (Papke-Wooldridge): primary specification ===\n")
 
 fp1 <- glm(voluntary_pref ~ donation_z + env_z,
            data = anal_data, family = quasibinomial(link = "logit"))
@@ -332,7 +332,7 @@ print(round(ape_df, 4))
 
 # Deviance-based R² for quasi-likelihood models: 1 - deviance/null.deviance
 dev_r2 <- function(m) 1 - m$deviance / m$null.deviance
-cat("\nFractional probit deviance R²:\n")
+cat("\nFractional logit deviance R²:\n")
 for (nm in c("fp1","fp2","fp3","fp4")) {
   m <- get(nm)
   cat(nm, ": dev-R²=", round(dev_r2(m), 4), "  N=", nobs(m), "\n")

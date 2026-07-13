@@ -128,7 +128,7 @@ The regression design discriminates between the public-goods consequentialist an
 
 A related mechanism is hypothetical bias: DCE respondents who perceive their choices as inconsequential, believing that no real policy will follow from the survey, may state preferences that do not reflect genuine willingness to pay [@Hausman2012]. We measure policy consequentiality directly via Q14 ("How likely is it that Sweden will follow through on its biodiversity policy commitments?") and include it as a covariate to partial out this channel. If hypothetical bias is the primary mechanism, policy consequentiality should moderate the donation–voluntary preference association.
 
-A second, distinct mechanism predicts a *positive* association between Q14 and VP that does not involve hypothetical bias. A respondent who believes Sweden has a strong record of policy follow-through may perceive voluntary instruments as genuinely *viable* policy options — that is, they may believe that voluntary programmes in Sweden would in practice mobilise sufficient private contribution to achieve conservation goals. Under this "viable voluntarism" mechanism, high policy consequentiality increases trust in voluntary instruments specifically, leading to higher VP. This prediction is falsifiable: if viable voluntarism drives the Q14–VP association, the effect should be attenuated among respondents with low trust in NGOs and civil society (who would perceive voluntary mechanisms as less capable even in a high-compliance context). An exploratory test of the Q14 × trust\_ngo interaction in the fractional probit yields a non-significant negative coefficient ($\hat\beta = -0.016$, $p = 0.598$), which does not support the viable voluntarism attenuation prediction. The post-hoc Q14 finding therefore remains unexplained by either mechanism, and we flag it as requiring dedicated investigation in future work.
+A second, distinct mechanism predicts a *positive* association between Q14 and VP that does not involve hypothetical bias. A respondent who believes Sweden has a strong record of policy follow-through may perceive voluntary instruments as genuinely *viable* policy options — that is, they may believe that voluntary programmes in Sweden would in practice mobilise sufficient private contribution to achieve conservation goals. Under this "viable voluntarism" mechanism, high policy consequentiality increases trust in voluntary instruments specifically, leading to higher VP. This prediction is falsifiable: if viable voluntarism drives the Q14–VP association, the effect should be attenuated among respondents with low trust in NGOs and civil society (who would perceive voluntary mechanisms as less capable even in a high-compliance context). An exploratory test of the Q14 × trust\_ngo interaction in the fractional logit yields a non-significant negative coefficient ($\hat\beta = -0.016$, $p = 0.598$), which does not support the viable voluntarism attenuation prediction. The post-hoc Q14 finding therefore remains unexplained by either mechanism, and we flag it as requiring dedicated investigation in future work.
 
 # Study Design and Data {#sec-data}
 
@@ -506,16 +506,65 @@ resp_level <- resp |>
   summarise(voluntary_pref = mean(chose_vol), n_mixed = n(), .groups = "drop")
 
 covars <- full_data |>
-  transmute(id, donation = yourdonation, gave = as.integer(yourdonation > 0),
-            env_import = q11, income = q8, gender = q10)
+  transmute(
+    id,
+    donation    = yourdonation,
+    gave        = as.integer(yourdonation > 0),
+    env_import  = q11,
+    income      = q8,
+    gender      = q10,
+    trust_state = q2_1,
+    trust_ngo   = q2_3,
+    policy_cq   = q14,
+    bio_knowl   = q12
+  )
 
 anal_data <- resp_level |>
   left_join(covars, by = "id") |>
-  filter(!is.na(donation), !is.na(env_import), !is.na(income), !is.na(gender)) |>
+  filter(!is.na(donation), !is.na(env_import), !is.na(income), !is.na(gender),
+         !is.na(trust_state), !is.na(trust_ngo), !is.na(policy_cq), !is.na(bio_knowl)) |>
   mutate(
-    env_t   = ntile(env_import, 3),
-    env_lab = factor(env_t, labels = c("Low env. att.", "Medium", "High env. att."))
+    env_med     = median(env_import),
+    env_hi      = env_import >= env_med,
+    donated     = gave == 1L,
+    env_z       = as.numeric(scale(env_import)),
+    donation_z  = as.numeric(scale(donation)),
+    gave_binary = gave,
+    income_mid  = as.integer(income %in% 2:4),
+    income_high = as.integer(income %in% 5:7),
+    female      = as.integer(gender == 2),
+    env_t       = ntile(env_import, 3),
+    env_lab     = factor(env_t, labels = c("Low env. att.", "Medium", "High env. att."))
   )
+
+# Fractional logit (Papke-Wooldridge) models
+library(sandwich); library(lmtest)
+fl1 <- glm(voluntary_pref ~ donation_z + env_z,
+           data = anal_data, family = quasibinomial(link = "logit"))
+fl2 <- glm(voluntary_pref ~ donation_z * env_z,
+           data = anal_data, family = quasibinomial(link = "logit"))
+fl3 <- glm(voluntary_pref ~ donation_z * env_z +
+             trust_ngo + trust_state + policy_cq +
+             bio_knowl + female + income_mid + income_high,
+           data = anal_data, family = quasibinomial(link = "logit"))
+fl4 <- glm(voluntary_pref ~ gave_binary * env_z +
+             trust_ngo + trust_state + policy_cq +
+             bio_knowl + female + income_mid + income_high,
+           data = anal_data, family = quasibinomial(link = "logit"))
+
+fmt_coef <- function(model, term, digits = 3) {
+  ct    <- coeftest(model, vcov = vcovHC(model, "HC3"))
+  if (!term %in% rownames(ct)) return("")
+  b     <- ct[term, "Estimate"]
+  se    <- ct[term, "Std. Error"]
+  pcol  <- grep("Pr\\(", colnames(ct), value = TRUE)[1]
+  p     <- ct[term, pcol]
+  stars <- ifelse(p < .001, "***", ifelse(p < .01, "**", ifelse(p < .05, "*",
+           ifelse(p < .1, "†", ""))))
+  sprintf("%s%s (%s)", formatC(b, digits = digits, format = "f"),
+          stars, formatC(se, digits = digits, format = "f"))
+}
+dev_r2 <- function(m) round(1 - m$deviance / m$null.deviance, 3)
 ```
 
 ## Donation experiment
@@ -655,21 +704,40 @@ ggplot() +
 #| tbl-cap: "Mean voluntary preference (VP) by environmental attitude × donation behaviour"
 #| eval: true
 
-tibble(
-  `Environmental attitude` = c("Low", "Low", "High", "High"),
-  `Donation behaviour`     = c("Did not donate", "Donated",
-                                "Did not donate", "Donated"),
-  `Mean VP`  = c(0.549, 0.486, 0.385, 0.392),
-  `SD`       = c(0.321, 0.324, 0.319, 0.310),
-  `n`        = c(176L, 492L, 84L, 1111L),
-  `95% CI`   = c(
-    "(0.502, 0.596)",
-    "(0.457, 0.515)",
-    "(0.317, 0.453)",
-    "(0.374, 0.410)"
-  )
-) |>
-  kableExtra::kbl(booktabs = TRUE, digits = 3, longtable = FALSE,
+twox2 <- anal_data |>
+  mutate(
+    env_grp = if_else(env_hi, "High environmental attitude", "Low environmental attitude"),
+    don_grp = if_else(donated, "Donated", "Did not donate")
+  ) |>
+  group_by(env_grp, don_grp) |>
+  summarise(
+    mean_vp = round(mean(voluntary_pref), 3),
+    sd_vp   = round(sd(voluntary_pref), 3),
+    n       = n(),
+    ci_lo   = round(mean(voluntary_pref) - 1.96 * sd(voluntary_pref) / sqrt(n()), 3),
+    ci_hi   = round(mean(voluntary_pref) + 1.96 * sd(voluntary_pref) / sqrt(n()), 3),
+    .groups = "drop"
+  ) |>
+  mutate(
+    ci = paste0("(", ci_lo, ", ", ci_hi, ")"),
+    env_grp = factor(env_grp, levels = c("Low environmental attitude",
+                                          "High environmental attitude")),
+    don_grp = factor(don_grp, levels = c("Did not donate", "Donated"))
+  ) |>
+  arrange(env_grp, don_grp)
+
+focal_ci <- twox2 |>
+  filter(env_grp == "High environmental attitude", don_grp == "Did not donate") |>
+  pull(ci)
+ref_ci   <- twox2 |>
+  filter(env_grp == "Low environmental attitude", don_grp == "Did not donate") |>
+  pull(ci)
+
+twox2 |>
+  select(`Environmental attitude` = env_grp,
+         `Donation behaviour` = don_grp,
+         `Mean VP` = mean_vp, SD = sd_vp, n, `95% CI` = ci) |>
+  kableExtra::kbl(booktabs = TRUE, longtable = FALSE,
                   align = c("l", "l", "r", "r", "r", "r")) |>
   kableExtra::kable_styling(latex_options = c("hold_position"),
                             bootstrap_options = c("condensed"),
@@ -679,77 +747,55 @@ tibble(
   kableExtra::footnote(
     general = c(
       "High/Low env. att. = median split on Q11 (Environmental importance, 1--5).",
-      "Donated = donation > 0 (SEK 1,000 lottery prize). 95% CI = mean +/- 1.96*SD/sqrt(n).",
-      "The focal strategic cell (High env. att. + Did not donate, n = 84) is underpowered;",
-      "its 95% CI (0.317, 0.453) does not overlap with the adjacent Low/Did-not-donate cell (0.502, 0.596)."
+      "Donated = donation > 0 (SEK 1,000 lottery prize). 95% CI = mean ± 1.96·SD/√n.",
+      paste0("The focal strategic cell (High env. att. + Did not donate, n = ",
+             twox2 |> filter(env_grp=="High environmental attitude",
+                             don_grp=="Did not donate") |> pull(n),
+             ") is underpowered;"),
+      paste0("its 95% CI ", focal_ci, " does not overlap with the Low/Did-not-donate cell ",
+             ref_ci, ".")
     ),
     general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
   )
 ```
 
-Because VP $\in [0,1]$ with 22.1% mass at zero and 12.0% at one, @tbl-reg reports fractional probit (Papke–Wooldridge) models estimated via quasi-binomial GLM with logit link and HC3 robust standard errors; we report average partial effects (APEs) obtained by multiplying each coefficient by the sample mean of $\hat\mu_i(1-\hat\mu_i) = 0.240$. OLS models (which yield nearly identical APE magnitudes, as expected when the DV is not heavily boundary-clustered) are reported in Appendix D for comparison. Because the donation distribution is right-skewed (median 500 SEK, mean 431 SEK, SD 353 SEK), we also estimated the main specification replacing `donation_z` with a log-transformed and standardised alternative ($\log(\text{donation}+1)$, then z-scored). Results are substantively unchanged: log-donation APE $= -0.023$ ($p = 0.008$), environmental concern APE $= -0.046$ ($p < 0.001$), interaction APE $= -0.005$ ($p = 0.541$).
+Because VP $\in [0,1]$ with 22.1% mass at zero and 12.0% at one, @tbl-reg reports fractional logit (Papke–Wooldridge) models estimated via quasi-binomial GLM with logit link and HC3 robust standard errors; we report average partial effects (APEs) obtained by multiplying each coefficient by the sample mean of $\hat\mu_i(1-\hat\mu_i) = 0.240$. OLS models (which yield nearly identical APE magnitudes, as expected when the DV is not heavily boundary-clustered) are reported in Appendix D for comparison. Because the donation distribution in the regression subsample ($n = 1{,}863$) is right-skewed (median 500 SEK, mean 431 SEK, SD 353 SEK), we also estimated the main specification replacing `donation_z` with a log-transformed and standardised alternative ($\log(\text{donation}+1)$, then z-scored). Results are substantively unchanged: log-donation APE $= -0.023$ ($p = 0.008$), environmental concern APE $= -0.046$ ($p < 0.001$), interaction APE $= -0.005$ ($p = 0.541$).
 
-Both main effects are negative and highly significant. The main effect of donation is negative (FP3: $\hat\beta = -0.126$, SE = 0.034, $p < 0.001$; APE = $-0.030$): higher donors show stronger preferences for mandatory instruments. The main effect of environmental concern is also negative (FP3: $\hat\beta = -0.176$, SE = 0.041, $p < 0.001$; APE = $-0.042$): environmentally concerned respondents prefer mandatory instruments. The interaction coefficient is small and statistically indistinguishable from zero in both the full sample (FP3: $-0.009$, SE = 0.034, $p = 0.792$; APE = $-0.002$) and the sensitivity sample excluding respondents with fewer than 3 mixed tasks (FP3$_{\text{sens}}$: $-0.033$, SE = 0.037, $p = 0.376$). There is therefore no evidence that the effect of donation on voluntary preference is amplified among environmentally concerned respondents or vice versa. The FP4 robustness check using a binary donation indicator confirms: the binary donated indicator is non-significant ($p = 0.372$), while environmental concern remains significant ($p = 0.003$), consistent with the continuous specification showing that the donation effect is driven by intensity of giving rather than participation alone.
+Both main effects are negative and highly significant. The main effect of donation is negative (FL3: $\hat\beta = -0.126$, SE = 0.034, $p < 0.001$; APE = $-0.030$): higher donors show stronger preferences for mandatory instruments. The main effect of environmental concern is also negative (FL3: $\hat\beta = -0.176$, SE = 0.041, $p < 0.001$; APE = $-0.042$): environmentally concerned respondents prefer mandatory instruments. The interaction coefficient is small and statistically indistinguishable from zero in both the full sample (FL3: $-0.009$, SE = 0.034, $p = 0.792$; APE = $-0.002$) and the sensitivity sample excluding respondents with fewer than 3 mixed tasks (FL3$_{\text{sens}}$: $-0.033$, SE = 0.037, $p = 0.376$). There is therefore no evidence that the effect of donation on voluntary preference is amplified among environmentally concerned respondents or vice versa. The FL4 robustness check using a binary donation indicator confirms: the binary donated indicator is non-significant ($p = 0.372$), while environmental concern remains significant ($p = 0.003$), consistent with the continuous specification showing that the donation effect is driven by intensity of giving rather than participation alone.
 
-Among covariates, trust in the state is the strongest predictor (FP3: APE = $-0.034$, $p < 0.001$): respondents who trust state institutions show stronger preferences for mandatory instruments, consistent with support for government-led conservation financing. Trust in NGOs is not significantly associated with voluntary preference (APE = $0.006$, $p = 0.461$). Policy consequentiality (Q14) is positively and marginally associated with voluntary preference (APE = $0.014$, $p = 0.064$): respondents who believe Swedish policy commitments will be followed through tend to choose voluntary instruments slightly more often, possibly because they perceive voluntary mechanisms as credible in a high-compliance context.
+Among covariates, trust in the state is the strongest predictor (FL3: APE = $-0.034$, $p < 0.001$): respondents who trust state institutions show stronger preferences for mandatory instruments, consistent with support for government-led conservation financing. Trust in NGOs is not significantly associated with voluntary preference (APE = $0.006$, $p = 0.461$). Policy consequentiality (Q14) is positively and marginally associated with voluntary preference (APE = $0.014$, $p = 0.064$): respondents who believe Swedish policy commitments will be followed through tend to choose voluntary instruments slightly more often, possibly because they perceive voluntary mechanisms as credible in a high-compliance context.
 
 ```{r}
 #| label: tbl-reg
-#| tbl-cap: "Fractional probit (Papke--Wooldridge) regressions: voluntary preference score (VP)"
+#| tbl-cap: "Fractional logit (Papke--Wooldridge) regressions: voluntary preference score (VP)"
 #| eval: true
 
+terms_main <- c("(Intercept)", "donation_z", "env_z", "donation_z:env_z",
+                 "gave_binary", "env_z:gave_binary",
+                 "trust_ngo", "trust_state", "policy_cq",
+                 "bio_knowl", "female", "income_mid", "income_high")
+row_labels <- c("Intercept", "Donation (z)", "Env. importance (z)",
+                "Donation × Env.", "Donated (0/1)", "Donated × Env.",
+                "Trust: NGOs", "Trust: state", "Policy conseq.",
+                "Bio. knowledge", "Female", "Income: mid", "Income: high",
+                "Dev. R²", "N")
+
+make_col <- function(model) {
+  vals <- sapply(terms_main, function(t) fmt_coef(model, t))
+  c(vals, as.character(dev_r2(model)), as.character(nobs(model)))
+}
+
 reg_tbl <- tibble(
-  Variable = c(
-    "Intercept",
-    "Donation (z)",
-    "Env. importance (z)",
-    "Donation x Env.",
-    "Donated (0/1)",
-    "Donated x Env.",
-    "Trust: NGOs",
-    "Trust: state",
-    "Policy conseq.",
-    "Bio. knowledge",
-    "Female",
-    "Income: mid",
-    "Income: high",
-    "Dev. R²",
-    "N"
-  ),
-  FP1 = c(
-    "-0.261*** (0.030)", "-0.139*** (0.033)", "-0.190*** (0.034)",
-    rep("", 10),
-    "0.031", "1863"
-  ),
-  FP2 = c(
-    "-0.257*** (0.032)", "-0.136*** (0.034)", "-0.193*** (0.035)",
-    "-0.012  (0.035)",
-    rep("", 9),
-    "0.031", "1863"
-  ),
-  FP3 = c(
-    "-0.030  (0.204)", "-0.126*** (0.034)", "-0.176*** (0.041)",
-    "-0.009  (0.034)",
-    "", "",
-    "0.024  (0.033)", "-0.142*** (0.030)",
-    "0.058†  (0.031)", "0.009  (0.038)",
-    "0.052 (0.063)", "-0.074 (0.089)", "-0.110 (0.107)",
-    "0.043", "1863"
-  ),
-  FP4 = c(
-    "0.077  (0.220)", "", "-0.236** (0.079)",
-    "",
-    "-0.090  (0.101)", "0.031 (0.085)",
-    "0.010  (0.033)", "-0.145*** (0.030)",
-    "0.068*  (0.031)", "0.013  (0.038)",
-    "0.060 (0.063)", "-0.091 (0.088)", "-0.136 (0.106)",
-    "0.037", "1863"
-  )
+  Variable = row_labels,
+  FL1 = make_col(fl1),
+  FL2 = make_col(fl2),
+  FL3 = make_col(fl3),
+  FL4 = make_col(fl4)
 )
 
 reg_tbl |>
   kableExtra::kbl(booktabs = TRUE, escape = TRUE, longtable = FALSE,
-                  col.names = c("", "FP1", "FP2", "FP3", "FP4"),
+                  col.names = c("", "FL1", "FL2", "FL3", "FL4"),
                   align = c("l", "r", "r", "r", "r")) |>
   kableExtra::kable_styling(latex_options = c("hold_position"),
                             bootstrap_options = c("condensed"),
@@ -757,8 +803,8 @@ reg_tbl |>
   kableExtra::footnote(
     general = c(
       "DV: VP score. Quasi-binomial GLM (logit link). HC3 robust SE in parentheses.",
-      "APE = coef x 0.240 (mean scale factor). FP1: main effects. FP2: + interaction.",
-      "FP3: full covariates. FP4: binary donated indicator (robustness).",
+      "APE = coef x 0.240 (mean scale factor). FL1: main effects. FL2: + interaction.",
+      "FL3: full covariates. FL4: binary donated indicator (robustness).",
       "OLS results (near-identical APEs) in Appendix D. † p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
     ),
     general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
@@ -794,7 +840,7 @@ ggplot(anal_data, aes(x = donation, y = voluntary_pref, colour = env_lab)) +
 
 ## Interpretation of main findings
 
-Our central finding is that both donation behaviour and environmental concern independently predict stronger preferences for mandatory instruments, with no significant interaction between the two (FP3: APE$_{\text{don}} = -0.030$, $p < 0.001$; APE$_{\text{env}} = -0.042$, $p < 0.001$; interaction APE = $-0.002$, $p = 0.792$). The data fail to support the strategic voluntary preference hypothesis: the pattern is the opposite of what the free-rider story predicts.
+Our central finding is that both donation behaviour and environmental concern independently predict stronger preferences for mandatory instruments, with no significant interaction between the two (FL3: APE$_{\text{don}} = -0.030$, $p < 0.001$; APE$_{\text{env}} = -0.042$, $p < 0.001$; interaction APE = $-0.002$, $p = 0.792$). The data fail to support the strategic voluntary preference hypothesis: the pattern is the opposite of what the free-rider story predicts.
 
 The strategic hypothesis predicted that high environmental concern combined with zero donation would produce the highest voluntary preference — these respondents would endorse voluntary schemes they personally intend to free-ride on. The data show exactly the opposite: the high-env-att, no-donation cell has the lowest mean VP (0.385), substantially lower than low-env-att respondents who did not donate (0.549), with non-overlapping confidence intervals. Environmentally concerned Swedes prefer mandatory instruments regardless of their personal giving behaviour.
 
@@ -922,9 +968,9 @@ Pre-registered analyses: conditional logit and mixed logit models (Sections 4.1 
 
 ## D. Robustness checks and power analysis {.unnumbered}
 
-**OLS results (primary specification in fractional probit; OLS for comparison).** The OLS models M1–M4 described in the pre-revision manuscript are retained here for comparison. The average partial effects (APEs) of the fractional probit models in @tbl-reg and the OLS coefficients are nearly identical (within rounding), confirming that the bounded distribution of VP does not substantially distort the OLS estimates in this application.
+**OLS results (primary specification in fractional logit; OLS for comparison).** The OLS models M1–M4 described in the pre-revision manuscript are retained here for comparison. The average partial effects (APEs) of the fractional logit models in @tbl-reg and the OLS coefficients are nearly identical (within rounding), confirming that the bounded distribution of VP does not substantially distort the OLS estimates in this application.
 
-**Sensitivity: n_mixed ≥ 3.** Rerunning the primary fractional probit model (FP3) on the subsample of respondents with at least 3 informative mixed tasks ($n = 1{,}478$, dropping 385 respondents with fewer than 3 mixed tasks) yields coefficient estimates consistent with the full sample: donation effect $\hat\beta_1 = -0.102$ (SE = 0.035, $p = 0.003$), environmental concern $\hat\beta_2 = -0.218$ (SE = 0.042, $p < 0.001$), interaction $\hat\beta_3 = -0.033$ (SE = 0.037, $p = 0.376$). The interaction remains non-significant and the main effects strengthen, confirming that the additive pattern is not an artefact of measurement noise.
+**Sensitivity: n_mixed ≥ 3.** Rerunning the primary fractional logit model (FL3) on the subsample of respondents with at least 3 informative mixed tasks ($n = 1{,}478$, dropping 385 respondents with fewer than 3 mixed tasks) yields coefficient estimates consistent with the full sample: donation effect $\hat\beta_1 = -0.102$ (SE = 0.035, $p = 0.003$), environmental concern $\hat\beta_2 = -0.218$ (SE = 0.042, $p < 0.001$), interaction $\hat\beta_3 = -0.033$ (SE = 0.037, $p = 0.376$). The interaction remains non-significant and the main effects strengthen, confirming that the additive pattern is not an artefact of measurement noise.
 
 **Power analysis.** Under the OLS model for VP with $n = 1{,}863$, $\overline{\text{VP}} = 0.431$, and $\text{SD}(\text{VP}) = 0.320$ (and standardised predictors), the minimum detectable effect size for the interaction at 80% power ($\alpha = 0.05$, two-sided) is $|\hat\beta_3| \approx 0.021$. The observed interaction estimate ($\hat\beta_3 = -0.002$) is an order of magnitude below this threshold, indicating the study had adequate power to detect medium-sized interactions but found no evidence of even a small effect. The null interaction result is therefore informative: we can reasonably rule out interactions of the magnitude originally hypothesised.
 
@@ -999,7 +1045,7 @@ het_tbl |>
 
 ## F. Theoretical framework: strategic hypothesis {.unnumbered}
 
-We sketch the strategic voluntary preference hypothesis in a simple expected-utility framework to clarify what the fractional probit interaction test identifies.
+We sketch the strategic voluntary preference hypothesis in a simple expected-utility framework to clarify what the fractional logit interaction test identifies.
 
 Let respondent $i$ hold environmental valuation $b_i \geq 0$ and private willingness to contribute $c_i \geq 0$, revealed by the dictator-game donation $G_i$. Consider a DCE choice between two instruments:
 
