@@ -454,3 +454,10 @@ anal_data |>
     mean_env        = round(mean(env_import), 2),
     mean_n_mixed    = round(mean(n_mixed), 1)
   ) |> print()
+
+
+# ==============================================================================
+# Session info (for reproducibility)
+# ==============================================================================
+cat("\n=== Session information ===\n")
+print(sessionInfo())

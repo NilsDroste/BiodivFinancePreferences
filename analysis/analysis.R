@@ -226,3 +226,9 @@ wtp_sek <- -coef[c("beta_don", "beta_cert", "beta_off", "beta_ind", "beta_pland"
 names(wtp_sek) <- c("Donation", "Certification", "Offsetting", "Industrial land", "Public land", "Public monitoring")
 cat("\n=== Implicit WTP (SEK/year) vs baseline: Tax + Small-scale private + Private monitoring ===\n")
 print(round(wtp_sek))
+
+# ==============================================================================
+# Session info (for reproducibility)
+# ==============================================================================
+cat("\n=== Session information ===\n")
+print(sessionInfo())

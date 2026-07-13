@@ -43,6 +43,11 @@ analysis/analysis.qmd
 paper/manuscript.html
 paper/manuscript_GEC_anon_files/
 
+# renv: track lockfile and activate script; exclude the package library
+renv/library/
+renv/python/
+renv/staging/
+
 # OS / editor
 .DS_Store
 .Rhistory

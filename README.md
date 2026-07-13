@@ -30,24 +30,37 @@ data/Full launch database/4178_excel_databas.xlsx
 
 ## Software
 
-- R ≥ 4.6
-- Packages: `tidyverse`, `readxl`, `here`, `apollo` (≥ 0.3.8), `logitr`, `kableExtra`, `patchwork`, `sandwich`, `lmtest`, `scales`, `janitor`
+| Component | Version used |
+|---|---|
+| R | 4.6.1 |
+| Quarto | 1.9.37 |
+| logitr | 1.2.0 |
+| apollo | 0.3.8 |
+| tidyverse | 2.0.0 |
+| kableExtra | 1.4.1 |
+| sandwich | 3.1-1 |
+| lmtest | 0.9-40 |
 
-Install all at once:
+This repository uses [renv](https://rstudio.github.io/renv/) to lock all 148 R package versions. To restore the exact environment:
 
 ```r
-install.packages(c(
-  "tidyverse", "readxl", "here", "apollo", "logitr",
-  "kableExtra", "patchwork", "sandwich", "lmtest",
-  "scales", "janitor"
-))
+install.packages("renv")
+renv::restore()
 ```
+
+This will install all packages at the versions recorded in `renv.lock`. Requires R 4.6+ and an internet connection; Apollo is installed from CRAN.
+
+The Quarto manuscript requires a LaTeX distribution. TeX Live 2024 or later is recommended:
+
+- macOS: `brew install --cask mactex-no-gui`
+- Linux: `apt install texlive-full`
+- Windows: install [MiKTeX](https://miktex.org/)
 
 ## Analysis scripts
 
 | Script | Content |
 |---|---|
-| `analysis/analysis.R` | Main analysis: data preparation, CL, MXL (via logitr), VP score, fractional probit, 2×2 descriptives, subgroup heterogeneity |
+| `analysis/analysis.R` | Main analysis: data preparation, CL, MXL (via logitr), VP score, fractional logit, 2×2 descriptives, subgroup heterogeneity |
 | `analysis/mxl_analysis.R` | Mixed logit estimation (Apollo) |
 | `analysis/donation_analysis.R` | Dictator game donation distribution and descriptives |
 | `analysis/heterogeneity_analysis.R` | Subgroup CL models by gender, income, environmental attitude |

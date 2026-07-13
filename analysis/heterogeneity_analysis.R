@@ -250,3 +250,10 @@ wide <- all_results |>
          off_Cell,  off_WTP_SEK)
 
 print(wide, n = 20)
+
+
+# ==============================================================================
+# Session info (for reproducibility)
+# ==============================================================================
+cat("\n=== Session information ===\n")
+print(sessionInfo())

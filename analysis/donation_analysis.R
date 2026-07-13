@@ -191,3 +191,9 @@ don |> summarise(
   pct_half   = round(mean(donation == 500) * 100, 1),
   pct_all    = round(mean(gave_all) * 100, 1)
 ) |> print()
+
+# ==============================================================================
+# Session info (for reproducibility)
+# ==============================================================================
+cat("\n=== Session information ===\n")
+print(sessionInfo())

@@ -269,3 +269,10 @@ posterior |>
 # Save model
 saveRDS(lcm_model, here("analysis", "LCM_2class_apollo.rds"))
 cat("\nModel saved to analysis/LCM_2class_apollo.rds\n")
+
+
+# ==============================================================================
+# Session info (for reproducibility)
+# ==============================================================================
+cat("\n=== Session information ===\n")
+print(sessionInfo())
