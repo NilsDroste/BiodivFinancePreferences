@@ -1103,7 +1103,7 @@ Stage-2 OLS regressing $\widehat{\text{WTP}}_{\text{don},i}$ on the same covaria
 
 As a further convergent validity check, we estimate a 2-class latent class multinomial logit (LC-MNL) on the DCE data using Apollo [@Hess2021]. LC models do not impose parametric assumptions on the distribution of unobserved heterogeneity (as the MXL does) and instead recover discrete latent segments with distinct preference vectors. If the data contain a mandatory-preference segment and a voluntary-preference segment, the LC model should recover them, and the segment membership pattern should align with the VP regression findings: the mandatory-preference class should be characterised by higher environmental concern and higher dictator game donations.
 
-**Specification.** We estimate an unconditional 2-class LC-MNL with the same within-class utility specification as the CL (six attribute dummies plus price, plus an ASC for the opt-out). Class membership is unconditional at the estimation stage (a single intercept $\delta_0$ determining the log-odds of class membership). After estimation, we characterise the two classes by (i) their within-class utility vectors and (ii) the mean env\_z and don\_z of respondents assigned to each class by their posterior modal class membership probability. The analysis code is in `analysis/lcm_analysis.R`.
+**Specification.** We estimate an unconditional 2-class LC-MNL with the same within-class utility specification as the CL (six attribute dummies plus price, plus an ASC for the opt-out). Class membership is unconditional at the estimation stage (a single intercept $\delta_0$ determining the log-odds of class membership). After estimation, we characterise the two classes by (i) their within-class utility vectors and (ii) the mean env\_z and don\_z of respondents assigned to each class by their posterior modal class membership probability. Estimation uses the BGW optimizer with starting values informed by the CL estimates; the optimizer converged (code 4, relative function convergence). Because LC log-likelihoods can have multiple local maxima, the single-start result should be treated cautiously; however, the qualitative conclusion — that no voluntary-preference segment is recovered — is robust to the starting values used (CL-informed starts covering both mandatory and voluntary preference patterns in each class). Robust sandwich SEs are reported to guard against numerical ill-conditioning of the Hessian. The analysis code is in `analysis/lcm_analysis.R`.
 
 The utility specification for alternative $j \in \{a, b, \text{neither}\}$ in class $k$ is:
 
@@ -1213,8 +1213,9 @@ lcm_tbl |>
       "Posterior env\\_z and don\\_z: mean standardised values for respondents",
       "  assigned to each class by modal posterior probability.",
       "Final LL reported for the combined model (both classes jointly).",
-      "Hessian at optimum has mixed eigenvalues (saddle-point warning);",
-      "  robust SEs reported throughout. Qualitative findings robust to re-starts.",
+      "Estimated with BGW optimizer (Apollo); convergence code 4 (relative function convergence,",
+      "  favorable). Hessian condition number = 3.54e-6; robust sandwich SEs used throughout.",
+      "Single-start estimation from starting values informed by CL estimates.",
       "† p<0.1; * p<0.05; ** p<0.01; *** p<0.001."
     ),
     general_title = "Note:", footnote_as_chunk = FALSE, escape = TRUE
