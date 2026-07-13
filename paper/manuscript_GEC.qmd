@@ -367,59 +367,84 @@ All six random parameters have large and highly significant standard deviations.
 #| tbl-cap: "Mixed logit results --- mean and SD of random parameters with WTP (pre-registered, $n = 16{,}808$)"
 #| eval: true
 
+mxl <- readRDS(here::here("analysis", "MXL_full_logitr.rds"))
+cf   <- coef(mxl)
+ses  <- logitr::se(mxl)
+V    <- solve(-mxl$hessian)
+
+fmt_mxl <- function(nm, digits = 3) {
+  b  <- cf[nm]; s <- ses[nm]
+  z  <- b / s; p <- 2 * (1 - pnorm(abs(z)))
+  st <- ifelse(p < .001, "***", ifelse(p < .01, "**",
+         ifelse(p < .05, "*", ifelse(p < .1, "†", ""))))
+  sg <- ifelse(b >= 0, "+", "")
+  sprintf("%s%s%s (%s)", sg,
+          formatC(b, digits = digits, format = "f"), st,
+          formatC(s, digits = digits, format = "f"))
+}
+
+wtp_cell <- function(nm, price_nm = "price", digits = 0) {
+  b  <- cf[nm]; p_c <- cf[price_nm]
+  wtp <- b / (-p_c) * 1000
+  ai  <- which(names(cf) == nm)
+  pi  <- which(names(cf) == price_nm)
+  g   <- rep(0, length(cf))
+  g[ai] <- 1 / (-p_c) * 1000
+  g[pi] <- -b / (p_c^2) * 1000
+  se_w  <- sqrt(abs(as.numeric(t(g) %*% V %*% g)))
+  z  <- cf[nm] / ses[nm]; pv <- 2 * (1 - pnorm(abs(z)))
+  st <- ifelse(pv < .001, "***", ifelse(pv < .01, "**",
+         ifelse(pv < .05, "*", ifelse(pv < .1, "†", ""))))
+  sg <- ifelse(wtp >= 0, "+", "")
+  sprintf("%s%s%s (%s)", sg,
+          formatC(round(wtp), big.mark = ",", format = "d"), st,
+          formatC(round(se_w), big.mark = ",", format = "d"))
+}
+
+share_cell <- function(mean_nm, sd_nm) {
+  mu <- cf[mean_nm]; sg <- abs(cf[sd_nm])
+  sprintf("%.1f%%", pnorm(mu / sg) * 100)
+}
+
+r_pars  <- c("don", "cert", "off", "ind", "pland", "pmon")
+sd_nms  <- paste0("sd_", r_pars)
+mcf_r2  <- round(1 - mxl$logLik / mxl$nullLogLik, 3)
+ll_fmt  <- formatC(round(mxl$logLik, 1), format = "f", digits = 1, big.mark = ",")
+
+param_labels <- c(
+  "ASC (neither/opt-out)",
+  "Donation (vs. tax)", "Certification (vs. tax)", "Offsetting (vs. tax)",
+  "Industrial land (vs. small-scale)", "Public land (vs. small-scale)",
+  "Public monitoring (vs. private audit)", "Annual cost (kSEK/year)",
+  "", "Log-likelihood", "McFadden R²", "N observations"
+)
+mean_col <- c(
+  sapply(c("asc_neither", r_pars, "price"), fmt_mxl),
+  "", ll_fmt, as.character(mcf_r2),
+  formatC(mxl$n$obs, format = "d", big.mark = ",")
+)
+sd_col <- c(
+  "---",
+  sapply(sd_nms, fmt_mxl),
+  "---", "", "", "", ""
+)
+share_col <- c(
+  "---",
+  mapply(share_cell, r_pars, sd_nms),
+  "---", "", "", "", ""
+)
+wtp_col <- c(
+  wtp_cell("asc_neither"),
+  sapply(r_pars, wtp_cell),
+  "---", "", "", "", ""
+)
+
 mxl_tbl <- tibble(
-  Parameter = c(
-    "ASC (neither/opt-out)",
-    "Donation (vs. tax)",
-    "Certification (vs. tax)",
-    "Offsetting (vs. tax)",
-    "Industrial land (vs. small-scale)",
-    "Public land (vs. small-scale)",
-    "Public monitoring (vs. private audit)",
-    "Annual cost (kSEK/year)",
-    "",
-    "Log-likelihood",
-    "McFadden R²",
-    "N observations"
-  ),
-  Mean = c(
-    "-1.738*** (0.047)",
-    "-0.692*** (0.056)",
-    "-0.184*** (0.054)",
-    "+0.241*** (0.059)",
-    "+0.119*   (0.049)",
-    "+0.306*** (0.049)",
-    "+0.394*** (0.047)",
-    "-0.287*** (0.007)",
-    "", "-15,411.9", "0.165", "16,808"
-  ),
-  SD = c(
-    "---",
-    "1.419*** (0.069)",
-    "1.515*** (0.067)",
-    "1.505*** (0.086)",
-    "1.167*** (0.063)",
-    "1.239*** (0.061)",
-    "1.530*** (0.053)",
-    "---",
-    "", "", "", ""
-  ),
-  Share = c(
-    "---", "31.3%", "45.2%", "56.3%",
-    "54.1%", "59.7%", "60.2%", "---",
-    "", "", "", ""
-  ),
-  WTP = c(
-    "-6,054 (184)",
-    "-2,408*** (201)",
-    "-641***  (186)",
-    "+837***  (207)",
-    "+415*    (171)",
-    "+1,064*** (170)",
-    "+1,373*** (164)",
-    "---",
-    "", "", "", ""
-  )
+  Parameter = param_labels,
+  Mean      = mean_col,
+  SD        = sd_col,
+  Share     = share_col,
+  WTP       = wtp_col
 )
 
 mxl_tbl |>
