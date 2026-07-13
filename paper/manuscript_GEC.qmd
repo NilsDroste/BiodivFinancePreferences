@@ -56,9 +56,10 @@ table.table td, table.table th { word-break: break-word; overflow-wrap: break-wo
 ```
 
 ```{=latex}
-\noindent\textbf{Keywords:} voluntary governance; biodiversity financing; most-likely case design; discrete choice experiment; public-goods consequentialism; collective action; Kunming-Montreal Global Biodiversity Framework
-
-\vspace{1em}
+\begin{quote}
+\small\noindent\textbf{Keywords:} voluntary governance; biodiversity financing; most-likely case design; discrete choice experiment; public-goods consequentialism; collective action; Kunming-Montreal Global Biodiversity Framework
+\end{quote}
+\vspace{0.5em}
 ```
 
 # Introduction {#sec-intro}
