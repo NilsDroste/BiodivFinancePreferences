@@ -11,9 +11,9 @@ Department of Food and Resource Economics (IFRO), University of Copenhagen
 nd@ifro.ku.dk
 [full postal address to be added]
 
-**Jens Christiansen**
+**Jens Marl Christiansen**
 Department of People and Technology, Roskilde University
-jens.christiansen@ruc.dk
+jmchristiansen@ruc.dk
 
 **Yohei Mitani**
 Graduate School of Global Environmental Studies, Kyoto University

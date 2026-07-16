@@ -4,9 +4,9 @@ author:
   - name: Nils Droste
     affiliations: Department of Food and Resource Economics, University of Copenhagen
     email: nd@ifro.ku.dk
-  - name: Jens Christiansen
-    affiliations: Lund University Centre for Sustainability Studies (LUCSUS)
-    email: jens.christiansen@lucsus.lu.se
+  - name: Jens Marl Christiansen
+    affiliations: Department of People and Technology, Roskilde University
+    email: jmchristiansen@ruc.dk
   - name: Yohei Mitani
     affiliations: Graduate School of Global Environmental Studies, Kyoto University
     email: mitani.yohei.7w@kyoto-u.ac.jp
