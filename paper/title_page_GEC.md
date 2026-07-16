@@ -12,8 +12,8 @@ nd@ifro.ku.dk
 [full postal address to be added]
 
 **Jens Christiansen**
-Lund University Centre for Sustainability Studies (LUCSUS), Lund University
-jens.christiansen@lucsus.lu.se
+Department of People and Technology, Roskilde University
+jens.christiansen@ruc.dk
 
 **Yohei Mitani**
 Graduate School of Global Environmental Studies, Kyoto University

@@ -66,6 +66,7 @@ The Quarto manuscript requires a LaTeX distribution. TeX Live 2024 or later is r
 | `analysis/heterogeneity_analysis.R` | Subgroup CL models by gender, income, environmental attitude |
 | `analysis/instrument_pref_analysis.R` | Instrument-level WTP calculations |
 | `analysis/lcm_analysis.R` | 2-class latent class MNL via Apollo (Appendix H) |
+| `analysis/lcm_nclass.R` | 3- and 4-class LC-MNL specification tests; model fit comparison (Appendix H) |
 | `analysis/heterogeneity_exploratory.R` | Exploratory subgroup CL models by party vote, state trust, policy consequentiality (Appendix I) |
 
 Run in the order listed. `analysis.R` must run first as it produces objects used downstream.

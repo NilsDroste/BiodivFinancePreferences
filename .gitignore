@@ -8,6 +8,9 @@ analysis/q17_for_coding.csv
 analysis/*.rds
 analysis/CL_full_iterations.csv
 analysis/LCM_2class_iterations.csv
+analysis/LCM_3class_iterations.csv
+analysis/LCM_4class_iterations.csv
+.vscode/
 
 # HB approach not reported in paper
 analysis/hb_wtp_feasibility.R

@@ -1230,6 +1230,53 @@ The posterior class characterisation provides weak convergent support for the VP
 
 Taken together, the LC results provide convergent validity to the primary CL and MXL findings: there is no latent segment of the Swedish population that prefers voluntary biodiversity financing instruments, and the aggregate mandatory preference is not an artefact of averaging over a voluntary-preference minority.
 
+**Number-of-classes specification test.** We assess sensitivity to the choice of $K = 2$ classes by estimating 3- and 4-class LC-MNL specifications with the same within-class utility function. Starting values for each additional class are informed by the 2-class estimates; all models use the BGW optimizer with robust sandwich SEs. The 4-class model shows signs of identification problems (parameters near $\pm\infty$), a known risk when too many classes are extracted from a dataset of this size. Table H.2 reports fit statistics for all three specifications.
+
+```{r}
+#| label: tbl-lcm-nclass
+#| tbl-cap: "Number-of-classes specification test: 2-, 3-, and 4-class LC-MNL. AIC $= -2\\,\\text{LL} + 2K$; BIC $= -2\\,\\text{LL} + K\\log(n)$, $n = 2{,}101$ respondents. Bold indicates minimum BIC."
+
+fit <- readRDS(here::here("analysis", "LCM_fit_comparison.rds"))
+best_bic <- which.min(fit$BIC)
+
+fit_fmt <- fit |>
+  dplyr::mutate(
+    LL  = formatC(LL,  format = "f", digits = 1, big.mark = ","),
+    AIC = formatC(AIC, format = "f", digits = 1, big.mark = ","),
+    BIC = formatC(BIC, format = "f", digits = 1, big.mark = ",")
+  )
+for (j in seq_len(ncol(fit_fmt))) {
+  fit_fmt[best_bic, j] <- paste0("\\textbf{", fit_fmt[best_bic, j], "}")
+}
+
+kableExtra::kbl(
+  fit_fmt,
+  format     = "latex",
+  booktabs   = TRUE,
+  longtable  = FALSE,
+  col.names  = c("Classes ($K$)", "Parameters", "Log-likelihood", "AIC", "BIC"),
+  align      = c("c", "c", "r", "r", "r"),
+  escape     = FALSE,
+  linesep    = ""
+) |>
+  kableExtra::kable_styling(
+    latex_options = c("hold_position"),
+    full_width    = TRUE
+  ) |>
+  kableExtra::footnote(
+    general = c(
+      "BGW optimizer; convergence code 4 for $K = 2$ and $K = 3$.",
+      "The $K = 4$ model shows parameter instability indicating likely non-identification.",
+      "Robust sandwich SEs used throughout. Single-start estimation."
+    ),
+    general_title  = "Note:",
+    escape         = FALSE,
+    threeparttable = TRUE
+  )
+```
+
+BIC is minimised at $K = 2$ (BIC $= 33{,}425.1$) and is essentially flat at $K = 3$ (BIC $= 33{,}418.5$), with neither model clearly preferred by this criterion. Across both well-identified specifications, the substantive conclusion is unchanged: no additional class recovers a voluntary-preference segment. In the 3-class solution, all three classes rank donation last relative to the tax baseline, with between-class heterogeneity concentrated in the magnitude of price sensitivity and the opt-out ASC. We retain the 2-class model as the primary reported specification on parsimony grounds.
+
 ## I. Exploratory subgroup heterogeneity {.unnumbered}
 
 *These analyses were not pre-registered and should be treated as exploratory.*
