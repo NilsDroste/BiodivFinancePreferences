@@ -43,6 +43,94 @@ library(knitr)
 library(kableExtra)
 library(patchwork)
 library(here)
+library(readxl)
+library(sandwich)
+library(lmtest)
+```
+
+```{r}
+#| label: load-data
+#| eval: true
+
+data_path   <- here::here("data", "Full launch database", "4178_excel_databas.xlsx")
+design_path <- here::here("design", "Trial 3 - factorial grouped, svensk.xlsx")
+
+full_data  <- read_excel(data_path, sheet = 2)
+price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
+design_raw <- read_excel(design_path, sheet = 1)
+names(design_raw) <- c(
+  "cs","block","a_source","a_src_txt","a_land","a_land_txt",
+  "a_monitor","a_mon_txt","a_price","a_price_txt",
+  "b_source","b_src_txt","b_land","b_land_txt",
+  "b_monitor","b_mon_txt","b_price","b_price_txt"
+)
+design <- design_raw |>
+  select(cs, block, a_source, a_land, a_monitor, a_price,
+         b_source, b_land, b_monitor, b_price) |>
+  group_by(block) |> mutate(task = row_number()) |> ungroup() |>
+  mutate(a_price_sek = price_map[as.character(a_price)],
+         b_price_sek = price_map[as.character(b_price)])
+
+choices_ord1 <- full_data |> filter(ordning == 1) |>
+  select(id, block, choice1:choice8) |>
+  pivot_longer(choice1:choice8, names_to = "col", values_to = "choice") |>
+  mutate(task = as.integer(substr(col, 7, 7)))
+choices_ord2 <- full_data |> filter(ordning == 2) |>
+  select(id, block, choice12, choice22, choice32, choice42,
+         choice52, choice62, choice72, choice82) |>
+  pivot_longer(-c(id, block), names_to = "col", values_to = "choice") |>
+  mutate(task = as.integer(substr(col, 7, 7)))
+
+resp <- bind_rows(choices_ord1, choices_ord2) |>
+  filter(!is.na(choice)) |>
+  left_join(design, by = c("block", "task")) |>
+  mutate(choice_num = case_when(choice == "a" ~ 1L, choice == "b" ~ 2L, TRUE ~ 3L))
+
+resp_level <- resp |>
+  mutate(
+    a_vol = a_source %in% c(1L, 2L), b_vol = b_source %in% c(1L, 2L),
+    a_man = a_source %in% c(0L, 3L), b_man = b_source %in% c(0L, 3L),
+    mixed_task = (a_vol & b_man) | (a_man & b_vol),
+    chose_vol  = case_when(
+      !mixed_task | choice == "3" ~ NA_real_,
+      (a_vol & choice == "a") | (b_vol & choice == "b") ~ 1, TRUE ~ 0
+    )
+  ) |>
+  filter(mixed_task, !is.na(chose_vol)) |>
+  group_by(id) |>
+  summarise(voluntary_pref = mean(chose_vol), n_mixed = n(), .groups = "drop")
+
+covars <- full_data |>
+  transmute(
+    id,
+    donation    = yourdonation,
+    gave        = as.integer(yourdonation > 0),
+    env_import  = q11,
+    income      = q8,
+    gender      = q10,
+    trust_state = q2_1,
+    trust_ngo   = q2_3,
+    policy_cq   = q14,
+    bio_knowl   = q12
+  )
+
+anal_data <- resp_level |>
+  left_join(covars, by = "id") |>
+  filter(!is.na(donation), !is.na(env_import), !is.na(income), !is.na(gender),
+         !is.na(trust_state), !is.na(trust_ngo), !is.na(policy_cq), !is.na(bio_knowl)) |>
+  mutate(
+    env_med     = median(env_import),
+    env_hi      = env_import >= env_med,
+    donated     = gave == 1L,
+    env_z       = as.numeric(scale(env_import)),
+    donation_z  = as.numeric(scale(donation)),
+    gave_binary = gave,
+    income_mid  = as.integer(income %in% 2:4),
+    income_high = as.integer(income %in% 5:7),
+    female      = as.integer(gender == 2),
+    env_t       = ntile(env_import, 3),
+    env_lab     = factor(env_t, labels = c("Low env. att.", "Medium", "High env. att."))
+  )
 ```
 
 # Introduction
@@ -310,7 +398,7 @@ instr_colors2 <- c(
 party_order <- c("Left (S/V/MP)", "Centre-right", "SD", "No pref / DK")
 
 all_exp |>
-  filter(Group %in% party_order) |>
+  filter(Label %in% party_order) |>
   mutate(
     ci_lo      = Coef - 1.96 * SE,
     ci_hi      = Coef + 1.96 * SE,
@@ -319,10 +407,10 @@ all_exp |>
       cert = "Certification",
       off  = "Offsetting"
     ),
-    Group = factor(Group, levels = party_order)
+    Label = factor(Label, levels = party_order)
   ) |>
   filter(Instrument %in% c("Donation", "Certification", "Offsetting")) |>
-  ggplot(aes(x = Coef, y = Group, colour = Instrument)) +
+  ggplot(aes(x = Coef, y = Label, colour = Instrument)) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
   geom_linerange(aes(xmin = ci_lo, xmax = ci_hi),
                  position = position_dodge(width = 0.5), linewidth = 0.8) +
