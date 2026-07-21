@@ -218,8 +218,7 @@ wtp_delta <- function(attr_nm) {
 }
 
 wtp_df <- tibble(
-  attr  = c("donation_mean", "cert_mean", "off_mean",
-            "ind_mean", "pland_mean", "pmon_mean"),
+  attr  = c("don", "cert", "off", "ind", "pland", "pmon"),
   label = c("Donation", "Certification", "Offsetting",
             "Industrial land", "Public land", "Public monitoring"),
   type  = c("voluntary", "voluntary", "mandatory",
