@@ -1,0 +1,107 @@
+---
+title: "Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions"
+author:
+  - name: Nils Droste
+    affiliations: Department of Food and Resource Economics, University of Copenhagen
+    email: nd@ifro.ku.dk
+  - name: Jens Marl Christiansen
+    affiliations: Department of People and Technology, Roskilde University
+    email: jmchristiansen@ruc.dk
+  - name: Yohei Mitani
+    affiliations: Graduate School of Global Environmental Studies, Kyoto University
+    email: mitani.yohei.7w@kyoto-u.ac.jp
+date: today
+abstract: |
+  The Kunming-Montreal Global Biodiversity Framework relies on voluntary and market-based private finance to close a USD 200 billion annual funding gap for nature. Missing from the debate is the demand side: do citizens actually prefer voluntary over mandatory biodiversity financing channels? We test this using a most-likely case design. Sweden ranks among the world's highest for social trust, environmental identity, and per-capita conservation spending, constituting the most structurally favorable context for voluntary instrument support. If citizens here do not prefer voluntary channels, public preferences and governance trajectory diverge at their own best case. Using a preregistered discrete choice experiment ($n = 2{,}101$) combined with an incentivised donation experiment, we find that Swedish citizens consistently prefer mandatory instruments: corporate offsetting carries the highest mean utility and public monitoring commands a willingness-to-pay premium of approximately SEK 1,600 per year. Environmental concern and donation behaviour independently predict stronger mandatory preference, with no evidence of strategic free-riding. Where voluntary instrument preference does appear, we theorize it reflects a pragmatic response to weak or distrusted state institutions rather than genuine endorsement of voluntary governance. Our findings suggest GBF reliance on voluntary private finance is misaligned with citizen preferences in one of the most favorable contexts for voluntary support globally.
+keywords:
+  - biodiversity financing
+  - discrete choice experiment
+  - voluntary governance
+  - most-likely case design
+  - Kunming-Montreal Global Biodiversity Framework
+format:
+  pdf:
+    number-sections: false
+    fontsize: 12pt
+    geometry: margin=2.5cm
+    keep-tex: false
+  docx:
+    number-sections: false
+bibliography: references.bib
+execute:
+  eval: false
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| eval: true
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+```
+
+# Introduction
+
+Global biodiversity governance has, over three decades, shifted substantially toward voluntary, market-based, and non-state financing instruments. The Kunming-Montreal Global Biodiversity Framework (GBF), which commits governments to mobilising at least USD 200 billion per year for nature by 2030, reflects this trajectory in its heavy reliance on private and voluntary financing alongside public funding [@CBD2022]. Voluntary corporate offsetting, consumer certification schemes, and private donations to conservation organisations have been promoted as flexible alternatives to gridlocked multilateral state regulation. Yet the demand-side question has rarely been asked: does citizen demand support voluntary instruments as the governance architecture does?
+
+We test this using a most-likely case design. For voluntary instruments to enjoy public support, the ideal conditions are high social trust (so people believe others will also contribute, reducing free-rider concerns), high environmental concern, and high individual willingness to pay. Sweden meets all three at or near their global maximum: Scandinavian countries rank highest globally on generalized social trust [@WVS2022], and Sweden's per-capita conservation spending, environmental policy stringency, and public environmental identity are among the highest in the world [@OECD2020]. If citizen demand for voluntary instruments fails here, it fails at its own best case, producing a globally informative lower bound on preference alignment with the voluntary governance turn.
+
+An important conceptual distinction sharpens the design logic: individual environmental *willingness* (the inclination and capacity to act voluntarily) and *structural instrument preference* (whether one prefers voluntary or mandatory policy architecture) are not the same thing. Sweden is the ceiling for the former. We test the latter. Even when individual willingness is maximized, do citizens prefer to route conservation finance through voluntary or mandatory channels?
+
+We combine a preregistered discrete choice experiment (DCE, $n = 2{,}101$) with an incentivised donation experiment. The DCE presents paired choices between biodiversity programmes differing in financing instrument (tax, donation, certification, mandatory offsetting), land ownership type, monitoring regime, and annual cost. The donation experiment measures revealed-preference personal giving to a conservation NGO, providing a behavioral anchor for the preference analysis. We construct a respondent-level voluntary preference (VP) score from DCE choices and regress it on donation behaviour, environmental attitudes, and their interaction, asking whether the most environmentally motivated and personally generous citizens endorse voluntary instruments or demand mandatory ones.
+
+# Results
+
+## Citizens prefer mandatory biodiversity financing
+
+The conditional logit (CL) reveals a clear preference ordering: corporate offsetting carries the highest utility ($\hat\beta_{\text{off}} = +0.146$, $p < 0.001$), followed by tax payment (baseline), market certification ($\hat\beta_{\text{cert}} = -0.082$, $p < 0.05$), and voluntary donation ($\hat\beta_{\text{don}} = -0.376$, $p < 0.001$). The opt-out (status quo) is strongly rejected (ASC $= -3.28$, $p < 0.001$). Results are robust across mixed logit specifications (Extended Data Table 1). Public monitoring commands a willingness-to-pay (WTP) premium of approximately SEK 1,600/year; donation-financed programmes carry a large negative WTP (approximately $-$SEK 1,700/year relative to the tax baseline).
+
+The preference for corporate offsetting over tax payment reveals a within-mandatory distinction: beyond preferring mandatory instruments in general, Swedish citizens specifically favour placing the compliance burden on corporate actors. The DCE source attribute is orthogonally varied, so this is a direct preference comparison independent of cost. The pattern is consistent with a polluter-pays norm and with evidence from trust subgroups: respondents with higher market trust show a larger offsetting premium (WTP $+$SEK 1,117/year, high market trust) than those with lower market trust (WTP $+$SEK 712/year), while the preference for tax over voluntary instruments is stable across trust groups.
+
+## No strategic free-riding: the effectiveness logic
+
+To test whether apparent voluntary preference reflects strategic free-riding rather than genuine endorsement, we construct a respondent-level VP score (share of mixed-instrument DCE tasks where the voluntary option was chosen; mean = 0.431, SD = 0.309) and regress it on actual donation behaviour and environmental concern. Fractional logit with HC3 robust standard errors yields: APE$_{\text{don}} = -0.030$ ($p < 0.001$), APE$_{\text{env}} = -0.042$ ($p < 0.001$), interaction APE $= -0.002$ ($p = 0.792$). Both donation behaviour and environmental concern independently predict stronger mandatory preference; they do not interact.
+
+The strategic free-rider hypothesis predicts that high environmental concern combined with zero donation produces the highest VP: these respondents would endorse voluntary schemes they personally do not contribute to. The data show exactly the opposite. The high-concern, no-donation cell has the *lowest* mean VP (0.385, 95% CI 0.317–0.453, $n = 84$), substantially below the low-concern, no-donation cell (0.549, 95% CI 0.502–0.596), with non-overlapping confidence intervals (Fig. 1). The low-concern, no-donation cell reflects disengagement rather than strategy: respondents who neither care strongly nor give are indifferent between instruments. The high-concern, high-donation cell (VP = 0.392) reflects consequentialism: actual contributors who nonetheless want mandatory schemes, because they worry others will not contribute voluntarily (assurance motive) or distrust private monitoring to deliver conservation outcomes (effectiveness concern).
+
+A 2-class latent class MNL (Appendix H of Supplementary Information) does not recover a voluntary-preference segment: both classes rank donation last and offsetting first. Heterogeneity across classes reflects differences in preference intensity and price sensitivity, not in direction. A class-number specification test (K = 2, 3, 4) confirms this: BIC is essentially flat at K = 2 and K = 3, and no additional class reverses the preference ordering.
+
+Qualitative corroboration comes from open-ended survey responses. Respondents explicitly articulating support for mandatory instruments (n ≈ 26) had a mean VP of 0.278, versus 0.431 in the full sample. The dominant expressed mechanism was scale insufficiency: *"Relying on donations means choosing not to care whether we reach the goals"*; *"Market mechanisms don't work; simply put, not enough money will be collected."* Stated reasoning and incentivised DCE choices align.
+
+## Heterogeneity
+
+Pre-registered subgroup CL models stratified by gender, income, and environmental attitude confirm that preference ordering is stable across groups (Extended Data Fig. 1). Exploratory analyses reveal a political dimension: left-bloc voters strongly prefer state tax; centre-right and Sweden Democrat voters prefer corporate offsetting. Individual voluntary donation is rejected robustly by all political subgroups — the consensus is on mandatory mechanisms, not on which mandatory instrument. Low state trust shifts preferences within mandatory instruments (toward offsetting, away from tax) but does not produce voluntary instrument preference.
+
+# Discussion
+
+Swedish citizens consistently prefer mandatory biodiversity financing instruments over voluntary alternatives, even in the context most structurally favorable to voluntary instrument support globally. The preference is not a statistical artefact: it replicates across conditional logit, mixed logit, latent class, and WTP specifications, and is corroborated by both qualitative open-ended responses and revealed donation behaviour. The most environmentally committed and personally generous respondents most strongly reject voluntary instruments, ruling out strategic free-riding as an explanation.
+
+Two mechanisms are consistent with the data and cannot be distinguished by our design: assurance (voluntary schemes cannot guarantee others will contribute) and effectiveness (private monitoring cannot reliably deliver conservation outcomes). Both are "public-goods consequentialist" in structure — they evaluate instruments by their capacity to solve a collective action problem at scale. The qualitative responses suggest both motivations are present: some respondents focus on aggregate contribution sufficiency, others on monitoring credibility. Future research could separate these with a factorial design varying the monitoring attribute and the voluntary participation rate displayed to respondents.
+
+The finding carries a theoretical implication for the governance literature on the voluntary turn. We theorize that voluntary instrument preference, where it appears, reflects a constrained defensive response to institutional weakness rather than unconstrained endorsement of voluntary governance. Citizens in lower-trust or lower-capacity state contexts may express preference for voluntary or NGO-led instruments not because these are structurally superior, but as a rational bypass of a distrusted state. Under this account, the global proliferation of voluntary biodiversity finance mechanisms is better understood as a symptom of institutional deficit than as evidence of citizen demand for voluntary governance. Our data provide the demand-side test for the optimal case; cross-national replication in lower-trust contexts is the natural extension.
+
+For GBF implementation, the implication is direct. Target 19's reliance on voluntary private finance, justified partly as matching decentralized citizen preferences, is misaligned with preferences in the context most favorable to voluntary support. If mandatory preference persists in lower-trust contexts — as the constrained-preference hypothesis implies — the reliance on voluntary mechanisms is unlikely to generate the financing volumes required and is structurally misaligned with what citizens would choose if binding mechanisms were available.
+
+# Methods
+
+Full methods are provided in the Supplementary Information. Key elements are summarized here.
+
+**Study design and preregistration.** Data were collected via online survey of Swedish citizens (Lysio Research, April–May 2026). The study was preregistered prior to data collection (AsPredicted [blinded for review]). The final analysis sample comprises $n = 2{,}101$ respondents (48.8% female, median age 43), recruited to be representative of the Swedish adult population in age, gender, and region.
+
+**Discrete choice experiment.** The DCE used a $4 \times 3 \times 2 \times 4$ factorial design: financing instrument (tax, donation, certification, mandatory offsetting), land ownership (public, industrial private, small-scale private), monitoring (public administration, private audit), and annual cost (SEK 492–7,380/year). Each respondent completed 8 choice tasks with two programme options and a status quo. The VP score is the share of mixed-instrument tasks (tasks where one option is mandatory and one is voluntary) in which the respondent chose the voluntary option.
+
+**Donation experiment.** Following the DCE, respondents allocated a portion of a potential SEK 1,000 prize to Naturskyddsföreningen (the Swedish Society for Nature Conservation). With 100 winners drawn from 2,101 respondents, the game is incentive-compatible in expectation. Giving rate: 83.3% donated a positive amount; median donation SEK 400.
+
+**Statistical models.** Conditional logit (CL) and mixed logit (MXL, 500 Halton draws, normal distributions on 6 random parameters) estimated via logitr 1.2.0. WTP computed via the delta method from the MXL Hessian. VP score analysis: fractional logit (Papke-Wooldridge) with HC3 robust standard errors; average partial effects reported. Latent class MNL estimated via Apollo 0.3.8. All confirmatory analyses preregistered; VP and subgroup analyses exploratory.
+
+**Data availability.** Anonymized microdata will be deposited upon acceptance. Open-ended responses (Q17) are excluded from the public deposit; the coded subset used for qualitative triangulation is available from the corresponding author. Ethics approval: Etikprövningsmyndigheten, ID 2025-04420-01.
+
+**Code availability.** Full replication code (R, Quarto) is available at [blinded for review].
+
+# References
+
+::: {#refs}
+:::
