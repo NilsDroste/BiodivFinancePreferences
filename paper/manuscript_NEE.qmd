@@ -217,12 +217,36 @@ wtp_delta <- function(attr_nm) {
        se  = sqrt(abs(as.numeric(t(g) %*% V %*% g))))
 }
 
+# shared theme and palette -----------------------------------------------
+nee_theme <- function(base = 12) {
+  theme_minimal(base_size = base, base_family = "") +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(colour = "#e1e0d9", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),
+    axis.line.x        = element_line(colour = "#c3c2b7", linewidth = 0.5),
+    axis.ticks.x       = element_line(colour = "#c3c2b7", linewidth = 0.4),
+    axis.ticks.length  = unit(3, "pt"),
+    axis.text          = element_text(colour = "#52514e", size = rel(0.85)),
+    axis.title         = element_text(colour = "#0b0b0b", size = rel(0.9)),
+    strip.text         = element_text(colour = "#0b0b0b", face = "bold", size = rel(0.9)),
+    legend.text        = element_text(colour = "#52514e", size = rel(0.82)),
+    legend.title       = element_text(colour = "#0b0b0b", size = rel(0.85)),
+    legend.key.size    = unit(10, "pt"),
+    plot.tag           = element_text(face = "bold", size = rel(1.1), colour = "#0b0b0b"),
+    plot.tag.position  = "topleft"
+  )
+}
+# palette: blue = mandatory, orange = voluntary, muted = other
+COL_MAN  <- "#2a78d6"   # slot 1 blue
+COL_VOL  <- "#eb6834"   # slot 2 orange
+COL_MUTE <- "#898781"   # muted ink
+
 wtp_df <- tibble(
   attr  = c("don", "cert", "off", "ind", "pland", "pmon"),
   label = c("Donation", "Certification", "Offsetting",
             "Industrial land", "Public land", "Public monitoring"),
-  type  = c("voluntary", "voluntary", "mandatory",
-            "land", "land", "monitoring")
+  type  = c("voluntary", "voluntary", "mandatory", "land", "land", "monitoring")
 ) |>
   rowwise() |>
   mutate(wtp = wtp_delta(attr)$wtp,
@@ -231,8 +255,8 @@ wtp_df <- tibble(
          hi  = wtp + 1.96 * se) |>
   ungroup()
 
-instr_colors <- c("mandatory" = "#0072B2", "voluntary" = "#D55E00",
-                  "land" = "#888888", "monitoring" = "#888888")
+col_type <- c("mandatory" = COL_MAN, "voluntary" = COL_VOL,
+              "land" = COL_MUTE, "monitoring" = COL_MUTE)
 
 cl_coefs <- tibble(
   label = c("Donation", "Certification", "Offsetting",
@@ -241,42 +265,47 @@ cl_coefs <- tibble(
   se    = c(0.032, 0.032, 0.034, 0.030, 0.028, 0.024),
   type  = c("voluntary", "voluntary", "mandatory", "land", "land", "monitoring")
 ) |>
-  mutate(lo = coef - 1.96 * se, hi = coef + 1.96 * se,
-         label = factor(label, levels = rev(c("Donation", "Certification",
-           "Offsetting", "Industrial land", "Public land", "Public monitoring"))))
+  mutate(lo    = coef - 1.96 * se,
+         hi    = coef + 1.96 * se,
+         label = factor(label, levels = rev(c(
+           "Donation", "Certification", "Offsetting",
+           "Industrial land", "Public land", "Public monitoring"))))
 
 p_coef <- ggplot(cl_coefs, aes(x = coef, y = label, colour = type)) +
-  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
-  geom_linerange(aes(xmin = lo, xmax = hi), linewidth = 0.8) +
-  geom_point(size = 3) +
-  scale_colour_manual(values = instr_colors, guide = "none") +
-  labs(x = "Coefficient (vs. tax baseline)", y = NULL,
-       title = "A  Instrument preferences (CL)") +
-  theme_minimal(base_size = 10) +
-  theme(panel.grid.minor = element_blank(),
-        plot.title = element_text(face = "bold", size = 10))
+  geom_vline(xintercept = 0, colour = "#c3c2b7", linewidth = 0.5) +
+  geom_linerange(aes(xmin = lo, xmax = hi), linewidth = 0.7) +
+  geom_point(size = 3.5, stroke = 0.5,
+             shape = 21, fill = "white", colour = NA) +
+  geom_point(size = 3.5) +
+  scale_colour_manual(values = col_type, guide = "none") +
+  labs(x = "Coefficient (vs. tax baseline)", y = NULL, tag = "a") +
+  nee_theme() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(colour = "#e1e0d9", linewidth = 0.4),
+        axis.line.x = element_blank(), axis.ticks.x = element_blank())
 
 wtp_plot_df <- wtp_df |>
   filter(type %in% c("mandatory", "voluntary")) |>
   mutate(label = factor(label, levels = rev(c("Donation", "Certification", "Offsetting"))))
 
 p_wtp <- ggplot(wtp_plot_df, aes(x = wtp, y = label, colour = type)) +
-  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
-  geom_linerange(aes(xmin = lo, xmax = hi), linewidth = 0.8) +
-  geom_point(size = 3) +
-  scale_colour_manual(values = instr_colors, guide = "none") +
-  labs(x = "WTP relative to tax (SEK/year)", y = NULL,
-       title = "B  Willingness to pay (MXL)") +
-  theme_minimal(base_size = 10) +
-  theme(panel.grid.minor = element_blank(),
-        plot.title = element_text(face = "bold", size = 10))
+  geom_vline(xintercept = 0, colour = "#c3c2b7", linewidth = 0.5) +
+  geom_linerange(aes(xmin = lo, xmax = hi), linewidth = 0.7) +
+  geom_point(size = 3.5) +
+  scale_colour_manual(values = col_type, guide = "none") +
+  scale_x_continuous(labels = scales::label_comma()) +
+  labs(x = "WTP vs. tax (SEK per year)", y = NULL, tag = "b") +
+  nee_theme() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(colour = "#e1e0d9", linewidth = 0.4),
+        axis.line.x = element_blank(), axis.ticks.x = element_blank())
 
 p_coef / p_wtp
 ```
 
 ```{r}
 #| label: fig-vp
-#| fig-cap: "Voluntary preference (VP) score analysis. (A) Distribution of VP scores (share of mixed-instrument tasks where voluntary option was chosen). Blue: lean mandatory (VP ≤ 0.5, 67%); orange: lean voluntary (VP > 0.5, 33%). (B) VP score by donation amount, stratified by environmental attitude tercile (OLS fits with 95% CI). Convergent slopes indicate no interaction; the null interaction (p = 0.792) rules out strategic free-riding."
+#| fig-cap: "Voluntary preference (VP) score analysis. (a) Distribution of VP scores (share of mixed-instrument tasks where the voluntary option was chosen). Blue shading: lean mandatory (VP ≤ 0.5, 67%); orange shading: lean voluntary (VP > 0.5, 33%). Dashed line: sample mean (0.43). (b) VP score by donation amount, stratified by environmental attitude tercile (OLS fits ± 95% CI). Convergent slopes indicate no interaction; the null interaction ($p = 0.792$) rules out strategic free-riding."
 #| fig-width: 6.5
 #| fig-height: 5.5
 #| eval: true
@@ -285,142 +314,155 @@ vp_mean  <- mean(anal_data$voluntary_pref)
 pct_mand <- round(mean(anal_data$voluntary_pref <= 0.5) * 100)
 pct_vol  <- round(mean(anal_data$voluntary_pref >  0.5) * 100)
 
-dens     <- density(anal_data$voluntary_pref, from = 0, to = 1, n = 512)
-dens_df  <- tibble(x = dens$x, y = dens$y)
+dens      <- density(anal_data$voluntary_pref, from = 0, to = 1, n = 512)
+dens_df   <- tibble(x = dens$x, y = dens$y)
 y_at_half <- approx(dens$x, dens$y, xout = 0.5)$y
-y_label  <- max(dens$y) * 0.45
+y_label   <- max(dens$y) * 0.42
 dens_mand <- dens_df |> filter(x <= 0.5) |> add_row(x = 0.5, y = y_at_half) |> arrange(x)
 dens_vol  <- dens_df |> filter(x >= 0.5) |> add_row(x = 0.5, y = y_at_half) |> arrange(x)
 
 p_dist <- ggplot() +
-  geom_area(data = dens_mand, aes(x = x, y = y), fill = "#0072B2", alpha = 0.55) +
-  geom_area(data = dens_vol,  aes(x = x, y = y), fill = "#D55E00", alpha = 0.55) +
-  geom_line(data = dens_df,   aes(x = x, y = y), colour = "grey20", linewidth = 0.5) +
-  geom_vline(xintercept = 0.5, colour = "grey30", linewidth = 0.7) +
-  geom_vline(xintercept = vp_mean, linetype = "dashed", colour = "grey30", linewidth = 0.55) +
-  annotate("text", x = 0.20, y = y_label,
-           label = paste0(pct_mand, "% lean\nmandatory"),
-           colour = "#0072B2", size = 3.2, fontface = "bold", hjust = 0.5) +
-  annotate("text", x = 0.78, y = y_label,
-           label = paste0(pct_vol, "% lean\nvoluntary"),
-           colour = "#D55E00", size = 3.2, fontface = "bold", hjust = 0.5) +
-  scale_x_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1),
-    labels = c("0\n(always\nmandatory)", "0.25", "0.5", "0.75", "1\n(always\nvoluntary)"),
+  geom_area(data = dens_mand, aes(x = x, y = y),
+            fill = COL_MAN, alpha = 0.25) +
+  geom_area(data = dens_vol,  aes(x = x, y = y),
+            fill = COL_VOL, alpha = 0.25) +
+  geom_line(data = dens_df, aes(x = x, y = y),
+            colour = "#0b0b0b", linewidth = 0.7) +
+  geom_vline(xintercept = 0.5, colour = "#898781", linewidth = 0.6) +
+  geom_vline(xintercept = vp_mean, linetype = "dashed",
+             colour = "#898781", linewidth = 0.5) +
+  annotate("text", x = 0.18, y = y_label,
+           label = paste0(pct_mand, "% lean mandatory"),
+           colour = COL_MAN, size = 3.4, fontface = "bold", hjust = 0) +
+  annotate("text", x = 0.55, y = y_label,
+           label = paste0(pct_vol, "% lean voluntary"),
+           colour = COL_VOL, size = 3.4, fontface = "bold", hjust = 0) +
+  scale_x_continuous(
+    breaks = c(0, 0.25, 0.5, 0.75, 1),
+    labels = c("0\n(always mandatory)", "0.25", "0.5\n(indifferent)",
+               "0.75", "1\n(always voluntary)"),
     limits = c(-0.01, 1.01)) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.06))) +
-  labs(x = "Voluntary preference score (VP)", y = "Density",
-       title = "A  VP score distribution") +
-  theme_minimal(base_size = 10) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
-        axis.text.x = element_text(size = 8, lineheight = 0.85),
-        plot.title = element_text(face = "bold", size = 10))
+  scale_y_continuous(expand = expansion(mult = c(0, 0.08))) +
+  labs(x = "Voluntary preference score", y = "Density", tag = "a") +
+  nee_theme() +
+  theme(panel.grid.major.y = element_blank(),
+        axis.text.x = element_text(size = 8.5, lineheight = 0.9))
 
-p_interact <- ggplot(anal_data, aes(x = donation, y = voluntary_pref, colour = env_lab)) +
-  geom_jitter(alpha = 0.12, size = 0.7, width = 25, height = 0.02) +
-  geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
+p_interact <- ggplot(anal_data,
+                     aes(x = donation, y = voluntary_pref, colour = env_lab)) +
+  geom_jitter(alpha = 0.09, size = 0.6, width = 22, height = 0.015,
+              shape = 16) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1.2,
+              alpha = 0.12) +
   scale_colour_manual(
-    values = c("Low env. att." = "#D55E00", "Medium" = "#E69F00",
-               "High env. att." = "#0072B2"),
-    name = "Environmental\nattitude") +
-  scale_x_continuous(labels = scales::label_comma()) +
-  scale_y_continuous(labels = scales::percent, limits = c(-0.1, 1.1)) +
-  labs(x = "Donation (SEK)", y = "Voluntary preference (VP)",
-       title = "B  VP by donation × environmental attitude") +
-  theme_minimal(base_size = 10) +
-  theme(legend.position = "bottom",
-        plot.title = element_text(face = "bold", size = 10))
+    values = c("Low env. att."  = COL_VOL,
+               "Medium"         = COL_MUTE,
+               "High env. att." = COL_MAN),
+    name   = "Environmental attitude") +
+  scale_x_continuous(labels = scales::label_comma(),
+                     breaks = c(0, 250, 500, 750, 1000)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1),
+                     limits = c(-0.05, 1.05)) +
+  labs(x = "Donation (SEK)", y = "Voluntary preference score", tag = "b") +
+  nee_theme() +
+  theme(legend.position  = "bottom",
+        legend.direction = "horizontal")
 
 p_dist / p_interact
 ```
 
 ```{r}
 #| label: fig-2x2
-#| fig-cap: "Mean voluntary preference (VP) score by environmental attitude (median split on Q11) and donation behaviour (donated > 0 vs. zero). Error bars: 95% CI. The strategic free-rider hypothesis predicts highest VP in the high-concern, no-donation cell; the data show exactly the opposite. n in each cell shown."
-#| fig-width: 5
+#| fig-cap: "Mean voluntary preference (VP) score by environmental attitude (median split) and donation behaviour. Error bars: 95% CI; cell sample sizes shown. The strategic free-rider hypothesis predicts the highest VP in the high-concern, no-donation cell (left bar, right panel); the data show exactly the opposite — this cell has the *lowest* mean VP of all four."
+#| fig-width: 5.5
 #| fig-height: 3.8
 #| eval: true
 
 twox2 <- anal_data |>
   mutate(
-    env_grp = if_else(env_hi, "High env. concern", "Low env. concern"),
+    env_grp = if_else(env_hi, "High environmental concern", "Low environmental concern"),
     don_grp = if_else(donated, "Donated", "Did not donate")
   ) |>
   group_by(env_grp, don_grp) |>
-  summarise(
-    mean_vp = mean(voluntary_pref),
-    se_vp   = sd(voluntary_pref) / sqrt(n()),
-    n       = n(),
-    .groups = "drop"
-  ) |>
+  summarise(mean_vp = mean(voluntary_pref),
+            se_vp   = sd(voluntary_pref) / sqrt(n()),
+            n       = n(), .groups = "drop") |>
   mutate(
     ci_lo   = mean_vp - 1.96 * se_vp,
     ci_hi   = mean_vp + 1.96 * se_vp,
-    env_grp = factor(env_grp, levels = c("Low env. concern", "High env. concern")),
+    env_grp = factor(env_grp,
+      levels = c("Low environmental concern", "High environmental concern")),
     don_grp = factor(don_grp, levels = c("Did not donate", "Donated")),
-    fill    = case_when(
-      env_grp == "High env. concern" & don_grp == "Did not donate" ~ "focal",
-      TRUE ~ "other"
-    )
+    highlight = env_grp == "High environmental concern" & don_grp == "Did not donate"
   )
 
-ggplot(twox2, aes(x = don_grp, y = mean_vp, fill = fill)) +
-  geom_col(width = 0.55, alpha = 0.85) +
-  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi), width = 0.15, colour = "grey30") +
-  geom_text(aes(label = paste0("n = ", n), y = ci_hi + 0.02),
-            size = 2.8, colour = "grey40") +
+ggplot(twox2, aes(x = don_grp, y = mean_vp)) +
+  geom_col(aes(fill = highlight), width = 0.5,
+           colour = NA) +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = 0.12, linewidth = 0.6, colour = "#52514e") +
+  geom_text(aes(label = paste0("n = ", scales::comma(n)),
+                y = ci_hi + 0.025),
+            size = 3, colour = "#52514e") +
   facet_wrap(~env_grp) +
-  scale_fill_manual(values = c("focal" = "#0072B2", "other" = "#888888"),
-                    guide = "none") +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 0.70)) +
-  labs(x = NULL, y = "Mean VP score",
-       caption = "Blue bar = focal strategic free-rider cell (lowest VP, not highest)") +
-  theme_minimal(base_size = 10) +
-  theme(panel.grid.minor = element_blank(),
-        strip.text = element_text(face = "bold"))
+  scale_fill_manual(
+    values = c("TRUE" = COL_MAN, "FALSE" = COL_MUTE),
+    guide  = "none") +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    limits = c(0, 0.72),
+    breaks = seq(0, 0.6, 0.2)) +
+  labs(x = NULL, y = "Mean voluntary preference score",
+       tag = "Fig. 3") +
+  nee_theme() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(colour = "#e1e0d9", linewidth = 0.4),
+        axis.line.x        = element_line(colour = "#c3c2b7", linewidth = 0.5),
+        axis.ticks.x       = element_line(colour = "#c3c2b7", linewidth = 0.4))
 ```
 
 ```{r}
 #| label: fig-subgroups
-#| fig-cap: "Instrument preference heterogeneity by political bloc (exploratory, not preregistered). Coefficients from subgroup conditional logit models relative to tax baseline (95% CI). Individual voluntary donation is rejected by all political blocs; the cross-partisan divide is between state tax and corporate offsetting."
+#| fig-cap: "Instrument preference heterogeneity by political bloc (exploratory). Coefficients from subgroup conditional logit models relative to the tax baseline (95% CI). Voluntary donation is rejected across all political blocs; the cross-partisan divide is between state tax (preferred by left) and mandatory corporate offsetting (preferred by centre-right and SD)."
 #| fig-width: 6.5
-#| fig-height: 4.5
+#| fig-height: 4.2
 #| eval: true
 
 all_exp <- readRDS(here::here("analysis", "heterogeneity_exploratory.rds"))
 
-instr_colors2 <- c(
-  "Donation"      = "#D55E00",
-  "Certification" = "#E69F00",
-  "Offsetting"    = "#0072B2"
-)
-
 party_order <- c("Left (S/V/MP)", "Centre-right", "SD", "No pref / DK")
+
+col_instr <- c("Donation"      = COL_VOL,
+               "Certification" = COL_MUTE,
+               "Offsetting"    = COL_MAN)
 
 all_exp |>
   filter(Label %in% party_order) |>
   mutate(
     ci_lo      = Coef - 1.96 * SE,
     ci_hi      = Coef + 1.96 * SE,
-    Instrument = recode(Attr,
+    Instrument = dplyr::recode(Attr,
       don  = "Donation",
       cert = "Certification",
-      off  = "Offsetting"
-    ),
-    Label = factor(Label, levels = party_order)
+      off  = "Offsetting"),
+    Label = factor(Label, levels = rev(party_order))
   ) |>
   filter(Instrument %in% c("Donation", "Certification", "Offsetting")) |>
   ggplot(aes(x = Coef, y = Label, colour = Instrument)) +
-  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
+  geom_vline(xintercept = 0, colour = "#c3c2b7", linewidth = 0.5) +
   geom_linerange(aes(xmin = ci_lo, xmax = ci_hi),
-                 position = position_dodge(width = 0.5), linewidth = 0.8) +
-  geom_point(position = position_dodge(width = 0.5), size = 3) +
-  scale_colour_manual(values = instr_colors2, name = "Instrument") +
-  labs(x = "Coefficient vs. tax baseline", y = NULL,
-       title = "Instrument preferences by political bloc") +
-  theme_minimal(base_size = 10) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = "bottom",
-        plot.title = element_text(face = "bold", size = 10))
+                 position = position_dodge(width = 0.55),
+                 linewidth = 0.7) +
+  geom_point(position = position_dodge(width = 0.55),
+             size = 3.5) +
+  scale_colour_manual(values = col_instr, name = NULL) +
+  labs(x = "Coefficient vs. tax baseline", y = NULL, tag = "Fig. 4") +
+  nee_theme() +
+  theme(legend.position  = "bottom",
+        legend.direction = "horizontal",
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(colour = "#e1e0d9", linewidth = 0.4),
+        axis.line.x = element_blank(), axis.ticks.x = element_blank())
 ```
 
 # References
