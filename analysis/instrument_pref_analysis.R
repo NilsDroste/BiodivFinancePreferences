@@ -355,7 +355,7 @@ print(coeftest(fp3_sens, vcov = vcovHC(fp3_sens, "HC3")))
 
 # 7a. Distribution of voluntary_pref
 p_dist <- ggplot(anal_data, aes(x = voluntary_pref)) +
-  geom_histogram(binwidth = 0.1, fill = "#0072B2", colour = "white") +
+  geom_histogram(binwidth = 0.1, fill = "#3b4994", colour = "white") +
   geom_vline(xintercept = mean(anal_data$voluntary_pref),
              linetype = "dashed", colour = "#D55E00") +
   annotate("text",
@@ -389,7 +389,7 @@ p_cell <- anal_data |>
   geom_col(alpha = 0.85) +
   geom_errorbar(aes(ymin = mn - 1.96*se, ymax = mn + 1.96*se), width = 0.25) +
   geom_text(aes(label = paste0("n=", n)), vjust = -0.6, size = 3) +
-  scale_fill_manual(values = c("Low" = "#D55E00", "High" = "#0072B2"),
+  scale_fill_manual(values = c("Low" = "#D55E00", "High" = "#3b4994"),
                     name = "Env. att.") +
   scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, .15))) +
   labs(title = "Voluntary preference by environmental attitude × donation",
@@ -408,7 +408,7 @@ p_interact <- anal_data |>
   geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
   scale_colour_manual(
     values = c("Low env. att." = "#D55E00", "Medium" = "#E69F00",
-               "High env. att." = "#0072B2"),
+               "High env. att." = "#3b4994"),
     name = NULL) +
   scale_x_continuous(labels = scales::label_comma()) +
   scale_y_continuous(labels = scales::percent) +
@@ -424,9 +424,9 @@ p_env <- ggplot(anal_data,
                     fill   = factor(gave_binary))) +
   geom_jitter(alpha = 0.2, size = 0.8, width = 0.1, height = 0.02) +
   geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
-  scale_colour_manual(values = c("0" = "#D55E00", "1" = "#0072B2"),
+  scale_colour_manual(values = c("0" = "#D55E00", "1" = "#3b4994"),
                       labels = c("Did not donate", "Donated"), name = NULL) +
-  scale_fill_manual(values  = c("0" = "#D55E00", "1" = "#0072B2"),
+  scale_fill_manual(values  = c("0" = "#D55E00", "1" = "#3b4994"),
                     labels  = c("Did not donate", "Donated"), name = NULL) +
   scale_y_continuous(labels = scales::percent) +
   labs(title = "Voluntary preference vs. environmental attitude by donation status",

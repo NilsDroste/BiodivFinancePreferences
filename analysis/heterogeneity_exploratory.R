@@ -272,7 +272,7 @@ plot_df <- all_exp |>
 instr_colors <- c(
   "Donation"      = "#D55E00",
   "Certification" = "#E69F00",
-  "Offsetting"    = "#0072B2"
+  "Offsetting"    = "#3b4994"
 )
 
 p_coef <- ggplot(plot_df,
@@ -302,11 +302,11 @@ p_coef <- ggplot(plot_df,
   )
 
 ggsave(
-  here("paper", "fig_heterogeneity_exploratory.pdf"),
+  here("paper", "manuscript_files", "figure-pdf", "fig_heterogeneity_exploratory.pdf"),
   p_coef, width = 6.5, height = 7.5
 )
 
-cat("\nFigure saved to paper/fig_heterogeneity_exploratory.pdf\n")
+cat("\nFigure saved to paper/manuscript_files/figure-pdf/fig_heterogeneity_exploratory.pdf\n")
 
 # Save results for manuscript inline plotting
 saveRDS(all_exp, here("analysis", "heterogeneity_exploratory.rds"))
