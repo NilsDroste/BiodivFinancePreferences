@@ -1,0 +1,531 @@
+---
+title: "Supplementary Information"
+subtitle: "Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions"
+format:
+  pdf:
+    number-sections: false
+    fontsize: 11pt
+    geometry: margin=2.5cm
+    keep-tex: false
+bibliography: references.bib
+csl: nature.csl
+execute:
+  eval: true
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(here)
+library(readxl)
+library(sandwich)
+library(lmtest)
+library(logitr)
+```
+
+```{r load-data}
+# Load anonymised microdata from public deposit (pid and Q17 excluded)
+full_data <- read_csv(here("deposit", "biodivfinance_microdata_anon.csv"),
+                      show_col_types = FALSE)
+
+# Load DCE design file (public, in repository)
+price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
+design_raw <- read_excel(here("design", "Trial 3 - factorial grouped, svensk.xlsx"), sheet = 1)
+names(design_raw) <- c(
+  "cs", "block", "a_source", "a_src_txt", "a_land", "a_land_txt",
+  "a_monitor", "a_mon_txt", "a_price", "a_price_txt",
+  "b_source", "b_src_txt", "b_land", "b_land_txt",
+  "b_monitor", "b_mon_txt", "b_price", "b_price_txt"
+)
+design <- design_raw |>
+  select(cs, block, a_source, a_land, a_monitor, a_price,
+         b_source, b_land, b_monitor, b_price) |>
+  group_by(block) |> mutate(task = row_number()) |> ungroup() |>
+  mutate(a_price_sek = price_map[as.character(a_price)],
+         b_price_sek = price_map[as.character(b_price)])
+
+# Reconstruct choice data in long format (mirrors mxl_analysis.R pipeline)
+choices_ord1 <- full_data |> filter(ordning == 1) |>
+  select(id, block, choice1:choice8) |>
+  pivot_longer(choice1:choice8, names_to = "col", values_to = "choice") |>
+  mutate(task = as.integer(substr(col, 7, 7)))
+choices_ord2 <- full_data |> filter(ordning == 2) |>
+  select(id, block, choice12, choice22, choice32, choice42,
+         choice52, choice62, choice72, choice82) |>
+  pivot_longer(-c(id, block), names_to = "col", values_to = "choice") |>
+  mutate(task = as.integer(substr(col, 7, 7)))
+
+resp <- bind_rows(choices_ord1, choices_ord2) |>
+  filter(!is.na(choice)) |>
+  left_join(design, by = c("block", "task")) |>
+  mutate(choice_num = case_when(choice == "a" ~ 1L, choice == "b" ~ 2L, TRUE ~ 3L))
+```
+
+```{r build-long}
+# Build 3-row-per-task long format for CL estimation
+obs_int <- as.integer(factor(paste0(resp$id, "_", resp$task)))
+
+df_a <- data.frame(
+  obsID  = obs_int, respID = resp$id, altID = "a",
+  chosen = as.integer(resp$choice_num == 1),
+  don    = as.integer(resp$a_source == 1),
+  cert   = as.integer(resp$a_source == 2),
+  off    = as.integer(resp$a_source == 3),
+  ind    = as.integer(resp$a_land == 1),
+  pland  = as.integer(resp$a_land == 2),
+  pmon   = as.integer(resp$a_monitor == 1),
+  price  = resp$a_price_sek / 1000   # price in thousands SEK
+)
+df_b <- data.frame(
+  obsID  = obs_int, respID = resp$id, altID = "b",
+  chosen = as.integer(resp$choice_num == 2),
+  don    = as.integer(resp$b_source == 1),
+  cert   = as.integer(resp$b_source == 2),
+  off    = as.integer(resp$b_source == 3),
+  ind    = as.integer(resp$b_land == 1),
+  pland  = as.integer(resp$b_land == 2),
+  pmon   = as.integer(resp$b_monitor == 1),
+  price  = resp$b_price_sek / 1000
+)
+df_n <- data.frame(
+  obsID  = obs_int, respID = resp$id, altID = "neither",
+  chosen = as.integer(resp$choice_num == 3),
+  don = 0, cert = 0, off = 0, ind = 0, pland = 0, pmon = 0, price = 0
+)
+long_db <- rbind(df_a, df_b, df_n)
+long_db <- long_db[order(long_db$respID, long_db$obsID, long_db$altID), ]
+long_db$asc_neither <- as.integer(long_db$altID == "neither")
+```
+
+```{r vp-data}
+# Construct VP scores (same logic as instrument_pref_analysis.R)
+resp_scored <- resp |>
+  mutate(
+    a_vol      = a_source %in% c(1L, 2L),   # donation or certification
+    b_vol      = b_source %in% c(1L, 2L),
+    a_man      = a_source %in% c(0L, 3L),   # tax or offsetting
+    b_man      = b_source %in% c(0L, 3L),
+    mixed_task = (a_vol & b_man) | (a_man & b_vol),
+    chose_vol  = case_when(
+      !mixed_task | choice == "3" ~ NA_real_,
+      (a_vol & choice == "a") | (b_vol & choice == "b") ~ 1,
+      TRUE ~ 0
+    )
+  )
+
+resp_level <- resp_scored |>
+  filter(mixed_task, !is.na(chose_vol)) |>
+  group_by(id) |>
+  summarise(voluntary_pref = mean(chose_vol), n_mixed = n(), .groups = "drop")
+
+covars <- full_data |>
+  transmute(
+    id,
+    donation    = yourdonation,
+    gave        = as.integer(yourdonation > 0),
+    env_import  = q11,
+    bio_knowl   = q12,
+    trust_ngo   = q2_3,
+    trust_state = q2_1,
+    policy_cq   = q14,
+    income      = q8,
+    gender      = q10
+  )
+
+anal_data <- resp_level |>
+  left_join(covars, by = "id") |>
+  filter(!is.na(donation), !is.na(env_import), !is.na(income), !is.na(gender)) |>
+  mutate(
+    donation_z  = scale(donation)[, 1],
+    env_z       = scale(env_import)[, 1],
+    female      = as.integer(gender == 2),
+    income_mid  = as.integer(income == 2),
+    income_high = as.integer(income >= 3),
+    gave_binary = gave
+  )
+```
+
+# Supplementary Methods
+
+## S1. Discrete choice experiment design
+
+Each respondent completed eight choice tasks. Every task presented two hypothetical biodiversity programme alternatives plus a status-quo option ("neither programme"). Programmes were described by four attributes whose levels are given in Table S1. The $4 \times 3 \times 2 \times 4$ full factorial was reduced to a blocked fractional factorial design (one block per respondent, 8 tasks per block). Within each task, attribute levels for options A and B were drawn independently from the design.
+
+```{r attr-table}
+attr_tab <- tribble(
+  ~Attribute,            ~Level,                                       ~Note,
+  "Financing instrument", "Tax (public budget allocation)",            "Baseline",
+  "",                     "Voluntary private donation",                "",
+  "",                     "Consumer certification scheme",             "",
+  "",                     "Mandatory corporate offsetting",            "",
+  "Land ownership",       "Small-scale private land",                  "Baseline",
+  "",                     "Industrial private land",                   "",
+  "",                     "Public land",                               "",
+  "Monitoring",           "Private audit",                             "Baseline",
+  "",                     "Public administration",                     "",
+  "Annual household cost","SEK 492/year (approx. USD 49)",             "",
+  "",                     "SEK 2,460/year (approx. USD 246)",          "",
+  "",                     "SEK 4,920/year (approx. USD 492)",          "",
+  "",                     "SEK 7,380/year (approx. USD 738)",          ""
+)
+
+kbl(attr_tab, booktabs = TRUE, longtable = FALSE,
+    caption = "Supplementary Table S1 | DCE attribute levels. Baseline levels serve as the reference category in conditional and mixed logit models.",
+    col.names = c("Attribute", "Level", "Note"),
+    align = "llc") |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position") |>
+  column_spec(1, bold = TRUE)
+```
+
+**Instrument coding.** Financing source was coded relative to the tax baseline: donation ($\hat\beta_\text{don}$), certification ($\hat\beta_\text{cert}$), and mandatory offsetting ($\hat\beta_\text{off}$). Land ownership was coded relative to small-scale private land: industrial private ($\hat\beta_\text{ind}$) and public ($\hat\beta_\text{pland}$). Monitoring was coded relative to private audit: public administration ($\hat\beta_\text{pmon}$). Price entered the utility function in thousands SEK to improve numerical scaling.
+
+**Alternative-specific constant.** An alternative-specific constant ($\text{ASC}_\text{neither}$) was included for the opt-out (status-quo) alternative. A negative ASC indicates a systematic preference for any programme over the status quo.
+
+## S2. Voluntary preference (VP) score
+
+The VP score quantifies each respondent's tendency to choose voluntary over mandatory financing instruments in the DCE. Only tasks in which the two programme alternatives presented one voluntary instrument (donation or certification) and one mandatory instrument (tax or mandatory offsetting) are included; tasks where both options share the same instrument type, or where the respondent chose the opt-out, are excluded from the denominator. For eligible "mixed-instrument" tasks, VP equals the proportion in which the respondent chose the voluntary option, ranging from 0 (always mandatory) to 1 (always voluntary). The mean number of mixed-instrument tasks per respondent was `r round(mean(anal_data$n_mixed), 1)` (range `r min(anal_data$n_mixed)`–`r max(anal_data$n_mixed)`).
+
+## S3. Donation experiment
+
+Immediately following the DCE, respondents allocated a share of a potential SEK 1,000 prize to Naturskyddsföreningen (the Swedish Society for Nature Conservation). One hundred winners were drawn randomly from all $n = 2{,}101$ respondents, making the game incentive-compatible in expectation: each respondent faced an approximately 1-in-21 chance of their allocation being paid out. The donation amount (SEK 0–1,000) is used as a continuous measure of individual propensity to contribute to biodiversity conservation voluntarily and as a binary indicator (gave > 0).
+
+## S4. Sample characterisation
+
+```{r sample-table}
+n_total <- nrow(full_data)
+
+gender_n <- full_data |>
+  mutate(g = case_when(q10==1~"Male", q10==2~"Female", TRUE~"Other/NR")) |>
+  count(g)
+
+party_pct <- full_data |>
+  mutate(party = case_when(
+    q16 == 1  ~ "Social Democrats (S)",
+    q16 == 2  ~ "Sweden Democrats (SD)",
+    q16 == 3  ~ "Moderate Party (M)",
+    q16 == 4  ~ "Green Party (MP)",
+    q16 == 5  ~ "Centre Party (C)",
+    q16 == 6  ~ "Christian Democrats (KD)",
+    q16 == 7  ~ "Left Party (V)",
+    q16 == 8  ~ "Liberal Party (L)",
+    q16 == 9  ~ "Other party",
+    q16 == 10 ~ "No preference / DK"
+  )) |>
+  count(party) |>
+  arrange(desc(n)) |>
+  mutate(label = paste0(party, ": ", n, " (", round(n/n_total*100,1), "%)"))
+
+fem_n   <- filter(gender_n, g == "Female")$n
+male_n  <- filter(gender_n, g == "Male")$n
+other_n <- filter(gender_n, g == "Other/NR")$n
+
+desc_tab <- tribble(
+  ~Characteristic, ~Value,
+  "Analysis sample ($n$)",          format(n_total, big.mark = ","),
+  "Female",                          paste0(fem_n,   " (", round(fem_n/n_total*100,1),   "%)"),
+  "Male",                            paste0(male_n,  " (", round(male_n/n_total*100,1),  "%)"),
+  "Other / prefer not to say",       paste0(other_n, " (", round(other_n/n_total*100,1), "%)"),
+  "Env. importance (Q11; 1–5 scale)","Mean: $\\bar{x}$ = " |>
+    paste0(round(mean(full_data$q11, na.rm=TRUE),2),
+           ", SD = ", round(sd(full_data$q11, na.rm=TRUE),2)),
+  "Biodiversity knowledge (Q12; 1–5 scale)", "Mean: $\\bar{x}$ = " |>
+    paste0(round(mean(full_data$q12, na.rm=TRUE),2),
+           ", SD = ", round(sd(full_data$q12, na.rm=TRUE),2)),
+  "Donation amount (SEK)",           paste0("Mean = ", round(mean(full_data$yourdonation),0),
+                                           ", Median = ", median(full_data$yourdonation),
+                                           ", SD = ", round(sd(full_data$yourdonation),0)),
+  "Donated > 0",                     paste0(sum(full_data$yourdonation>0),
+                                           " (", round(mean(full_data$yourdonation>0)*100,1), "%)")
+)
+
+kbl(desc_tab, booktabs = TRUE, longtable = FALSE, escape = FALSE,
+    caption = "Supplementary Table S2 | Sample descriptive statistics.",
+    col.names = c("Characteristic", "Value"),
+    align = "ll") |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position")
+```
+
+Party composition: Social Democrats 23.6%, Sweden Democrats 13.7%, Moderate Party 14.6%, Green Party 7.8%, Centre Party 4.8%, Christian Democrats 3.7%, Left Party 6.5%, Liberal Party 1.9%, Other 7.2%, No preference or don't know 16.3%. Relative to the 2022 Riksdag election, Sweden Democrats (13.7% vs. 20.5% vote share) and Social Democrats (23.6% vs. 30.3%) are under-represented; smaller parties are broadly proportional. As SD voters show the weakest mandatory preference (main text Fig. 5), their under-representation modestly biases the sample's lean-mandatory VP share upward; within-sample subgroup findings are unaffected.
+
+# Supplementary Results
+
+## Supplementary Figure S1 | Pre-registered subgroup heterogeneity
+
+```{r fig-heterogeneity}
+#| label: fig-heterogeneity
+#| fig-cap: "Supplementary Fig. S1 | Instrument preference heterogeneity by pre-registered subgroups. Coefficients from subgroup conditional logit models relative to tax baseline (95% CI), stratified by gender, income tercile, and environmental attitude tercile. Only the three financing instrument coefficients (donation, certification, offsetting) are shown; land and monitoring coefficients are omitted for clarity. The mandatory-over-voluntary preference ordering is broadly consistent across all subgroups."
+#| fig-width: 7
+#| fig-height: 5
+#| eval: true
+
+# Subgroup CL helper — runs from deposit data loaded above
+make_long_sub <- function(data) {
+  obs <- as.integer(factor(paste0(data$id, "_", data$task)))
+  bind_rows(
+    data.frame(obsID=obs, chosen=as.integer(data$choice_num==1), asc=0L,
+               don=as.integer(data$a_source==1), cert=as.integer(data$a_source==2),
+               off=as.integer(data$a_source==3), ind=as.integer(data$a_land==1),
+               pland=as.integer(data$a_land==2), pmon=as.integer(data$a_monitor==1),
+               price=data$a_price_sek/1000),
+    data.frame(obsID=obs, chosen=as.integer(data$choice_num==2), asc=0L,
+               don=as.integer(data$b_source==1), cert=as.integer(data$b_source==2),
+               off=as.integer(data$b_source==3), ind=as.integer(data$b_land==1),
+               pland=as.integer(data$b_land==2), pmon=as.integer(data$b_monitor==1),
+               price=data$b_price_sek/1000),
+    data.frame(obsID=obs, chosen=as.integer(data$choice_num==3), asc=1L,
+               don=0L, cert=0L, off=0L, ind=0L, pland=0L, pmon=0L, price=0)
+  ) |> arrange(obsID)
+}
+
+run_cl_sub <- function(data, label) {
+  long <- make_long_sub(data)
+  m <- logitr(data=long, outcome="chosen", obsID="obsID",
+               pars=c("asc","don","cert","off","ind","pland","pmon","price"),
+               numMultiStarts=3)
+  cf <- coef(m); se <- logitr::se(m)
+  tibble(group=label,
+         attr=c("don","cert","off"),
+         coef=cf[c("don","cert","off")],
+         se=se[c("don","cert","off")]) |>
+    mutate(lo=coef-1.96*se, hi=coef+1.96*se)
+}
+
+# Join covariates needed for subgroup splits
+resp_cov <- resp |>
+  left_join(full_data |> select(id, q10, q8, q11), by="id") |>
+  mutate(
+    gender_grp = case_when(q10==1~"Male", q10==2~"Female", TRUE~NA_character_),
+    income_t   = ntile(q8, 3),
+    env_t      = ntile(q11, 3)
+  ) |>
+  filter(!is.na(gender_grp))
+
+sub_res <- bind_rows(
+  run_cl_sub(filter(resp_cov, gender_grp=="Male"),   "Male"),
+  run_cl_sub(filter(resp_cov, gender_grp=="Female"), "Female"),
+  run_cl_sub(filter(resp_cov, income_t==1),          "Income: low"),
+  run_cl_sub(filter(resp_cov, income_t==2),          "Income: mid"),
+  run_cl_sub(filter(resp_cov, income_t==3),          "Income: high"),
+  run_cl_sub(filter(resp_cov, env_t==1),             "Env. att.: low"),
+  run_cl_sub(filter(resp_cov, env_t==2),             "Env. att.: mid"),
+  run_cl_sub(filter(resp_cov, env_t==3),             "Env. att.: high")
+)
+
+group_order <- c("Male","Female",
+                 "Income: low","Income: mid","Income: high",
+                 "Env. att.: low","Env. att.: mid","Env. att.: high")
+
+instr_cols <- c("Donation"="D55E00","Certification"="E69F00","Offsetting"="3b4994") |>
+  paste0("#", x=_) |> setNames(names(instr_cols))
+instr_cols <- c(Donation="#D55E00", Certification="#E69F00", Offsetting="#3b4994")
+
+sub_res |>
+  mutate(
+    Instrument = recode(attr, don="Donation", cert="Certification", off="Offsetting"),
+    group = factor(group, levels=rev(group_order))
+  ) |>
+  ggplot(aes(x=coef, y=group, colour=Instrument)) +
+  geom_vline(xintercept=0, linetype="dashed", colour="grey60") +
+  geom_linerange(aes(xmin=lo, xmax=hi),
+                 position=position_dodge(width=0.55), linewidth=0.7) +
+  geom_point(position=position_dodge(width=0.55), size=2.8) +
+  scale_colour_manual(values=instr_cols, name="Instrument") +
+  labs(x="Coefficient vs. tax baseline", y=NULL) +
+  theme_minimal(base_size=11) +
+  theme(panel.grid.minor=element_blank(), legend.position="bottom")
+```
+
+## Supplementary Table S3 | Conditional logit — full model output
+
+```{r cl-table}
+cl <- logitr(
+  data    = long_db,
+  outcome = "chosen",
+  obsID   = "obsID",
+  pars    = c("asc_neither","don","cert","off","ind","pland","pmon","price"),
+  numMultiStarts = 5
+)
+
+cf  <- coef(cl)
+se  <- logitr::se(cl)
+zv  <- cf / se
+pv  <- 2 * pnorm(abs(zv), lower.tail = FALSE)
+
+par_nms  <- c("asc_neither","don","cert","off","ind","pland","pmon","price")
+par_labs <- c("ASC (status quo / opt-out)", "Donation", "Certification",
+              "Offsetting", "Industrial land", "Public land",
+              "Public monitoring", "Price (TSEK/year)")
+
+cl_tab <- tibble(
+  Parameter = par_labs,
+  Estimate  = sprintf("%.4f", cf[par_nms]),
+  SE        = sprintf("%.4f", se[par_nms]),
+  z         = sprintf("%.3f", zv[par_nms]),
+  p         = ifelse(pv[par_nms] < 0.001, "<0.001", sprintf("%.4f", pv[par_nms]))
+)
+
+kbl(cl_tab, booktabs = TRUE, longtable = FALSE, align = "lrrrr",
+    caption = paste0(
+      "Supplementary Table S3 | Conditional logit full output [@McFadden1974]. ",
+      "Baseline: tax financing, small-scale private land, private monitoring. ",
+      "$N = ", format(n_distinct(long_db$respID), big.mark=","), "$ respondents; ",
+      format(nrow(long_db), big.mark=","), " choice observations. ",
+      "Log-likelihood $= ", round(as.numeric(logLik(cl)), 2), "$; ",
+      "AIC $= ", round(AIC(cl), 1), "$."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position") |>
+  footnote(
+    general = "Price coefficient is per thousand SEK/year. Conditional logit WTP = -(attribute coefficient) / (price coefficient / 1000).",
+    threeparttable = TRUE
+  )
+```
+
+## Supplementary Table S4 | Mixed logit — full model output
+
+```{r mxl-table}
+# Load fitted MXL model from deposit (model object; no individual-level data stored here
+# beyond what is reconstructed from the public deposit CSV)
+mxl <- readRDS(here("deposit", "MXL_full_logitr.rds"))
+
+cf_m  <- coef(mxl)
+se_m  <- logitr::se(mxl)
+zv_m  <- cf_m / se_m
+pv_m  <- 2 * pnorm(abs(zv_m), lower.tail = FALSE)
+
+pars <- c("asc_neither","don","cert","off","ind","pland","pmon","price",
+          "sd_don","sd_cert","sd_off","sd_ind","sd_pland","sd_pmon")
+labs <- c(
+  "Mean: ASC (status quo / opt-out)",
+  "Mean: Donation", "Mean: Certification", "Mean: Offsetting",
+  "Mean: Industrial land", "Mean: Public land", "Mean: Public monitoring",
+  "Mean: Price (TSEK/year)",
+  "SD: Donation", "SD: Certification", "SD: Offsetting",
+  "SD: Industrial land", "SD: Public land", "SD: Public monitoring"
+)
+
+mxl_tab <- tibble(
+  Parameter = labs,
+  Estimate  = sprintf("%.4f", cf_m[pars]),
+  SE        = sprintf("%.4f", se_m[pars]),
+  z         = sprintf("%.3f", zv_m[pars]),
+  p         = ifelse(pv_m[pars] < 0.001, "<0.001", sprintf("%.4f", pv_m[pars]))
+)
+
+kbl(mxl_tab, booktabs = TRUE, longtable = FALSE, align = "lrrrr",
+    caption = paste0(
+      "Supplementary Table S4 | Mixed logit full output [@McFaddenTrain2000; @Train2009]. ",
+      "Normal mixing distributions on 6 random parameters (donation, certification, ",
+      "offsetting, industrial land, public land, public monitoring); ",
+      "500 Halton draws; 10 random starts; seed = 42. ",
+      "Baseline: tax financing, small-scale private land, private monitoring. ",
+      "Log-likelihood $= ", round(as.numeric(logLik(mxl)), 2), "$."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position") |>
+  footnote(
+    general = "SD parameters capture preference heterogeneity across respondents. WTP via delta method from the MXL Hessian; see main text for WTP estimates.",
+    threeparttable = TRUE
+  )
+```
+
+## Supplementary Table S5 | Voluntary preference regression
+
+```{r vp-table}
+# Fractional logit (Papke-Wooldridge) models
+fp1 <- glm(voluntary_pref ~ donation_z + env_z,
+           data = anal_data, family = quasibinomial(link = "logit"))
+fp2 <- glm(voluntary_pref ~ donation_z * env_z,
+           data = anal_data, family = quasibinomial(link = "logit"))
+fp3 <- glm(voluntary_pref ~ donation_z * env_z +
+             trust_ngo + trust_state + policy_cq +
+             bio_knowl + female + income_mid + income_high,
+           data = anal_data, family = quasibinomial(link = "logit"))
+fp4 <- glm(voluntary_pref ~ gave_binary * env_z +
+             trust_ngo + trust_state + policy_cq +
+             bio_knowl + female + income_mid + income_high,
+           data = anal_data, family = quasibinomial(link = "logit"))
+
+# Average partial effect scale factor for FP3 (primary model)
+ape_scale <- mean(fitted(fp3) * (1 - fitted(fp3)))
+
+# Helper: formatted "est*** (se)" string
+fmt_cell <- function(m, var) {
+  ct <- coeftest(m, vcov = vcovHC(m, "HC3"))
+  if (!var %in% rownames(ct)) return("")
+  r   <- ct[var, ]
+  est <- sprintf("%.3f", r["Estimate"])
+  se  <- sprintf("%.3f", r["Std. Error"])
+  p   <- r["Pr(>|z|)"]
+  stars <- if (p < .001) "***" else if (p < .01) "**" else if (p < .05) "*" else if (p < .1) "." else ""
+  paste0(est, stars, " (", se, ")")
+}
+
+dev_r2 <- function(m) sprintf("%.4f", 1 - m$deviance / m$null.deviance)
+
+vars <- c("(Intercept)", "donation_z", "env_z", "donation_z:env_z",
+          "gave_binary", "env_z:gave_binary",
+          "trust_ngo", "trust_state", "policy_cq",
+          "bio_knowl", "female", "income_mid", "income_high")
+vlabs <- c("Intercept",
+           "Donation (z-score)", "Env. importance (z-score)",
+           "Donation $\\times$ Env. importance",
+           "Donated (binary)", "Donated $\\times$ Env. importance",
+           "Trust: NGOs (Q2\\_3)", "Trust: state (Q2\\_1)",
+           "Policy consequentiality (Q14)",
+           "Biodiversity knowledge (Q12)",
+           "Female", "Income: mid", "Income: high")
+
+tab_rows <- map2_dfr(vars, vlabs, function(v, l) {
+  tibble(
+    Variable = l,
+    FP1 = fmt_cell(fp1, v),
+    FP2 = fmt_cell(fp2, v),
+    FP3 = fmt_cell(fp3, v),
+    FP4 = fmt_cell(fp4, v)
+  )
+})
+
+# APE for FP3 key predictors
+ape_don <- sprintf("%.3f", coef(fp3)["donation_z"]   * ape_scale)
+ape_env <- sprintf("%.3f", coef(fp3)["env_z"]        * ape_scale)
+ape_int <- sprintf("%.3f", coef(fp3)["donation_z:env_z"] * ape_scale)
+
+fit_rows <- tibble(
+  Variable = c("Dev. $R^2$", "$N$"),
+  FP1 = c(dev_r2(fp1), as.character(nobs(fp1))),
+  FP2 = c(dev_r2(fp2), as.character(nobs(fp2))),
+  FP3 = c(dev_r2(fp3), as.character(nobs(fp3))),
+  FP4 = c(dev_r2(fp4), as.character(nobs(fp4)))
+)
+
+bind_rows(tab_rows, fit_rows) |>
+  kbl(booktabs = TRUE, longtable = FALSE, escape = FALSE, align = "lcccc",
+      caption = paste0(
+        "Supplementary Table S5 | Voluntary preference (VP) regression --- ",
+        "fractional logit (Papke-Wooldridge). Dependent variable: VP score (0--1). ",
+        "HC3 robust standard errors in parentheses. ",
+        "FP1: main effects only (continuous donation z-score). ",
+        "FP2: interaction added. ",
+        "FP3: full model (primary specification, reported in main text). ",
+        "FP4: binary donated indicator instead of continuous donation (robustness check). ",
+        "Average partial effects for FP3: ",
+        "donation z-score $= ", ape_don, "$; ",
+        "env. importance z-score $= ", ape_env, "$; ",
+        "interaction $= ", ape_int, "$."
+      ),
+      col.names = c("", "FP1", "FP2", "FP3", "FP4")) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position") |>
+  footnote(
+    general = ". $p<0.1$\\\\quad * $p<0.05$\\\\quad ** $p<0.01$\\\\quad *** $p<0.001$",
+    escape  = FALSE,
+    threeparttable = TRUE
+  )
+```
+
+# References
+
+::: {#refs}
+:::

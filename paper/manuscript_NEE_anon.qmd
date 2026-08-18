@@ -366,7 +366,7 @@ ggplot(twox2, aes(x = don_grp, y = mean_vp, fill = fill)) +
 
 ## Heterogeneity
 
-Pre-registered subgroup models stratified by gender, income, and environmental attitude confirm the preference ordering is broadly consistent across groups (Extended Data Fig. 1). Exploratory analyses reveal that the political divide runs between state-coercive and market/corporate accountability mechanisms: left-bloc voters strongly prefer state tax, centre-right voters prefer mandatory corporate offsetting. Individual voluntary donation is rejected across all political subgroups: the cross-partisan consensus is on mandatory mechanisms, not on which mandatory instrument. Low state trust shifts preferences within mandatory instruments (toward mandatory corporate offsetting, away from state tax) but does not produce voluntary instrument preference.
+Pre-registered subgroup models stratified by gender, income, and environmental attitude confirm the preference ordering is broadly consistent across groups (Supplementary Fig. S1). Exploratory analyses reveal that the political divide runs between state-coercive and market/corporate accountability mechanisms: left-bloc voters strongly prefer state tax, centre-right voters prefer mandatory corporate offsetting. Individual voluntary donation is rejected across all political subgroups: the cross-partisan consensus is on mandatory mechanisms, not on which mandatory instrument. Low state trust shifts preferences within mandatory instruments (toward mandatory corporate offsetting, away from state tax) but does not produce voluntary instrument preference.
 
 ```{r}
 #| label: fig-subgroups
@@ -511,14 +511,4 @@ Full methods are provided in the Supplementary Information. Key elements are sum
 ::: {#refs}
 :::
 
-# Extended Data
-
-```{r}
-#| label: fig-heterogeneity
-#| fig-cap: "Extended Data Fig. 1 | Instrument preference heterogeneity by pre-registered subgroups. Coefficients from subgroup conditional logit models relative to tax baseline (95% CI), stratified by gender, income tercile, and environmental attitude tercile. The mandatory-over-voluntary preference ordering is broadly consistent across subgroups."
-#| fig-width: 7
-#| fig-height: 5
-#| eval: true
-knitr::include_graphics(here::here("paper/manuscript_files/figure-pdf", "fig_heterogeneity_exploratory.pdf"))
-```
 
