@@ -38,6 +38,9 @@ design/Survey design.docx
 # Generated outputs
 paper/*.pdf
 paper/*.tex
+paper/*.png
+paper/*.fdb_latexmk
+paper/*.rmarkdown
 paper/manuscript_GEC_files/
 paper/manuscript_files/
 Rplots.pdf
