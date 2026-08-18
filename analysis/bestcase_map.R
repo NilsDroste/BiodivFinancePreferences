@@ -9,12 +9,17 @@ library(magick)
 library(here)
 
 # ─── Data ────────────────────────────────────────────────────────────────────
-# WVS Wave 7 (2017–2022) country-level aggregates
+# EVS–WVS integrated dataset (Wave 7, 2017–2022) country-level aggregates
 # Interpersonal trust: Q57 "Most people can be trusted" (% agree)
 # Institutional trust: Q71 "Confidence in the government" (% a great deal + quite a lot)
-# Source: WVS Wave 7 online data analysis tool (worldvaluessurvey.org)
-# ASSUMPTION: values below are from WVS Wave 7 published country aggregates —
-#             verify against the official WVS data tool before publication.
+# Source: EVS–WVS online data analysis tool (worldvaluessurvey.org)
+# NOTE: Nordic countries (SE, NO, DK, FI) appear in the joint EVS–WVS integrated
+#       dataset, not in the standalone WVS Wave 7 file.
+# ASSUMPTION: values below are approximate; verify against the official EVS–WVS
+#             data tool before publication.
+# NOTE: Norway (NO) and Denmark (DK) rank above Sweden on interpersonal trust;
+#       Norway also ranks above Sweden on institutional trust and conservation
+#       spending. Sweden is one of the highest-ranked countries, not uniquely first.
 
 trust_data <- tribble(
   ~iso3,  ~country,              ~trust_interp, ~trust_inst,
@@ -198,8 +203,8 @@ p_bar <- ggplot(bar_df, aes(x = spend_pc_usd, y = country)) +
   scale_linewidth_identity() +
   scale_x_continuous(expand = expansion(mult = c(0, 0.15)),
                      labels = scales::label_number()) +
-  labs(x = "Public expenditure on environmental protection (USD per capita per year)", y = NULL,
-       title = "B  Per-capita conservation spending") +
+  labs(x = "Public environmental protection expenditure (USD per capita per year)", y = NULL,
+       title = "B  Public environmental protection spending per capita") +
   theme_minimal(base_size = 10) +
   theme(
     panel.grid.minor    = element_blank(),
