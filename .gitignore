@@ -1,7 +1,10 @@
-# Survey microdata — GDPR
+# Raw survey microdata — GDPR, not deposited
 data/
 
-# Open-ended responses — excluded from deposit (see README)
+# Anonymized deposit data — tracked for public release (pid and q17 removed)
+# deposit/ is intentionally NOT ignored
+
+# Open-ended responses — excluded from deposit (re-identification risk)
 analysis/q17_for_coding.csv
 
 # Fitted model objects (large, reproducible from scripts)
@@ -45,6 +48,10 @@ Rplots.pdf
 analysis/analysis.qmd
 paper/manuscript.html
 paper/manuscript_GEC_anon_files/
+paper/notes.md
+
+# Quarto build cache
+.quarto/
 
 # renv: track lockfile and activate script; exclude the package library
 renv/library/
