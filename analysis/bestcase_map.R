@@ -93,7 +93,7 @@ p_legend <- bi_legend(
   pal  = custom_pal, dim = 3,
   xlab = "Interpersonal trust",
   ylab = "Biodiversity spending",
-  size = 8, arrows = FALSE
+  size = 9, arrows = FALSE
 )
 
 # ------------------------------------------------------------------------------
@@ -117,22 +117,22 @@ bar_df <- trust_global |>
 p_bar <- ggplot(bar_df, aes(x = trust_interp, y = country, fill = is_swe)) +
   geom_col(width = 0.7) +
   geom_text(aes(label = sprintf("%.0f", trust_interp)),
-            hjust = -0.25, size = 2.8, colour = "grey30") +
+            hjust = -0.25, size = 3.1, colour = "grey30") +
   scale_fill_manual(values = c(`TRUE` = "#cc0000", `FALSE` = "#5ac8c8"),
                     guide = "none") +
   scale_x_continuous(expand = expansion(mult = c(0, 0.13))) +
-  labs(x = "Agreeing \"most people can be trusted\" (%)", y = NULL,
-       subtitle = sprintf("Sweden ranks %d of %d countries worldwide",
+  labs(x = "\"Most people can be trusted\" (%)", y = NULL,
+       subtitle = sprintf("Sweden ranks %dth of %d worldwide",
                           swe_rank, n_global)) +
-  theme_minimal(base_size = 10) +
+  theme_minimal(base_size = 11) +
   theme(
     panel.grid.minor   = element_blank(),
     panel.grid.major.y = element_blank(),
-    plot.subtitle      = element_text(size = 9, colour = "grey30"),
+    plot.subtitle      = element_text(size = 10, colour = "grey30"),
     axis.text.y        = element_text(
       face = ifelse(levels(bar_df$country) == "Sweden", "bold", "plain")),
     plot.background    = element_rect(fill = "white", colour = NA),
-    plot.margin        = margin(26, 10, 4, 4)
+    plot.margin        = margin(26, 18, 4, 4)
   )
 
 # ------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ p_bar <- ggplot(bar_df, aes(x = trust_interp, y = country, fill = is_swe)) +
 # ------------------------------------------------------------------------------
 
 tmp_map <- tempfile(fileext = ".png")
-ggsave(tmp_map, p_map, width = 5.2, height = 6.0, dpi = 300, bg = "white")
+ggsave(tmp_map, p_map, width = 5.2, height = 6.4, dpi = 300, bg = "white")
 map_img <- image_read(tmp_map) |> image_trim(fuzz = 0)
 map_h   <- image_info(map_img)$height
 
@@ -159,9 +159,9 @@ fig_bestcase <- plot_grid(
   map_panel, p_bar,
   ncol       = 2,
   rel_widths = c(1.15, 1),
-  labels         = c("A  Interpersonal trust and public biodiversity spending, Europe",
-                     "B  Interpersonal trust, global ranking"),
-  label_size     = 10,
+  labels         = c("A  Trust and biodiversity spending, Europe",
+                     "B  Global interpersonal trust"),
+  label_size     = 11,
   label_fontface = "bold",
   label_x        = c(0.02, 0),
   label_y        = 1.0,
@@ -169,9 +169,9 @@ fig_bestcase <- plot_grid(
 )
 
 ggsave(here("paper", "fig_bestcase.pdf"), fig_bestcase,
-       width = 10, height = 6.2, device = pdf, bg = "white")
+       width = 7.6, height = 5.4, device = pdf, bg = "white")
 ggsave(here("paper", "fig_bestcase.png"), fig_bestcase,
-       width = 10, height = 6.2, dpi = 300, bg = "white")
+       width = 7.6, height = 5.4, dpi = 300, bg = "white")
 
 # ------------------------------------------------------------------------------
 # Report the numbers quoted in the manuscript so they stay in sync with the data
