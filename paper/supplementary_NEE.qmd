@@ -12,6 +12,8 @@ format:
         % Supplementary numbering: Table S1..., Figure S1...
         \renewcommand{\thetable}{S\arabic{table}}
         \renewcommand{\thefigure}{S\arabic{figure}}
+        % Flush caption body instead of KOMA's hanging indent
+        \setcapindent{0pt}
 bibliography: references.bib
 csl: nature.csl
 execute:
