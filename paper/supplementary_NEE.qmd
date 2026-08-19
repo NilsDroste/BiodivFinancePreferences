@@ -305,14 +305,24 @@ run_cl_sub <- function(data, label) {
     mutate(lo=coef-1.96*se, hi=coef+1.96*se)
 }
 
-# Join covariates needed for subgroup splits
-resp_cov <- resp |>
-  left_join(full_data |> select(id, q10, q8, q11), by="id") |>
-  mutate(
-    gender_grp = case_when(q10==1~"Male", q10==2~"Female", TRUE~NA_character_),
-    income_t   = ntile(q8, 3),
+# Join covariates needed for subgroup splits.
+#
+# Terciles MUST be assigned at the respondent level, not on the choice-task
+# frame: `resp` holds 8 rows per respondent, so calling ntile() on it ranks
+# 16,808 task rows rather than 2,101 people. Because ntile() breaks ties by row
+# position, respondents sitting exactly on a tercile boundary would then have
+# their 8 tasks split across two terciles and be counted in both subgroups.
+resp_tercile <- full_data |>
+  transmute(
+    id,
+    gender_grp = case_when(q10 == 1 ~ "Male", q10 == 2 ~ "Female",
+                           TRUE ~ NA_character_),
+    income_t   = ntile(q8,  3),
     env_t      = ntile(q11, 3)
-  ) |>
+  )
+
+resp_cov <- resp |>
+  left_join(resp_tercile, by = "id") |>
   filter(!is.na(gender_grp))
 
 sub_res <- bind_rows(
@@ -350,7 +360,7 @@ sub_res |>
 
 ## Choice model estimates
 
-Full output for the conditional logit [@McFadden1974] is given in Table S3 and for the mixed logit [@McFaddenTrain2000; @Train2009] in Table S4. Both were estimated with logitr 1.2.0 [@Helveston2023]. The mixed logit uses 500 Halton draws, normal mixing distributions on the six non-price attributes, and 10 random starts with a fixed seed to guard against local optima; the reported model is the best-fitting start.
+Full output for the conditional logit [@McFadden1974] is given in Table S3 and for the mixed logit [@McFaddenTrain2000; @Train2009] in Table S4. Both were estimated with logitr 1.2.0 [@Helveston2023]. The mixed logit uses 500 Sobol draws, normal mixing distributions on the six non-price attributes, and 10 random starts with a fixed seed to guard against local optima; the reported model is the best-fitting start.
 
 ```{r cl-table}
 cl <- logitr(
@@ -431,7 +441,7 @@ kbl(mxl_tab, booktabs = TRUE, longtable = FALSE, align = "lrrrr", linesep = "",
       "Mixed logit full model output. ",
       "Normal mixing distributions on 6 random parameters (donation, certification, ",
       "offsetting, industrial land, public land, public monitoring); ",
-      "500 Halton draws; 10 random starts; seed = 42. ",
+      "500 Sobol draws; 10 random starts; seed = 42. ",
       "Baseline: tax financing, small-scale private land, private monitoring. ",
       "Log-likelihood $= ", round(as.numeric(logLik(mxl)), 2), "$."
     )) |>
