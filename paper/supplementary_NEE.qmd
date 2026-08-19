@@ -551,6 +551,82 @@ bind_rows(tab_rows, fit_rows) |>
   )
 ```
 
+## Supplementary Table S6 | Perceived instrument effectiveness (Q13)
+
+Question 13 asked respondents how effective each instrument is at delivering
+biodiversity benefits, on a five-point scale, for four instruments: voluntary
+donations (Q13\_1), market-based biodiversity certification (Q13\_2),
+environmental taxes (Q13\_3) and mandatory offsetting (Q13\_4). Because Q13 was
+administered *after* the choice tasks, it cannot identify the mechanism behind
+observed choices: preference and perceived effectiveness may both reflect a
+prior disposition, and the rating may rationalise the choice already made. It
+does, however, establish that the mandatory preference is not held in spite of a
+belief that voluntary instruments deliver better outcomes.
+
+```{r q13-table}
+eff <- full_data |>
+  transmute(
+    id,
+    eff_don  = q13_1,   # voluntary: donations
+    eff_cert = q13_2,   # voluntary: market-based certification
+    eff_tax  = q13_3,   # mandatory: environmental taxes
+    eff_off  = q13_4    # mandatory: mandatory offsetting
+  ) |>
+  mutate(
+    eff_vol     = (eff_don + eff_cert) / 2,
+    eff_man     = (eff_tax + eff_off)  / 2,
+    # Positive values = respondent judges mandatory instruments the more
+    # effective of the two families.
+    eff_rel_man = eff_man - eff_vol
+  )
+
+eff_means <- tibble(
+  Instrument = c("Voluntary donations (Q13\\_1)",
+                 "Market certification (Q13\\_2)",
+                 "Environmental taxes (Q13\\_3)",
+                 "Mandatory offsetting (Q13\\_4)",
+                 "Voluntary mean", "Mandatory mean"),
+  Mean = sprintf("%.2f", c(
+    mean(eff$eff_don,  na.rm = TRUE), mean(eff$eff_cert, na.rm = TRUE),
+    mean(eff$eff_tax,  na.rm = TRUE), mean(eff$eff_off,  na.rm = TRUE),
+    mean(eff$eff_vol,  na.rm = TRUE), mean(eff$eff_man,  na.rm = TRUE))),
+  SD = sprintf("%.2f", c(
+    sd(eff$eff_don,  na.rm = TRUE), sd(eff$eff_cert, na.rm = TRUE),
+    sd(eff$eff_tax,  na.rm = TRUE), sd(eff$eff_off,  na.rm = TRUE),
+    sd(eff$eff_vol,  na.rm = TRUE), sd(eff$eff_man,  na.rm = TRUE)))
+)
+
+tt <- t.test(eff$eff_man, eff$eff_vol, paired = TRUE)
+
+eff_vp <- resp_level |>
+  left_join(eff, by = "id") |>
+  filter(!is.na(eff_rel_man))
+m_eff  <- lm(voluntary_pref ~ eff_rel_man, data = eff_vp)
+ct_eff <- coeftest(m_eff, vcov = vcovHC(m_eff, "HC3"))
+
+kbl(eff_means, booktabs = TRUE, longtable = FALSE, escape = FALSE,
+    align = "lrr",
+    caption = paste0(
+      "Perceived effectiveness of each financing instrument at delivering ",
+      "biodiversity benefits (Q13; 1 = not at all effective, 5 = very ",
+      "effective). Mandatory instruments are rated more effective than ",
+      "voluntary ones: paired $t = ", sprintf("%.1f", tt$statistic),
+      "$, $p < 0.001$, mean difference $= ", sprintf("%.3f", tt$estimate),
+      "$. Regressing the VP score on relative perceived mandatory ",
+      "effectiveness (mandatory mean minus voluntary mean) gives ",
+      "$b = ", sprintf("%.4f", ct_eff["eff_rel_man", "Estimate"]),
+      "$ (HC3 SE $= ", sprintf("%.4f", ct_eff["eff_rel_man", "Std. Error"]),
+      "$, $p < 0.001$, $n = ", format(nobs(m_eff), big.mark = ","),
+      "$): respondents who judge mandatory instruments relatively more ",
+      "effective choose voluntary options less often."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position") |>
+  footnote(
+    general = "Q13 was administered after the choice tasks, so these associations are post-choice validation and not evidence of mediation.",
+    threeparttable = TRUE
+  )
+```
+
 # References
 
 ::: {#refs}
