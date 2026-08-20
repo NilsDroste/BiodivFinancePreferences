@@ -677,16 +677,27 @@ kbl(bid_tab, booktabs = TRUE, longtable = FALSE, align = "rrrrrr",
   )
 ```
 
-Willingness to pay is identified where a configuration's implied choke price,
-the cost at which programme utility equals status-quo utility, falls inside the
-range presented. Table S8 reports that threshold for all 24 attribute
+Willingness to pay is identified where a configuration's **mean
+utility-equivalence price**, the annual cost at which mean programme utility
+equals mean status-quo utility, falls inside the range presented. This is not a
+choke price: at our highest cost 24.2 per cent of alternatives were still
+chosen overall, and 48.3 per cent of the most preferred bundle, so demand is
+far from choked off. Table S8 reports the threshold for all 24 attribute
 combinations. It lies within the bid range for 15 of them. The nine exceptions
 all pair public administration monitoring with a mandatory instrument or with
-public land, so willingness-to-pay estimates for the most highly valued bundles
-rest on extrapolation and are more likely to be overstated than understated
-[@Morkbak2010]. The ordering across instruments is unaffected, being estimated
-from the utility coefficients rather than from their ratio to the price
-coefficient.
+public land. For those bundles the data establish that mean willingness to pay
+exceeds SEK 7,380, but the amount above it is extrapolated: cost-vector
+experiments show the maximum bid can shift both price sensitivity and estimated
+willingness to pay, without a settled direction [@Morkbak2010]. The instrument
+ordering is unaffected, being estimated from the utility coefficients rather
+than from their ratio to the price coefficient.
+
+The combined non-cost attribute premium of the most preferred bundle is SEK
+3,699 (offsetting 913, public land 1,180, public monitoring 1,606), comfortably
+inside the span of costs presented (SEK 492 to 7,380). On the face-validity
+diagnostic for WTP overshooting proposed by @Glenk2024, which compares the
+attribute premium of the highest-utility bundle against the cost attribute
+range and excludes the opt-out constant, these estimates do not overshoot.
 
 ```{r choke-price}
 cf_c <- coef(mxl)
@@ -707,25 +718,26 @@ grid <- expand_grid(
                Public = unname(cf_c["pland"]))[land],
     v_mon  = c(`Private audit` = 0, `Public admin` = unname(cf_c["pmon"]))[monitoring],
     # Choke price: cost at which programme utility equals opt-out utility.
-    choke_sek = (asc_c - (v_src + v_land + v_mon)) / bp_c * 1000
+    equiv_sek = (asc_c - (v_src + v_land + v_mon)) / bp_c * 1000
   ) |>
-  arrange(choke_sek)
+  arrange(equiv_sek)
 
 choke_tab <- grid |>
   transmute(
     Instrument = instrument, Land = land, Monitoring = monitoring,
-    `Choke price (SEK/yr)`  = format(round(choke_sek), big.mark = ","),
-    `Pct of median income`  = sprintf("%.2f", choke_sek / SCB_MEDIAN_INCOME_SEK * 100),
-    `Within bid range`      = ifelse(choke_sek <= MAX_BID_SEK, "yes", "no")
+    `Utility-equiv. price (SEK/yr)` = format(round(equiv_sek), big.mark = ","),
+    `Pct of median income`  = sprintf("%.2f", equiv_sek / SCB_MEDIAN_INCOME_SEK * 100),
+    `Within bid range`      = ifelse(equiv_sek <= MAX_BID_SEK, "yes", "no")
   )
 
 kbl(choke_tab, booktabs = TRUE, longtable = FALSE, align = "lllrrc",
     caption = paste0(
-      "Implied choke price by attribute configuration, from the mixed logit. ",
-      "The choke price is the annual cost at which the utility of a programme ",
-      "equals that of the status quo. It falls inside the presented range ",
+      "Mean utility-equivalence price by attribute configuration, from the ",
+      "mixed logit: the annual cost at which mean programme utility equals mean ",
+      "status-quo utility. This is not a choke price, since demand is far from ",
+      "choked off at that cost. It falls inside the presented range ",
       "(maximum SEK ", format(MAX_BID_SEK, big.mark = ","), ") for ",
-      sum(grid$choke_sek <= MAX_BID_SEK), " of ", nrow(grid),
+      sum(grid$equiv_sek <= MAX_BID_SEK), " of ", nrow(grid),
       " configurations. The exceptions all combine public administration ",
       "monitoring with a mandatory instrument or with public land."
     )) |>
@@ -736,6 +748,101 @@ kbl(choke_tab, booktabs = TRUE, longtable = FALSE, align = "lllrrc",
     threeparttable = TRUE
   )
 ```
+
+## S9. Sensitivity of the cost coefficient to functional form
+
+If the linear-in-cost specification understated price sensitivity at the top of
+the range, the utility-equivalence prices in Table S8 would be too high. Table
+S9 re-estimates the conditional logit with four treatments of cost: linear,
+fully categorical (a dummy per cost level, imposing no shape), piecewise linear
+with a knot at SEK 4,920, and quadratic. The categorical specification fits
+best, but the improvement is small, and every specification places the most
+preferred bundle's utility-equivalence price above the SEK 7,380 maximum bid.
+
+```{r price-spec}
+L <- long_db |>
+  mutate(
+    sek    = price * 1000,                       # long_db holds price in kSEK
+    p_hi   = pmax(sek - 4920, 0) / 1000,         # piecewise, knot at SEK 4,920
+    price2 = price^2,
+    p2460  = as.integer(sek == 2460),
+    p4920  = as.integer(sek == 4920),
+    p7380  = as.integer(sek == 7380)
+  )
+
+base_pars <- c("asc_neither", "don", "cert", "off", "ind", "pland", "pmon")
+fit_spec <- function(extra) {
+  logitr(data = L, outcome = "chosen", obsID = "obsID",
+         pars = c(base_pars, extra), numMultiStarts = 3)
+}
+
+specs <- list(
+  Linear                       = "price",
+  `Categorical (dummy/level)`  = c("p2460", "p4920", "p7380"),
+  `Piecewise (knot SEK 4,920)` = c("price", "p_hi"),
+  Quadratic                    = c("price", "price2")
+)
+fits <- lapply(specs, fit_spec)
+
+# Utility-equivalence price for the most preferred bundle. Each specification
+# needs its own solution: using the linear coefficient alone would be wrong for
+# the quadratic (which has a curvature term) and for the piecewise model when
+# the solution lies above the knot, as it does here.
+equiv_price <- function(m, form) {
+  cf  <- coef(m)
+  num <- sum(cf[c("off", "pland", "pmon")]) - unname(cf["asc_neither"])
+  if (form == "linear") {
+    return(num / (-unname(cf["price"])) * 1000)
+  }
+  if (form == "piecewise") {
+    b1 <- unname(cf["price"]); b2 <- unname(cf["p_hi"]); knot <- 4.92
+    p_low <- num / (-b1)                       # solution on the lower segment
+    if (p_low <= knot) return(p_low * 1000)
+    # num + b1*p + b2*(p - knot) = 0 on the upper segment
+    return((-num + b2 * knot) / (b1 + b2) * 1000)
+  }
+  if (form == "quadratic") {
+    a1 <- unname(cf["price"]); a2 <- unname(cf["price2"])
+    disc <- a1^2 - 4 * a2 * num                # num + a1*p + a2*p^2 = 0
+    if (disc < 0) return(NA_real_)
+    roots <- c((-a1 + sqrt(disc)) / (2 * a2), (-a1 - sqrt(disc)) / (2 * a2))
+    roots <- sort(roots[roots > 0])
+    return(if (length(roots)) roots[1] * 1000 else NA_real_)
+  }
+  NA_real_                                     # categorical: no cost slope
+}
+forms <- c("linear", "categorical", "piecewise", "quadratic")
+
+spec_tab <- tibble(
+  Specification = names(specs),
+  `Log-likelihood` = sprintf("%.1f", sapply(fits, \(m) as.numeric(logLik(m)))),
+  k    = sapply(fits, \(m) length(coef(m))),
+  AIC  = sprintf("%.1f", sapply(fits, AIC)),
+  `AIC vs linear` = sprintf("%+.1f", sapply(fits, AIC) - AIC(fits[[1]])),
+  `Utility-equiv. price (SEK)` = mapply(
+    \(m, fm) { v <- equiv_price(m, fm)
+               if (is.na(v)) "n.a." else format(round(v), big.mark = ",") },
+    fits, forms)
+)
+
+kbl(spec_tab, booktabs = TRUE, longtable = FALSE, align = "lrrrrr",
+    caption = paste0(
+      "Sensitivity of the cost coefficient to functional form, conditional ",
+      "logit. The categorical specification fits best but by a small margin ",
+      "(AIC ", sprintf("%.1f", AIC(fits[[2]]) - AIC(fits[[1]])),
+      " relative to linear), and its cost utilities are close to linear in ",
+      "cost. In the piecewise model the upper-range slope is almost identical ",
+      "to the lower-range slope, so there is little evidence that price ",
+      "sensitivity changes across the range presented."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position",
+                font_size = 9) |>
+  footnote(
+    general = "The utility-equivalence price is not defined for the categorical specification, which estimates no continuous cost slope. All specifications place the most preferred bundle above the SEK 7,380 maximum bid.",
+    threeparttable = TRUE
+  )
+```
+
 
 # References
 
