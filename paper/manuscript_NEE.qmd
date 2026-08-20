@@ -325,7 +325,7 @@ p_interact <- ggplot(anal_data, aes(x = donation, y = voluntary_pref, colour = e
   scale_x_continuous(labels = scales::label_comma()) +
   scale_y_continuous(labels = scales::percent, limits = c(-0.1, 1.1)) +
   labs(x = "Donation (SEK)", y = "Voluntary preference (VP)",
-       title = "B  VP by donation × environmental attitude") +
+       title = "B  VP by donation and environmental attitude") +
   theme_minimal(base_size = 11) +
   theme(legend.position = "bottom",
         plot.title = element_text(face = "bold", size = 11))
