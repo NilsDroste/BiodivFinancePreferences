@@ -629,55 +629,110 @@ kbl(eff_means, booktabs = TRUE, longtable = FALSE, escape = FALSE,
   )
 ```
 
-## Supplementary Table S7 | Status-quo rejection across the cost range
+## S7. Cost vector, income shares, and choke price
 
-The cost attribute spanned SEK 492 to 7,380 per household per year. Acceptance
-of a programme over the status quo falls only modestly across that fifteenfold
-range, which means the design did not reach the price at which demand turns
-down. Willingness to pay is therefore bounded below by the highest amount
-presented rather than point-identified: the figures quoted in the Discussion are
-lower bounds, not estimates.
+The cost attribute spanned SEK 492 to 7,380 per household per year. Table S7
+sets those levels against Swedish household disposable income and reports the
+bid acceptance curve. Note that acceptance must be measured at the level of the
+individual alternative: the share of *tasks* in which either of the two offered
+programmes was chosen is mechanically high and is not a bid acceptance curve.
 
-```{r acceptance-table}
-acc <- resp |>
-  mutate(
-    chose_programme = choice_num %in% c(1L, 2L),
-    # The cheapest of the two programmes on offer is the binding price the
-    # respondent could have accepted in that task.
-    cheapest_sek    = pmin(a_price_sek, b_price_sek)
-  )
+```{r bid-acceptance}
+# SCB (Statistics Sweden), table TabVX4bDispInkN, all households, 2024.
+SCB_MEDIAN_INCOME_SEK <- 472600
+SCB_MEAN_INCOME_SEK   <- 612200
 
-acc_sum <- acc |>
-  group_by(cheapest_sek) |>
-  summarise(n_tasks = n(), accept = mean(chose_programme), .groups = "drop")
+# Alternative-level: was THIS option chosen, at ITS OWN price?
+alt <- bind_rows(
+  resp |> transmute(chosen = choice_num == 1L, sek = a_price_sek),
+  resp |> transmute(chosen = choice_num == 2L, sek = b_price_sek)
+)
 
-acc_tab <- acc_sum |>
+bid_tab <- alt |>
+  group_by(sek) |>
+  summarise(n = n(), uptake = mean(chosen), .groups = "drop") |>
   transmute(
-    `Lowest cost on offer (SEK/year)` = format(cheapest_sek, big.mark = ","),
-    `Approx. USD/year`  = round(cheapest_sek / 10),
-    `Choice tasks`      = format(n_tasks, big.mark = ","),
-    `Chose a programme` = sprintf("%.1f", accept * 100)
+    `Cost (SEK/year)`      = format(sek, big.mark = ","),
+    `USD/year`             = round(sek / 10),
+    `Pct of median income` = sprintf("%.2f", sek / SCB_MEDIAN_INCOME_SEK * 100),
+    `Pct of mean income`   = sprintf("%.2f", sek / SCB_MEAN_INCOME_SEK * 100),
+    `Alternatives shown`   = format(n, big.mark = ","),
+    `Chosen (pct)`         = sprintf("%.1f", uptake * 100)
   )
 
-# NOTE: percent signs must be escaped in the caption. An unescaped "%" is a
-# LaTeX comment and silently truncates the table, which leaves a dangling
-# \end{table} in the output.
-hi_acc <- sprintf("%.1f", max(acc_sum$accept) * 100)
-lo_acc <- sprintf("%.1f", min(acc_sum$accept) * 100)
-sq_pct <- sprintf("%.1f", mean(!acc$chose_programme) * 100)
-
-kbl(acc_tab, booktabs = TRUE, longtable = FALSE, align = "rrrr",
+kbl(bid_tab, booktabs = TRUE, longtable = FALSE, align = "rrrrrr",
     caption = paste0(
-      "Percentage of choice tasks in which a biodiversity programme was chosen ",
-      "over the status quo, by the lowest annual cost available in that task. ",
-      "Acceptance falls only from ", hi_acc, " to ", lo_acc,
-      " per cent across a fifteenfold increase in cost, so the bid vector does ",
-      "not span the choke price. Overall status-quo rate: ", sq_pct,
-      " per cent."
+      "Cost levels as a share of Swedish household disposable income, with the ",
+      "bid acceptance curve. Income reference: median SEK ",
+      format(SCB_MEDIAN_INCOME_SEK, big.mark = ","), " and mean SEK ",
+      format(SCB_MEAN_INCOME_SEK, big.mark = ","),
+      " for all households in 2024 (Statistics Sweden). Uptake is measured per ",
+      "alternative, that is the probability a given programme was chosen at its ",
+      "own cost, and more than halves across the range."
     )) |>
   kable_styling(full_width = TRUE, latex_options = "hold_position") |>
   footnote(
-    general = "Because acceptance remains high at the top of the cost range, total willingness to pay cannot be point-identified from these data and is reported in the main text as a lower bound.",
+    general = "The highest cost presented is about 1.6 per cent of median household disposable income.",
+    threeparttable = TRUE
+  )
+```
+
+Willingness to pay is identified where a configuration's implied choke price,
+the cost at which programme utility equals status-quo utility, falls inside the
+range presented. Table S8 reports that threshold for all 24 attribute
+combinations. It lies within the bid range for 15 of them. The nine exceptions
+all pair public administration monitoring with a mandatory instrument or with
+public land, so willingness-to-pay estimates for the most highly valued bundles
+rest on extrapolation and are more likely to be overstated than understated
+[@Morkbak2010]. The ordering across instruments is unaffected, being estimated
+from the utility coefficients rather than from their ratio to the price
+coefficient.
+
+```{r choke-price}
+cf_c <- coef(mxl)
+asc_c <- unname(cf_c["asc_neither"])
+bp_c  <- unname(cf_c["price"])
+MAX_BID_SEK <- 7380
+
+grid <- expand_grid(
+  instrument = c("Tax", "Donation", "Certification", "Offsetting"),
+  land       = c("Small private", "Industrial", "Public"),
+  monitoring = c("Private audit", "Public admin")
+) |>
+  mutate(
+    v_src  = c(Tax = 0, Donation = unname(cf_c["don"]),
+               Certification = unname(cf_c["cert"]),
+               Offsetting = unname(cf_c["off"]))[instrument],
+    v_land = c(`Small private` = 0, Industrial = unname(cf_c["ind"]),
+               Public = unname(cf_c["pland"]))[land],
+    v_mon  = c(`Private audit` = 0, `Public admin` = unname(cf_c["pmon"]))[monitoring],
+    # Choke price: cost at which programme utility equals opt-out utility.
+    choke_sek = (asc_c - (v_src + v_land + v_mon)) / bp_c * 1000
+  ) |>
+  arrange(choke_sek)
+
+choke_tab <- grid |>
+  transmute(
+    Instrument = instrument, Land = land, Monitoring = monitoring,
+    `Choke price (SEK/yr)`  = format(round(choke_sek), big.mark = ","),
+    `Pct of median income`  = sprintf("%.2f", choke_sek / SCB_MEDIAN_INCOME_SEK * 100),
+    `Within bid range`      = ifelse(choke_sek <= MAX_BID_SEK, "yes", "no")
+  )
+
+kbl(choke_tab, booktabs = TRUE, longtable = FALSE, align = "lllrrc",
+    caption = paste0(
+      "Implied choke price by attribute configuration, from the mixed logit. ",
+      "The choke price is the annual cost at which the utility of a programme ",
+      "equals that of the status quo. It falls inside the presented range ",
+      "(maximum SEK ", format(MAX_BID_SEK, big.mark = ","), ") for ",
+      sum(grid$choke_sek <= MAX_BID_SEK), " of ", nrow(grid),
+      " configurations. The exceptions all combine public administration ",
+      "monitoring with a mandatory instrument or with public land."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position",
+                font_size = 9) |>
+  footnote(
+    general = "Estimates for configurations outside the bid range rest on extrapolation beyond the costs any respondent was shown.",
     threeparttable = TRUE
   )
 ```
