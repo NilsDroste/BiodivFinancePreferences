@@ -188,6 +188,17 @@ kbl(attr_tab, booktabs = TRUE, longtable = FALSE, linesep = "",
   column_spec(1, bold = TRUE)
 ```
 
+**Hypothetical-bias and cost-vector mitigation.** Before the choice tasks,
+respondents were shown a budget-substitution reminder: "In your answers to the
+subsequent choices, please consider that the money that you spend on
+biodiversity conservation will no longer be available for other purposes." The
+opt-out was explained explicitly ("If you choose 'none of the above', it implies
+that everything stays as it is (status quo), and no financing option is
+implemented"), and respondents were instructed to "answer as if you actually had
+to incur the annual cost for your household associated with your choice."
+Combined cheap-talk and opt-out reminder devices of this kind have been shown to
+reduce cost-vector effects on welfare estimates substantially [@Borger2025].
+
 **Instrument coding.** Financing source was coded relative to the tax baseline: donation ($\hat\beta_\text{don}$), certification ($\hat\beta_\text{cert}$), and mandatory offsetting ($\hat\beta_\text{off}$). Land ownership was coded relative to small-scale private land: industrial private ($\hat\beta_\text{ind}$) and public ($\hat\beta_\text{pland}$). Monitoring was coded relative to private audit: public administration ($\hat\beta_\text{pmon}$). Price entered the utility function in thousands SEK to improve numerical scaling.
 
 **Alternative-specific constant.** An alternative-specific constant ($\text{ASC}_\text{neither}$) was included for the opt-out (status-quo) alternative. A negative ASC indicates a systematic preference for any programme over the status quo.
@@ -695,7 +706,7 @@ than from their ratio to the price coefficient.
 The combined non-cost attribute premium of the most preferred bundle is SEK
 3,699 (offsetting 913, public land 1,180, public monitoring 1,606), comfortably
 inside the span of costs presented (SEK 492 to 7,380). On the face-validity
-diagnostic for WTP overshooting proposed by @Glenk2024, which compares the
+diagnostic for WTP overshooting proposed by Glenk et al. [@Glenk2024], which compares the
 attribute premium of the highest-utility bundle against the cost attribute
 range and excludes the opt-out constant, these estimates do not overshoot.
 
