@@ -629,6 +629,59 @@ kbl(eff_means, booktabs = TRUE, longtable = FALSE, escape = FALSE,
   )
 ```
 
+## Supplementary Table S7 | Status-quo rejection across the cost range
+
+The cost attribute spanned SEK 492 to 7,380 per household per year. Acceptance
+of a programme over the status quo falls only modestly across that fifteenfold
+range, which means the design did not reach the price at which demand turns
+down. Willingness to pay is therefore bounded below by the highest amount
+presented rather than point-identified: the figures quoted in the Discussion are
+lower bounds, not estimates.
+
+```{r acceptance-table}
+acc <- resp |>
+  mutate(
+    chose_programme = choice_num %in% c(1L, 2L),
+    # The cheapest of the two programmes on offer is the binding price the
+    # respondent could have accepted in that task.
+    cheapest_sek    = pmin(a_price_sek, b_price_sek)
+  )
+
+acc_sum <- acc |>
+  group_by(cheapest_sek) |>
+  summarise(n_tasks = n(), accept = mean(chose_programme), .groups = "drop")
+
+acc_tab <- acc_sum |>
+  transmute(
+    `Lowest cost on offer (SEK/year)` = format(cheapest_sek, big.mark = ","),
+    `Approx. USD/year`  = round(cheapest_sek / 10),
+    `Choice tasks`      = format(n_tasks, big.mark = ","),
+    `Chose a programme` = sprintf("%.1f", accept * 100)
+  )
+
+# NOTE: percent signs must be escaped in the caption. An unescaped "%" is a
+# LaTeX comment and silently truncates the table, which leaves a dangling
+# \end{table} in the output.
+hi_acc <- sprintf("%.1f", max(acc_sum$accept) * 100)
+lo_acc <- sprintf("%.1f", min(acc_sum$accept) * 100)
+sq_pct <- sprintf("%.1f", mean(!acc$chose_programme) * 100)
+
+kbl(acc_tab, booktabs = TRUE, longtable = FALSE, align = "rrrr",
+    caption = paste0(
+      "Percentage of choice tasks in which a biodiversity programme was chosen ",
+      "over the status quo, by the lowest annual cost available in that task. ",
+      "Acceptance falls only from ", hi_acc, " to ", lo_acc,
+      " per cent across a fifteenfold increase in cost, so the bid vector does ",
+      "not span the choke price. Overall status-quo rate: ", sq_pct,
+      " per cent."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position") |>
+  footnote(
+    general = "Because acceptance remains high at the top of the cost range, total willingness to pay cannot be point-identified from these data and is reported in the main text as a lower bound.",
+    threeparttable = TRUE
+  )
+```
+
 # References
 
 ::: {#refs}
