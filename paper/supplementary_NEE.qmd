@@ -161,9 +161,11 @@ anal_data <- resp_level |>
 
 # Supplementary Methods
 
-## S1. Discrete choice experiment design
+Full methods are given in the Methods section of the main text. This section
+provides the attribute-level table, the sample descriptives, and the verbatim
+wording of the bias-mitigation devices, which are referenced there.
 
-Each respondent completed eight choice tasks. Every task presented two hypothetical biodiversity programme alternatives plus a status-quo option ("neither programme"). Programmes were described by four attributes whose levels are given in Table S1. The $4 \times 3 \times 2 \times 4$ full factorial was reduced to a blocked fractional factorial design (one block per respondent, 8 tasks per block). Within each task, attribute levels for options A and B were drawn independently from the design.
+## Attribute levels
 
 ```{r attr-table}
 attr_tab <- tribble(
@@ -191,30 +193,28 @@ kbl(attr_tab, booktabs = TRUE, longtable = FALSE, linesep = "",
   column_spec(1, bold = TRUE)
 ```
 
-**Hypothetical-bias and cost-vector mitigation.** Before the choice tasks,
-respondents were shown a budget-substitution reminder: "In your answers to the
-subsequent choices, please consider that the money that you spend on
-biodiversity conservation will no longer be available for other purposes." The
-opt-out was explained explicitly ("If you choose 'none of the above', it implies
+## Bias-mitigation wording
+
+The choice tasks were preceded by three devices intended to reduce hypothetical
+bias and cost-vector effects, quoted here in full.
+
+A budget-substitution reminder: *"In your answers to the subsequent choices,
+please consider that the money that you spend on biodiversity conservation will
+no longer be available for other purposes."*
+
+An explicit opt-out reminder: *"If you choose 'none of the above', it implies
 that everything stays as it is (status quo), and no financing option is
-implemented"), and respondents were instructed to "answer as if you actually had
-to incur the annual cost for your household associated with your choice."
-Combined cheap-talk and opt-out reminder devices of this kind have been shown to
-reduce cost-vector effects on welfare estimates substantially [@Borger2025].
+implemented."*
 
-**Instrument coding.** Financing source was coded relative to the tax baseline: donation ($\hat\beta_\text{don}$), certification ($\hat\beta_\text{cert}$), and mandatory offsetting ($\hat\beta_\text{off}$). Land ownership was coded relative to small-scale private land: industrial private ($\hat\beta_\text{ind}$) and public ($\hat\beta_\text{pland}$). Monitoring was coded relative to private audit: public administration ($\hat\beta_\text{pmon}$). Price entered the utility function in thousands SEK to improve numerical scaling.
+An incidence instruction: respondents were asked to *"answer as if you actually
+had to incur the annual cost for your household associated with your choice."*
 
-**Alternative-specific constant.** An alternative-specific constant ($\text{ASC}_\text{neither}$) was included for the opt-out (status-quo) alternative. A negative ASC indicates a systematic preference for any programme over the status quo.
+Consent was obtained on a click-through gate before the survey began: *"By
+clicking next, you consent to the anonymized collection of your data, which will
+be included in future academic analyses and publications,"* with the participant
+information sheet linked from that page.
 
-## S2. Voluntary preference (VP) score
-
-The VP score quantifies each respondent's tendency to choose voluntary over mandatory financing instruments in the DCE. Only tasks in which the two programme alternatives presented one voluntary instrument (donation or certification) and one mandatory instrument (tax or mandatory offsetting) are included; tasks where both options share the same instrument type, or where the respondent chose the opt-out, are excluded from the denominator. For eligible "mixed-instrument" tasks, VP equals the proportion in which the respondent chose the voluntary option, ranging from 0 (always mandatory) to 1 (always voluntary). The mean number of mixed-instrument tasks per respondent was `r round(mean(anal_data$n_mixed), 1)` (range `r min(anal_data$n_mixed)`–`r max(anal_data$n_mixed)`).
-
-## S3. Donation experiment
-
-Immediately following the DCE, respondents allocated a share of a potential SEK 1,000 prize to Naturskyddsföreningen (the Swedish Society for Nature Conservation). One hundred winners were drawn randomly from all $n = 2{,}101$ respondents, making the game incentive-compatible in expectation: each respondent faced an approximately 1-in-21 chance of their allocation being paid out. The donation amount (SEK 0–1,000) is used as a continuous measure of individual propensity to contribute to biodiversity conservation voluntarily and as a binary indicator (gave > 0).
-
-## S4. Sample characterisation
+## Sample characterisation
 
 ```{r sample-table}
 n_total <- nrow(full_data)
@@ -274,7 +274,8 @@ kbl(desc_tab, booktabs = TRUE, longtable = FALSE, escape = FALSE, linesep = "",
   kable_styling(full_width = TRUE, latex_options = "hold_position")
 ```
 
-Party composition: Social Democrats 23.6%, Sweden Democrats 13.7%, Moderate Party 14.6%, Green Party 7.8%, Centre Party 4.8%, Christian Democrats 3.7%, Left Party 6.5%, Liberal Party 1.9%, Other 7.2%, No preference or don't know 16.3%. Relative to the 2022 Riksdag election, Sweden Democrats (13.7% vs. 20.5% vote share) and Social Democrats (23.6% vs. 30.3%) are under-represented; smaller parties are broadly proportional. As SD voters show the weakest mandatory preference (main text Fig. 5), their under-representation modestly biases the sample's lean-mandatory VP share upward; within-sample subgroup findings are unaffected.
+Party composition and its comparison with the 2022 Riksdag election are reported
+in the main text Methods.
 
 # Supplementary Results
 
