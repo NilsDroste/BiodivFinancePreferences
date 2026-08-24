@@ -32,6 +32,9 @@ library(readxl)
 library(sandwich)
 library(lmtest)
 library(logitr)
+
+# Respondent-clustered covariance for the conditional logit models below.
+source(here("analysis", "cluster_se.R"))
 ```
 
 ```{r load-data}
@@ -281,7 +284,7 @@ Pre-registered subgroup conditional logit models stratified by gender, income te
 
 ```{r}
 #| label: fig-heterogeneity
-#| fig-cap: "Instrument preference heterogeneity by pre-registered subgroups. Coefficients from subgroup conditional logit models relative to tax baseline (95% CI), stratified by gender, income tercile, and environmental attitude tercile. Only the three financing instrument coefficients (donation, certification, offsetting) are shown; land and monitoring coefficients are omitted for clarity. The mandatory-over-voluntary preference ordering is broadly consistent across all subgroups."
+#| fig-cap: "Instrument preference heterogeneity by pre-registered subgroups. Coefficients from subgroup conditional logit models relative to tax baseline (95% CI, respondent-clustered), stratified by gender, income tercile, and environmental attitude tercile. Only the three financing instrument coefficients (donation, certification, offsetting) are shown; land and monitoring coefficients are omitted for clarity. The mandatory-over-voluntary preference ordering is broadly consistent across all subgroups."
 #| fig-width: 7
 #| fig-height: 5
 #| eval: true
@@ -290,17 +293,17 @@ Pre-registered subgroup conditional logit models stratified by gender, income te
 make_long_sub <- function(data) {
   obs <- as.integer(factor(paste0(data$id, "_", data$task)))
   bind_rows(
-    data.frame(obsID=obs, chosen=as.integer(data$choice_num==1), asc=0L,
+    data.frame(obsID=obs, respID=data$id, chosen=as.integer(data$choice_num==1), asc=0L,
                don=as.integer(data$a_source==1), cert=as.integer(data$a_source==2),
                off=as.integer(data$a_source==3), ind=as.integer(data$a_land==1),
                pland=as.integer(data$a_land==2), pmon=as.integer(data$a_monitor==1),
                price=data$a_price_sek/1000),
-    data.frame(obsID=obs, chosen=as.integer(data$choice_num==2), asc=0L,
+    data.frame(obsID=obs, respID=data$id, chosen=as.integer(data$choice_num==2), asc=0L,
                don=as.integer(data$b_source==1), cert=as.integer(data$b_source==2),
                off=as.integer(data$b_source==3), ind=as.integer(data$b_land==1),
                pland=as.integer(data$b_land==2), pmon=as.integer(data$b_monitor==1),
                price=data$b_price_sek/1000),
-    data.frame(obsID=obs, chosen=as.integer(data$choice_num==3), asc=1L,
+    data.frame(obsID=obs, respID=data$id, chosen=as.integer(data$choice_num==3), asc=1L,
                don=0L, cert=0L, off=0L, ind=0L, pland=0L, pmon=0L, price=0)
   ) |> arrange(obsID)
 }
@@ -310,7 +313,7 @@ run_cl_sub <- function(data, label) {
   m <- logitr(data=long, outcome="chosen", obsID="obsID",
                pars=c("asc","don","cert","off","ind","pland","pmon","price"),
                numMultiStarts=3)
-  cf <- coef(m); se <- logitr::se(m)
+  cf <- coef(m); se <- cluster_se(m, long, long$respID)
   tibble(group=label,
          attr=c("don","cert","off"),
          coef=cf[c("don","cert","off")],
@@ -385,7 +388,9 @@ cl <- logitr(
 )
 
 cf  <- coef(cl)
-se  <- logitr::se(cl)
+# Clustered by respondent: eight choice tasks each, so tasks are not
+# independent and logitr's default standard errors are too small.
+se  <- cluster_se(cl, long_db, long_db$respID)
 zv  <- cf / se
 pv  <- 2 * pnorm(abs(zv), lower.tail = FALSE)
 
@@ -404,7 +409,7 @@ cl_tab <- tibble(
 
 kbl(cl_tab, booktabs = TRUE, longtable = FALSE, align = "lrrrr", linesep = "",
     caption = paste0(
-      "Conditional logit full model output. ",
+      "Conditional logit full model output, with standard errors clustered by respondent. ",
       "Baseline: tax financing, small-scale private land, private monitoring. ",
       "$N = ", format(n_distinct(long_db$respID), big.mark=","), "$ respondents; ",
       format(n_distinct(long_db$obsID), big.mark=","), " choice observations. ",

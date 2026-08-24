@@ -213,7 +213,10 @@ cl_coefs <- tibble(
   label = c("Donation", "Certification", "Offsetting",
             "Industrial land", "Public land", "Public monitoring"),
   coef  = c(-0.376, -0.082, 0.146, 0.010, 0.190, 0.315),
-  se    = c(0.032, 0.032, 0.034, 0.030, 0.028, 0.024),
+  # Respondent-clustered standard errors (analysis/cluster_se.R). The eight
+  # tasks per respondent are not independent; logitr's default SEs treat them
+  # as if they were and are 1.01-1.60x too small.
+  se    = c(0.040, 0.035, 0.037, 0.030, 0.029, 0.026),
   type  = c("voluntary", "voluntary", "mandatory", "land", "land", "monitoring")
 ) |>
   mutate(lo = coef - 1.96 * se, hi = coef + 1.96 * se,
@@ -268,7 +271,7 @@ The 2×2 cross-classification of environmental concern and donation behaviour (F
 
 A post-choice measure of perceived effectiveness is consistent with this reading. Respondents rated mandatory instruments more effective at delivering biodiversity benefits than voluntary ones (3.37 against 3.11 on a five-point scale; paired $t = 11.0$, $p < 0.001$), and the relative effectiveness they attributed to mandatory instruments predicts lower voluntary preference ($b = -0.069$, $p < 0.001$, $n = 1{,}863$). Because effectiveness was elicited after the choice tasks, this is associational validation rather than evidence of mediation: preference and perceived effectiveness could both reflect a common prior disposition. It does, however, rule out the possibility that the mandatory preference is held despite a belief that voluntary instruments work better.
 
-Critically, the findings imply that voluntary donation lacks a natural constituency. The citizens who care most about biodiversity prefer mandatory instruments, and those who care least will not contribute voluntarily in sufficient volumes regardless of instrument design. Certification fares somewhat better, attracting support in particular subgroups (see below), but it is outranked by mandatory corporate offsetting in every subgroup we examine.
+Critically, the findings imply that voluntary donation lacks a natural constituency. The citizens who care most about biodiversity prefer mandatory instruments, and those who care least will not contribute voluntarily in sufficient volumes regardless of instrument design. Certification fares somewhat better, carrying positive point estimates relative to tax in some subgroups, but it is outranked by mandatory corporate offsetting in every subgroup we examine.
 
 ```{r}
 #| label: fig-vp
@@ -384,7 +387,7 @@ ggplot(twox2, aes(x = don_grp, y = mean_vp, fill = fill)) +
 
 ## Heterogeneity
 
-Pre-registered subgroup models stratified by gender, income, and environmental attitude confirm the preference ordering is broadly consistent across groups (Supplementary Fig. S1). Exploratory analyses reveal that the political divide runs between state-coercive and market/corporate accountability mechanisms: left-bloc voters strongly prefer state tax, centre-right voters prefer mandatory corporate offsetting. Donation coefficients are negative in every political subgroup, though not statistically distinguishable from tax among centre-right ($p = 0.23$) or Sweden Democrat ($p = 0.50$) voters, and certification is preferred to tax among centre-right voters ($+0.14$, $p = 0.04$). Mandatory corporate offsetting nonetheless ranks first or joint-first in every group, so the cross-partisan consensus concerns the standing of mandatory mechanisms rather than which mandatory instrument is chosen. Low state trust does shift preferences toward voluntary instruments relative to tax: among the least trusting respondents, both donation ($+0.24$) and certification ($+0.28$) are preferred to tax (both $p < 0.001$). Mandatory corporate offsetting remains their most preferred instrument ($+0.33$), so low state trust reorders instruments without overturning the mandatory preference.
+Pre-registered subgroup models stratified by gender, income, and environmental attitude confirm the preference ordering is broadly consistent across groups (Supplementary Fig. S1). Exploratory analyses reveal that the political divide runs between state-coercive and market/corporate accountability mechanisms: left-bloc voters strongly prefer state tax, centre-right voters prefer mandatory corporate offsetting. Donation coefficients are negative in every political subgroup, though not statistically distinguishable from tax among centre-right ($p = 0.31$) or Sweden Democrat ($p = 0.58$) voters. Certification carries a positive point estimate relative to tax among centre-right voters ($+0.14$), but this is not significant once standard errors are clustered by respondent ($p = 0.06$). Mandatory corporate offsetting ranks first or joint-first in every group, so the cross-partisan consensus concerns the standing of mandatory mechanisms rather than which mandatory instrument is chosen. Low state trust does shift preferences toward voluntary instruments relative to tax: among the least trusting respondents, both donation ($+0.24$, $p = 0.002$) and certification ($+0.28$, $p < 0.001$) are preferred to tax. Mandatory corporate offsetting remains their most preferred instrument ($+0.33$), so low state trust reorders instruments without overturning the mandatory preference.
 
 ```{r}
 #| label: fig-subgroups
@@ -439,25 +442,29 @@ resp_p <- bind_rows(choices1b, choices2b) |>
 
 make_long_p <- function(data) {
   bind_rows(
-    data |> transmute(obsID, altID=1L, chosen=as.integer(choice_num==1), asc=0L,
+    data |> transmute(obsID, respID=id, altID=1L, chosen=as.integer(choice_num==1), asc=0L,
       don=as.integer(a_source==1), cert=as.integer(a_source==2), off=as.integer(a_source==3),
       ind=as.integer(a_land==1), pland=as.integer(a_land==2), pmon=as.integer(a_monitor==1),
       price=a_price_sek/1000),
-    data |> transmute(obsID, altID=2L, chosen=as.integer(choice_num==2), asc=0L,
+    data |> transmute(obsID, respID=id, altID=2L, chosen=as.integer(choice_num==2), asc=0L,
       don=as.integer(b_source==1), cert=as.integer(b_source==2), off=as.integer(b_source==3),
       ind=as.integer(b_land==1), pland=as.integer(b_land==2), pmon=as.integer(b_monitor==1),
       price=b_price_sek/1000),
-    data |> transmute(obsID, altID=3L, chosen=as.integer(choice_num==3), asc=1L,
+    data |> transmute(obsID, respID=id, altID=3L, chosen=as.integer(choice_num==3), asc=1L,
       don=0L, cert=0L, off=0L, ind=0L, pland=0L, pmon=0L, price=0)
   ) |> arrange(obsID, altID)
 }
 
+source(here::here("analysis", "cluster_se.R"))
+
 run_cl_p <- function(grp_label) {
   d <- resp_p |> filter(party_grp == grp_label)
-  m <- logitr(data = make_long_p(d), outcome = "chosen", obsID = "obsID",
+  L <- make_long_p(d)
+  m <- logitr(data = L, outcome = "chosen", obsID = "obsID",
                pars = c("asc","don","cert","off","ind","pland","pmon","price"),
                numMultiStarts = 5)
-  cf <- coef(m); se <- se(m)
+  # Cluster by respondent: eight tasks each, so tasks are not independent.
+  cf <- coef(m); se <- cluster_se(m, L, L$respID)
   tibble(Label = grp_label, Attr = c("don","cert","off"),
          Coef = cf[c("don","cert","off")], SE = se[c("don","cert","off")]) |>
     mutate(ci_lo = Coef - 1.96*SE, ci_hi = Coef + 1.96*SE)
@@ -524,7 +531,7 @@ Full methods are provided in the Supplementary Information. Key elements are sum
 
 **Donation experiment.** Following the DCE, respondents allocated a portion of a potential SEK 1,000 prize to Naturskyddsföreningen. With 100 winners from 2,101 respondents, the game is incentive-compatible in expectation. Giving rate: 83.3%; median donation SEK 400.
 
-**Statistical models.** Conditional logit [@McFadden1974] and mixed logit [@McFaddenTrain2000; @Train2009] (500 Sobol draws, normal distributions on 6 random parameters, 10 random starts) via logitr 1.2.0 [@Helveston2023]. WTP via delta method from the MXL Hessian. Full model output is reported in Supplementary Tables S3 and S4. VP analysis: fractional logit (Papke-Wooldridge) with HC3 robust standard errors; average partial effects reported. DCE choices treat instrument choice as a consequential policy recommendation [@Vossler2012]. The registrations (AsPredicted #273748 and #287153) cover the discrete choice experiment and its analysis by conditional and mixed logit, together with the intention to examine heterogeneity by socio-economic background. The voluntary preference score, the donation experiment, the strategic free-riding test, the perceived effectiveness analysis, the specific subgroup specifications, and the willingness-to-pay diagnostics are all exploratory and were not preregistered. The preregistered speeder-exclusion robustness check is reported in Supplementary Table S10; results are unchanged, so the full sample is retained.
+**Statistical models.** Conditional logit [@McFadden1974] and mixed logit [@McFaddenTrain2000; @Train2009] (500 Sobol draws, normal distributions on 6 random parameters, 10 random starts) via logitr 1.2.0 [@Helveston2023]. WTP via delta method from the MXL Hessian. Because each respondent completes eight choice tasks, all conditional logit standard errors, including those for the subgroup models, are clustered by respondent; the mixed logit is estimated with a panel identifier and so already accounts for the repeated choices. Full model output is reported in Supplementary Tables S3 and S4. VP analysis: fractional logit (Papke-Wooldridge) with HC3 robust standard errors; average partial effects reported. DCE choices treat instrument choice as a consequential policy recommendation [@Vossler2012]. The registrations (AsPredicted #273748 and #287153) cover the discrete choice experiment and its analysis by conditional and mixed logit, together with the intention to examine heterogeneity by socio-economic background. The voluntary preference score, the donation experiment, the strategic free-riding test, the perceived effectiveness analysis, the specific subgroup specifications, and the willingness-to-pay diagnostics are all exploratory and were not preregistered. The preregistered speeder-exclusion robustness check is reported in Supplementary Table S10; results are unchanged, so the full sample is retained.
 
 **Data availability.** Anonymized respondent-level microdata are available at <https://github.com/NilsDroste/BiodivFinancePreferences> in CSV and SPSS format. The panel provider identifier and the open-ended responses to Q17 are withheld to preclude re-identification; survey completion times are included. Coded Q17 responses are available from the corresponding author on request.
 
