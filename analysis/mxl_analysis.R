@@ -7,7 +7,10 @@ library(tidyr)
 # Step 1: Build apollo database
 # ==============================================================================
 
-full_data <- read_excel(here("data/Full launch database", "4178_excel_databas.xlsx"), sheet = 2)
+# Read the anonymised public deposit rather than the restricted raw file, so the
+# reported mixed logit is reproducible from the published replication package.
+full_data <- readr::read_csv(here("deposit", "biodivfinance_microdata_anon.csv"),
+                             show_col_types = FALSE)
 
 price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
 design_raw <- read_excel(here("design", "Trial 3 - factorial grouped, svensk.xlsx"), sheet = 1)

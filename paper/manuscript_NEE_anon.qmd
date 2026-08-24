@@ -47,10 +47,12 @@ library(lmtest)
 #| label: load-data
 #| eval: true
 
-data_path   <- here::here("data", "Full launch database", "4178_excel_databas.xlsx")
+# Read the anonymised public deposit rather than the restricted raw file, so
+# that the manuscript renders from the published replication package.
+data_path   <- here::here("deposit", "biodivfinance_microdata_anon.csv")
 design_path <- here::here("design", "Trial 3 - factorial grouped, svensk.xlsx")
 
-full_data  <- read_excel(data_path, sheet = 2)
+full_data  <- readr::read_csv(data_path, show_col_types = FALSE)
 price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
 design_raw <- read_excel(design_path, sheet = 1)
 names(design_raw) <- c(
@@ -246,7 +248,7 @@ p_wtp <- ggplot(wtp_plot_df, aes(x = wtp_usd, y = label, colour = type)) +
 p_coef / p_wtp
 ```
 
-## No strategic free-riding: effectiveness concerns drive mandatory preference
+## No strategic free-riding, and a role for perceived effectiveness
 
 To test whether apparent mandatory preference is driven by strategic free-riding (high-concern respondents endorsing mandatory instruments so others are forced to pay while they benefit) [@Andreoni1990; @KollmussAgyeman2002], we construct a respondent-level VP score, defined as the share of mixed-instrument DCE tasks in which the respondent chose the voluntary option (mean = 0.431, SD = 0.320; Fig. 3A), and regress it on donation behaviour, environmental concern, and their interaction.
 
@@ -506,15 +508,19 @@ Three hypotheses follow from the most-likely case logic and warrant cross-nation
 
 Full methods are provided in the Supplementary Information. Key elements are summarised here.
 
-**Study design and preregistration.** Data were collected via online survey of Swedish citizens ([survey firm blinded for review], April–May 2026), preregistered prior to data collection (AsPredicted [blinded for review]). The final analysis sample comprises $n = 2{,}101$ respondents (48.8% female), recruited to represent the Swedish adult population by age, gender, and region. Gender is balanced (50.5% male, 48.8% female). Comparison with 2022 Riksdag election results reveals that Sweden Democrats (SD; 13.7% of sample vs. 20.5% of 2022 vote share) and Social Democrats (S; 23.6% vs. 30.3%) are both under-represented in the sample, while smaller parties are broadly proportional. SD voters show the weakest mandatory preference (Fig. 5), so their under-representation modestly biases the lean-mandatory VP share upward; within-sample subgroup findings are unaffected.
+**Study design and preregistration.** Data were collected via online survey of Swedish citizens ([survey firm blinded for review]) in two waves: a pilot wave fielded 24 March 2026 ($n = 122$) and the full launch fielded from 20 April to 6 May 2026, with the final dataset delivered 20 May 2026. As preregistered (AsPredicted [blinded for review]), pilot responses were retained in the final analysis; 119 of the 122 pilot respondents appear in the delivered file. The final analysis sample comprises $n = 2{,}101$ respondents (48.8% female), quota-balanced to approximate the Swedish adult population by age, gender, and region. No post-hoc weighting was applied. Gender is balanced (50.5% male, 48.8% female). Comparison with 2022 Riksdag election results reveals that Sweden Democrats (SD; 13.7% of sample vs. 20.5% of 2022 vote share) and Social Democrats (S; 23.6% vs. 30.3%) are both under-represented in the sample, while smaller parties are broadly proportional. SD voters show the weakest mandatory preference (Fig. 5), so their under-representation modestly biases the lean-mandatory VP share upward; within-sample subgroup findings are unaffected.
 
 **Discrete choice experiment.** A $4 \times 3 \times 2 \times 4$ factorial design: financing instrument (tax, donation, certification, mandatory offsetting), land ownership (public, industrial private, small-scale private), monitoring (public administration, private audit), and annual cost (SEK 492–7,380/year). Each respondent completed 8 choice tasks (two programme options plus status quo). The VP score is the share of mixed-instrument tasks in which the respondent chose the voluntary option.
 
 **Donation experiment.** Following the DCE, respondents allocated a portion of a potential SEK 1,000 prize to a major Swedish conservation NGO [blinded for review]. With 100 winners from 2,101 respondents, the game is incentive-compatible in expectation. Giving rate: 83.3%; median donation SEK 400.
 
-**Statistical models.** Conditional logit [@McFadden1974] and mixed logit [@McFaddenTrain2000; @Train2009] (500 Sobol draws, normal distributions on 6 random parameters, 10 random starts) via logitr 1.2.0 [@Helveston2023]. WTP via delta method from the MXL Hessian. Full model output is reported in Supplementary Tables S3 and S4. VP analysis: fractional logit (Papke-Wooldridge) with HC3 robust standard errors; average partial effects reported. DCE choices treat instrument choice as a consequential policy recommendation [@Vossler2012]. Confirmatory analyses preregistered; VP and subgroup analyses exploratory.
+**Statistical models.** Conditional logit [@McFadden1974] and mixed logit [@McFaddenTrain2000; @Train2009] (500 Sobol draws, normal distributions on 6 random parameters, 10 random starts) via logitr 1.2.0 [@Helveston2023]. WTP via delta method from the MXL Hessian. Full model output is reported in Supplementary Tables S3 and S4. VP analysis: fractional logit (Papke-Wooldridge) with HC3 robust standard errors; average partial effects reported. DCE choices treat instrument choice as a consequential policy recommendation [@Vossler2012]. The registrations (AsPredicted #273748 and #287153) cover the discrete choice experiment and its analysis by conditional and mixed logit, together with the intention to examine heterogeneity by socio-economic background. The voluntary preference score, the donation experiment, the strategic free-riding test, the perceived effectiveness analysis, the specific subgroup specifications, and the willingness-to-pay diagnostics are all exploratory and were not preregistered. The preregistered speeder-exclusion robustness check is reported in Supplementary Table S10; results are unchanged, so the full sample is retained.
 
-**Data and code availability.** Anonymized microdata (CSV and SPSS format; panel identifier and open-ended responses Q17 excluded) and full replication code (R, Quarto) are available at [repository blinded for review]. Coded Q17 responses available from the corresponding author on request. Ethics: [ethics board blinded for review].
+**Data availability.** Anonymized respondent-level microdata are available at [repository blinded for review] in CSV and SPSS format. The panel provider identifier and the open-ended responses to Q17 are withheld to preclude re-identification; survey completion times are included. Coded Q17 responses are available from the corresponding author on request.
+
+**Code availability.** All analysis and figure code (R, Quarto), the experimental design file, and the code generating the anonymized deposit are available in the same repository. The manuscript and Supplementary Information render from the deposited data without access to restricted files.
+
+**Ethics.** The study was approved by [ethics board blinded for review], reference [blinded for review], and was conducted in accordance with all relevant ethical regulations. All participants gave informed consent before taking part.
 
 # References
 

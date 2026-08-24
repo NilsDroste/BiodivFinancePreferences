@@ -23,7 +23,8 @@ analysis/hb_wtp_stage2.rds
 analysis/pilot_analysis.R
 
 # Internal helper scripts not needed for replication
-analysis/_mxl_runner.R
+# NOTE: _mxl_runner.R is NOT ignored. mxl_analysis.R invokes it as a subprocess,
+# so without it the reported mixed logit cannot be reproduced from source.
 analysis/_table.R
 
 # Old manuscript versions and internal notes
@@ -34,6 +35,11 @@ paper/manuscript.fdb_latexmk
 feedback/
 claude/
 design/Survey design.docx
+# Email correspondence with the survey provider: contains names, phone numbers
+# and personal email addresses of the provider and the research team. Retained
+# locally as the record of the consent gate and field dates; never published.
+design/ParticipantInfo.pdf
+
 
 # Generated outputs
 paper/*.pdf

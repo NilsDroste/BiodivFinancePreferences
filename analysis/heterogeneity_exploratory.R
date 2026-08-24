@@ -14,8 +14,10 @@ library(patchwork)
 # 1. Load and prepare data (mirrors heterogeneity_analysis.R)
 # ------------------------------------------------------------------------------
 
-full_data <- read_excel(
-  here("data/Full launch database", "4178_excel_databas.xlsx"), sheet = 2
+# Reads the anonymised public deposit rather than the restricted raw file, so
+# this script runs from the published replication package.
+full_data <- readr::read_csv(
+  here("deposit", "biodivfinance_microdata_anon.csv"), show_col_types = FALSE
 )
 
 price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
