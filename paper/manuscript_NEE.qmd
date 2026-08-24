@@ -533,7 +533,7 @@ Full methods are provided in the Supplementary Information. Key elements are sum
 
 # Acknowledgements
 
-This work was supported by Mistra, the Swedish Foundation for Strategic Environmental Research, through the research programme BIOPATH ("Pathways towards an efficient alignment of the financial system with the needs of biodiversity"), 2022--2026. We thank Josefin Stagge and Lysio Research for survey administration and fieldwork.
+This work was supported by the Swedish Foundation for Strategic Environmental Research MISTRA (F 2022/1448), through the research programme BIOPATH ("Pathways towards an efficient alignment of the financial system with the needs of biodiversity"), 2022--2026. We thank Josefin Stagge and Lysio Research for survey administration and fieldwork.
 
 # Competing interests
 
