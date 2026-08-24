@@ -533,7 +533,13 @@ Full methods are provided in the Supplementary Information. Key elements are sum
 
 # Acknowledgements
 
-This work was supported by the Swedish Foundation for Strategic Environmental Research MISTRA (F 2022/1448), through the research programme BIOPATH ("Pathways towards an efficient alignment of the financial system with the needs of biodiversity"), 2022--2026. We thank Josefin Stagge and Lysio Research for survey administration and fieldwork.
+This work was supported by the Swedish Foundation for Strategic Environmental Research MISTRA (F 2022/1448), through the research programme BIOPATH ("Pathways towards an efficient alignment of the financial system with the needs of biodiversity"), 2022--2026. We thank colleagues who pre-tested the survey instrument, and Josefin Stagge and Lysio Research for survey administration and fieldwork.
+
+# Author contributions
+
+N.D., J.M.C. and Y.M. jointly designed the discrete choice experiment. J.M.C. administered data collection with the survey provider. N.D. performed the statistical analysis and produced the figures, and drafted the manuscript. All authors revised the manuscript and approved the final version.
+
+**CRediT.** **N.D.**: Conceptualization, Methodology, Software, Formal analysis, Visualization, Funding acquisition, Writing -- original draft, Writing -- review and editing. **J.M.C.**: Conceptualization, Methodology, Investigation, Data curation, Project administration, Writing -- review and editing. **Y.M.**: Conceptualization, Methodology, Writing -- review and editing.
 
 # Competing interests
 

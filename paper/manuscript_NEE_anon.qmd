@@ -523,7 +523,11 @@ Full methods are provided in the Supplementary Information. Key elements are sum
 
 # Acknowledgements
 
-[Funding acknowledgement blinded for review.] We thank the survey firm [blinded for review] for survey administration and fieldwork.
+[Funding acknowledgement blinded for review.] We thank colleagues who pre-tested the survey instrument, and the survey firm [blinded for review] for survey administration and fieldwork.
+
+# Author contributions
+
+All authors jointly designed the discrete choice experiment. One author administered data collection with the survey provider. One author performed the statistical analysis, produced the figures and drafted the manuscript. All authors revised the manuscript and approved the final version. [Author initials and CRediT roles blinded for review.]
 
 # Competing interests
 
