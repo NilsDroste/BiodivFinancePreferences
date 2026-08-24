@@ -564,7 +564,7 @@ bind_rows(tab_rows, fit_rows) |>
   )
 ```
 
-## Supplementary Table S6 | Perceived instrument effectiveness (Q13)
+## Perceived instrument effectiveness (Q13)
 
 Question 13 asked respondents how effective each instrument is at delivering
 biodiversity benefits, on a five-point scale, for four instruments: voluntary
@@ -640,7 +640,7 @@ kbl(eff_means, booktabs = TRUE, longtable = FALSE, escape = FALSE,
   )
 ```
 
-## S7. Cost vector, income shares, and choke price
+## Cost vector, income shares, and the utility-equivalence price
 
 The cost attribute spanned SEK 492 to 7,380 per household per year. Table S7
 sets those levels against Swedish household disposable income and reports the
@@ -760,7 +760,7 @@ kbl(choke_tab, booktabs = TRUE, longtable = FALSE, align = "lllrrc",
   )
 ```
 
-## S9. Sensitivity of the cost coefficient to functional form
+## Sensitivity of the cost coefficient to functional form
 
 If the linear-in-cost specification understated price sensitivity at the top of
 the range, the utility-equivalence prices in Table S8 would be too high. Table
