@@ -533,7 +533,7 @@ Financing source was coded relative to the tax baseline: donation ($\hat\beta_\t
 
 **Use of AI tools.** The authors used Claude (Anthropic) and Codex (OpenAI) to assist and double check analysis code, figure production, and manuscript drafting and revision. All analyses were specified, checked and interpreted by the authors, who verified all outputs against the underlying data and take full responsibility for the content of this article.
 
-**Data availability.** Anonymized respondent-level microdata are available at [repository blinded for review] in CSV and SPSS format. The panel provider identifier and the open-ended responses to Q17 are withheld to preclude re-identification; survey completion times are included. Coded Q17 responses are available from the corresponding author on request.
+**Data availability.** Anonymized respondent-level microdata are available at [repository blinded for review] in CSV and SPSS format. The panel provider identifier, the open-ended responses to Q17, and the postal-code item are withheld to preclude re-identification; survey completion times are included. None of the withheld variables enters any reported analysis. Coded Q17 responses are available from the corresponding author on request.
 
 **Code availability.** All analysis and figure code (R, Quarto), the experimental design file, and the code generating the anonymized deposit are available in the same repository. The manuscript and Supplementary Information render from the deposited data without access to restricted files.
 

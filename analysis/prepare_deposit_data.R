@@ -9,6 +9,15 @@ library(here)
 # Exclusions for re-identification protection:
 #   - pid: panel provider identifier, links back to individual panel records
 #   - q17: free-text open-ended responses, re-identification risk
+#   - q9:  postal code. The item asked for the first two digits, but 91
+#          respondents entered full five-digit Swedish codes and 125 values are
+#          held by a single respondent. Combined with gender, income and party
+#          preference it left 53.1% of the sample uniquely identifiable, against
+#          0.4% once removed. Party preference is a special category of personal
+#          data under GDPR Article 9, so this combination was the sharpest risk
+#          in the file. q9 is not used in any analysis, so removing it costs
+#          nothing. Coarsened geography can be re-derived from the raw file if a
+#          revision ever needs it.
 #
 # Added:
 #   - total_time_seconds: survey completion time, merged from the provider's
@@ -39,11 +48,11 @@ cat("Raw dimensions:", nrow(raw), "x", ncol(raw), "\n")
 deposit <- raw |>
   mutate(pid = as.character(pid)) |>
   left_join(timing |> mutate(pid = as.character(pid)), by = "pid") |>
-  select(-pid, -q17)
+  select(-pid, -q17, -q9)
 
 cat("Timing matched for", sum(!is.na(deposit$total_time_seconds)), "of",
     nrow(deposit), "respondents\n")
-cat("Variables dropped: pid, q17; added: total_time_seconds\n")
+cat("Variables dropped: pid, q17, q9; added: total_time_seconds\n")
 
 cat("Deposit dimensions:", nrow(deposit), "x", ncol(deposit), "\n")
 cat("Variables retained:", paste(names(deposit), collapse = ", "), "\n")
