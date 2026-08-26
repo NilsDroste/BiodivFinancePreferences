@@ -29,6 +29,10 @@ format:
       text: |
         % Flush caption body instead of KOMA's hanging indent under "Figure N:"
         \setcapindent{0pt}
+        % Line numbers for reviewers. lineno does not number inside floats,
+        % so tables and figure captions are left alone, which is what we want.
+        \usepackage{lineno}
+        \linenumbers
   docx:
     number-sections: false
 bibliography: references.bib

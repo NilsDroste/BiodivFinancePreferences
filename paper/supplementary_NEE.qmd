@@ -14,6 +14,10 @@ format:
         \renewcommand{\thefigure}{S\arabic{figure}}
         % Flush caption body instead of KOMA's hanging indent
         \setcapindent{0pt}
+        % Line numbers for reviewers. lineno does not number inside floats,
+        % so tables and figure captions are left alone, which is what we want.
+        \usepackage{lineno}
+        \linenumbers
 bibliography: references.bib
 csl: nature.csl
 execute:
