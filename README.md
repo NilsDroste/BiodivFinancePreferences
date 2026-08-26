@@ -1,32 +1,41 @@
-# Mandatory by Popular Demand: Biodiversity Finance Preferences in Sweden
+# Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions
 
-**Nils Droste, Jens Christiansen, and Yohei Mitani**
+**Nils Droste, Jens Marl Christiansen, and Yohei Mitani**
 
-Replication materials for the paper submitted to *Global Environmental Change*.
+Replication materials for the paper submitted to *Nature Ecology & Evolution*.
 
 Pre-registered at AsPredicted: [#273748](https://aspredicted.org/im78mi.pdf) (February 2026) and [#287153](https://aspredicted.org/zs4y9e.pdf) (April 2026).
 
-Ethics approval: Etikprövningsmyndigheten, ID 2025-04420-01.
+Ethics approval: Etikprövningsmyndigheten (Swedish Ethical Review Authority), ID 2025-04420-01. All participants gave informed consent.
 
 ---
 
 ## Repository structure
 
 ```
-analysis/        R scripts for all analyses reported in the paper
-design/          DCE attribute-level design matrix (Excel)
-paper/           Quarto manuscript source and bibliography
+deposit/         Anonymized respondent-level microdata and the fitted mixed logit
+analysis/        R scripts for all analyses and figures reported in the paper
+design/          DCE design matrix and the participant information sheet
+paper/           Quarto sources for the manuscript and supplementary information
+preregistration/ The two AsPredicted registrations
 ```
 
 ## Data
 
-Survey microdata are available as an anonymized dataset via [REPOSITORY DOI — to be added upon acceptance]. Open-ended responses (Q17) are excluded from the public deposit to protect respondent anonymity; the coded subset used for qualitative triangulation in Section 6.2 is available on request from the corresponding author (nd@ifro.ku.dk).
+The anonymized microdata are in `deposit/`, in CSV and SPSS format, with a
+codebook note in `deposit/README.md`. **Every script and both Quarto documents
+read from this file**, so the whole package runs as supplied, with no access to
+restricted material required.
 
-To run the analysis scripts, place the data file at:
+Three variables are withheld to preclude re-identification: the panel provider
+identifier, the open-ended responses (Q17), and the postal-code item. None enters
+any reported analysis. Survey completion times are included, since the
+pre-registered speeder-exclusion check depends on them. Coded Q17 responses are
+available from the corresponding author (nd@ifro.ku.dk) on request.
 
-```
-data/Full launch database/4178_excel_databas.xlsx
-```
+`analysis/prepare_deposit_data.R` documents how the deposit is derived from the
+restricted raw file. It is included for transparency and is the one script that
+cannot be run from this package.
 
 ## Software
 
@@ -35,7 +44,6 @@ data/Full launch database/4178_excel_databas.xlsx
 | R | 4.6.1 |
 | Quarto | 1.9.37 |
 | logitr | 1.2.0 |
-| apollo | 0.3.8 |
 | tidyverse | 2.0.0 |
 | kableExtra | 1.4.1 |
 | sandwich | 3.1-1 |
@@ -48,7 +56,7 @@ install.packages("renv")
 renv::restore()
 ```
 
-This will install all packages at the versions recorded in `renv.lock`. Requires R 4.6+ and an internet connection; Apollo is installed from CRAN.
+This will install all packages at the versions recorded in `renv.lock`. Requires R 4.6+ and an internet connection.
 
 The Quarto manuscript requires a LaTeX distribution. TeX Live 2024 or later is recommended:
 
