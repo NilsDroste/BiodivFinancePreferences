@@ -31,6 +31,8 @@ format:
         \setcapindent{0pt}
         % Line numbers for reviewers. lineno does not number inside floats,
         % so tables and figure captions are left alone, which is what we want.
+        % Allow long URLs to break across lines at sensible points
+        \usepackage{xurl}
         \usepackage{lineno}
         \linenumbers
   docx:
@@ -547,9 +549,9 @@ Financing source was coded relative to the tax baseline: donation ($\hat\beta_\t
 
 **Use of AI tools.** The authors used Claude (Anthropic) and Codex (OpenAI) to assist and double check analysis code, figure production, and manuscript drafting and revision. All analyses were specified, checked and interpreted by the authors, who verified all outputs against the underlying data and take full responsibility for the content of this article.
 
-**Data availability.** Anonymized respondent-level microdata are available at <https://github.com/NilsDroste/BiodivFinancePreferences> in CSV and SPSS format. The panel provider identifier, the open-ended responses to Q17, and the postal-code item are withheld to preclude re-identification; survey completion times are included. None of the withheld variables enters any reported analysis. Coded Q17 responses are available from the corresponding author on request.
+**Data availability.** Anonymized respondent-level microdata are deposited at Zenodo (doi:10.5281/zenodo.22113029) [@DrosteEtAl2026Data] in CSV and SPSS format. The panel provider identifier, the open-ended responses to Q17, and the postal-code item are withheld to preclude re-identification; survey completion times are included. None of the withheld variables enters any reported analysis. Coded Q17 responses are available from the corresponding author on request.
 
-**Code availability.** All analysis and figure code (R, Quarto), the experimental design file, and the code generating the anonymized deposit are available in the same repository. The manuscript and Supplementary Information render from the deposited data without access to restricted files.
+**Code availability.** All analysis and figure code (R, Quarto), the experimental design file, and the code generating the anonymized deposit are included in the same Zenodo deposit [@DrosteEtAl2026Data], and are maintained at <https://github.com/NilsDroste/BiodivFinancePreferences>. The manuscript and Supplementary Information render from the deposited data without access to restricted files.
 
 **Ethics.** The study was approved by the Swedish Ethical Review Authority (Etikprövningsmyndigheten), reference 2025-04420-01, and was conducted in accordance with all relevant ethical regulations. All participants gave informed consent before taking part.
 

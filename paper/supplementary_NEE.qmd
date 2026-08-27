@@ -16,6 +16,8 @@ format:
         \setcapindent{0pt}
         % Line numbers for reviewers. lineno does not number inside floats,
         % so tables and figure captions are left alone, which is what we want.
+        % Allow long URLs to break across lines at sensible points
+        \usepackage{xurl}
         \usepackage{lineno}
         \linenumbers
 bibliography: references.bib
