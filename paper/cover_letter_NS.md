@@ -2,7 +2,7 @@ Nature Sustainability
 
 Dear Editors,
 
-We submit for your consideration as an Article, "Mandatory biodiversity financing is preferred even where voluntary should work," by Nils Droste, Jens Marl Christiansen and Yohei Mitani.
+We submit for your consideration as an Article, "Citizens prefer mandatory over voluntary biodiversity financing," by Nils Droste, Jens Marl Christiansen and Yohei Mitani.
 
 The Kunming-Montreal Global Biodiversity Framework leans heavily on voluntary, market-based and non-state finance to mobilise USD 200 billion per year for nature. A substantial evidence base asks whether such instruments can deliver and finds that they struggle to scale, but that work is uniformly supply-side. Voluntary architecture also presupposes something on the demand side: that citizens are willing to route conservation money through voluntary channels rather than requiring the state to compel it. That presupposition has not been tested directly.
 

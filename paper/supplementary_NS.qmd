@@ -1,6 +1,6 @@
 ---
 title: "Supplementary Information"
-subtitle: "Mandatory biodiversity financing is preferred even where voluntary should work"
+subtitle: "Citizens prefer mandatory over voluntary biodiversity financing"
 format:
   pdf:
     number-sections: false
