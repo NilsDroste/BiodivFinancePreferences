@@ -1,3 +1,12 @@
+    caption = paste0(
+      "Conditional logit coefficients relative to the tax baseline, split by ",
+      "trust in the state as a steward of conservation funds (Q2-1) and by ",
+      "belief that the state will deliver on its biodiversity commitments ",
+      "(Q14). Respondent-clustered p-values in parentheses. Distrust of the ",
+      "state as a steward shifts preferences toward voluntary instruments; ",
+      "doubt about delivery does not, and if anything strengthens opposition ",
+      "to voluntary donation. The two measures correlate only weakly, r = ",
+      sprintf("%.2f", rho), "."
 ---
 title: "Supplementary Information"
 subtitle: "Citizens prefer mandatory over voluntary biodiversity financing"
@@ -942,6 +951,81 @@ kbl(spd_tab, booktabs = TRUE, longtable = FALSE, escape = FALSE, align = "lrrrrr
     general = "Respondents without a timing record from the provider are retained in all columns, so that the speed criterion is not confounded with non-delivery of the timing variable.",
     threeparttable = TRUE
   )
+```
+
+## Underprovision and distrust as separate mechanisms
+
+The paper theorises that voluntary instrument preference, where it appears,
+reflects a constrained response to institutional weakness. Two distinct
+judgements about the state can be separated in these data, and they act in
+opposite directions.
+
+Q2-1 asks how much respondents would trust the state to handle money spent on
+biodiversity restoration and conservation. Q14 asks how far they agree that
+"Sweden will follow through on its biodiversity policies and targets", which is a
+judgement about delivery rather than about stewardship. The two are only weakly
+related, so they are not interchangeable proxies for confidence in government.
+
+```{r state-mechanisms}
+r_sub <- resp |>
+  left_join(full_data |> select(id, q2_1, q14), by = "id")
+
+fit_sub <- function(d) {
+  o <- as.integer(factor(paste0(d$id, "_", d$task)))
+  alt <- function(px, k) data.frame(
+    obsID = o, respID = d$id, chosen = as.integer(d$choice_num == k), asc = 0L,
+    don   = as.integer(d[[paste0(px, "_source")]] == 1),
+    cert  = as.integer(d[[paste0(px, "_source")]] == 2),
+    off   = as.integer(d[[paste0(px, "_source")]] == 3),
+    ind   = as.integer(d[[paste0(px, "_land")]] == 1),
+    pland = as.integer(d[[paste0(px, "_land")]] == 2),
+    pmon  = as.integer(d[[paste0(px, "_monitor")]] == 1),
+    price = d[[paste0(px, "_price_sek")]] / 1000)
+  sq <- data.frame(obsID = o, respID = d$id,
+                   chosen = as.integer(d$choice_num == 3), asc = 1L,
+                   don = 0, cert = 0, off = 0, ind = 0, pland = 0, pmon = 0, price = 0)
+  L <- rbind(alt("a", 1), alt("b", 2), sq); L <- L[order(L$obsID), ]
+  m <- logitr(data = L, outcome = "chosen", obsID = "obsID",
+              pars = c("asc","don","cert","off","ind","pland","pmon","price"),
+              numMultiStarts = 3)
+  cf <- coef(m); se <- cluster_se(m, L, L$respID)
+  tibble(n = n_distinct(d$id),
+         don  = sprintf("%+.3f", cf["don"]),  don_p  = cf["don"]/se["don"],
+         cert = sprintf("%+.3f", cf["cert"]), cert_p = cf["cert"]/se["cert"],
+         off  = sprintf("%+.3f", cf["off"]),  off_p  = cf["off"]/se["off"])
+}
+
+grp <- list(
+  "Trust in state (Q2-1) low"   = filter(r_sub, q2_1 <= 2),
+  "Trust in state (Q2-1) high"     = filter(r_sub, q2_1 >= 4),
+  "Follow-through (Q14) doubted"           = filter(r_sub, q14  <= 2),
+  "Follow-through (Q14) expected"         = filter(r_sub, q14  >= 4)
+)
+res <- bind_rows(lapply(grp, fit_sub), .id = "Group")
+pv <- function(z) ifelse(abs(z) > 3.29, "<0.001", sprintf("%.3f", 2*pnorm(abs(z), lower.tail = FALSE)))
+
+tab <- res |>
+  transmute(Group,
+            `n`           = n,
+            Donation      = paste0(don,  " (", pv(don_p),  ")"),
+            Certification = paste0(cert, " (", pv(cert_p), ")"),
+            Offsetting    = paste0(off,  " (", pv(off_p),  ")"))
+
+rho <- cor(full_data$q14, full_data$q2_1, use = "complete.obs")
+
+kbl(tab, booktabs = TRUE, longtable = FALSE, escape = FALSE, align = "lrrrr",
+    caption = paste0(
+      "Conditional logit coefficients relative to the tax baseline, split by ",
+      "trust in the state as a steward of conservation funds (Q2-1) and by ",
+      "belief that the state will deliver on its biodiversity commitments ",
+      "(Q14). Respondent-clustered p-values in parentheses. Distrust of the ",
+      "state as a steward shifts preferences toward voluntary instruments; ",
+      "doubt about delivery does not, and if anything strengthens opposition ",
+      "to voluntary donation. The two measures correlate only weakly, r = ",
+      sprintf("%.2f", rho), "."
+    )) |>
+  kable_styling(full_width = TRUE, latex_options = "hold_position", font_size = 9) |>
+  column_spec(1, width = "5cm")
 ```
 
 # References
