@@ -17,8 +17,11 @@
 # Colours match the manuscript figures so the abstract and the paper read as one
 # piece: donation #D55E00, certification #E69F00, mandatory #3b4994.
 #
-# This is a sketch for discussion, not final art. Cell Press ask for at least
-# 1200 px on the shortest side; the PNG below is written at 300 dpi.
+# Cell Press ask for at least 1200 px on the shortest side AND that the whole
+# thing stay readable at 5 x 5 cm on screen. The second constraint binds, not
+# the first: at that display size a 9 pt label on this canvas renders near
+# 3 pt. Type below is therefore sized against the canvas, with nothing
+# under ~11 pt. Shrink it back and the abstract fails the legibility rule.
 # ==============================================================================
 
 library(tidyverse)
@@ -102,19 +105,19 @@ p1 <- ggplot(setup, aes(x = value, y = fct_rev(cond))) +
                colour = "grey88", linewidth = 4, lineend = "round") +
   geom_point(size = 6, colour = MAND) +
   geom_text(aes(label = lab), hjust = ifelse(setup$value > 0.5, 1.15, -0.15),
-            size = 3.1, colour = GREY) +
+            size = 3.9, colour = GREY) +
   scale_x_continuous(limits = c(-0.05, 1.05)) +
   labs(title = "Where voluntary biodiversity finance should work best",
        subtitle = "Sweden: others can be expected to contribute,\nand the state is not already paying") +
-  theme_void(base_size = 11) +
-  theme(axis.text.y = element_text(hjust = 1, size = 9.5, colour = "grey20"),
-        plot.title = element_text(face = "bold", size = 11.5),
-        plot.subtitle = element_text(size = 9, colour = GREY),
+  theme_void(base_size = 12) +
+  theme(axis.text.y = element_text(hjust = 1, size = 11, colour = "grey20"),
+        plot.title = element_text(face = "bold", size = 12),
+        plot.subtitle = element_text(size = 11, colour = GREY),
         plot.margin = margin(6, 10, 10, 6))
 
 # --- Band 2: the preference ordering -----------------------------------------
 pref <- tibble(
-  instrument = c("Mandatory\noffsetting", "Tax", "Certification", "Voluntary\ndonation"),
+  instrument = c("Mandatory\noffsetting", "Tax\n(reference)", "Certification", "Voluntary\ndonation"),
   utility    = c(cf_all[["off"]], 0, cf_all[["cert"]], cf_all[["don"]]),
   type       = c("Mandatory", "Mandatory", "Voluntary", "Voluntary")
 ) |>
@@ -125,19 +128,19 @@ p2 <- ggplot(pref, aes(x = utility, y = instrument, fill = type)) +
   geom_col(width = 0.62) +
   scale_fill_manual(values = c(Mandatory = MAND, Voluntary = VOL), guide = "none") +
   annotate("text", x = 0.02, y = 4.42, label = "preferred to tax",
-           colour = MAND, size = 3, fontface = "bold", hjust = 0) +
-  annotate("text", x = -0.02, y = 1.58, label = "ranked last",
-           colour = VOL, size = 3, fontface = "bold", hjust = 1) +
-  scale_x_continuous(limits = c(-0.46, 0.26)) +
+           colour = MAND, size = 3.9, fontface = "bold", hjust = 0) +
+  annotate("text", x = -0.02, y = 1.50, label = "ranked last",
+           colour = VOL, size = 3.9, fontface = "bold", hjust = 1) +
+  scale_x_continuous(limits = c(-0.52, 0.36)) +  # headroom for the larger annotations
   labs(title = "Citizens choose mandatory instruments anyway",
        subtitle = "n = 2,101; preference relative to a tax-financed programme",
        x = NULL, y = NULL) +
-  theme_minimal(base_size = 11) +
+  theme_minimal(base_size = 12) +
   theme(panel.grid = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 9, colour = "grey20"),
-        plot.title = element_text(face = "bold", size = 11.5),
-        plot.subtitle = element_text(size = 9, colour = GREY),
+        axis.text.y = element_text(size = 11, colour = "grey20"),
+        plot.title = element_text(face = "bold", size = 12),
+        plot.subtitle = element_text(size = 11, colour = GREY),
         plot.margin = margin(6, 10, 6, 6))
 
 # --- Band 3: the two judgements about the state ------------------------------
@@ -151,24 +154,24 @@ p3 <- ggplot(mech, aes(x = effect, y = judgement, fill = effect > 0)) +
   geom_vline(xintercept = 0, colour = "grey55") +
   geom_col(width = 0.5) +
   geom_text(aes(label = outcome, hjust = ifelse(mech$effect > 0, -0.1, 1.1)),
-            size = 3, colour = GREY) +
+            size = 3.9, colour = GREY) +
   scale_fill_manual(values = c(`TRUE` = VOL, `FALSE` = MAND), guide = "none") +
-  scale_x_continuous(limits = c(-0.78, 0.52)) +
+  scale_x_continuous(limits = c(-0.92, 0.72)) +  # headroom for the larger annotations
   labs(title = "Underprovision and distrust are not the same thing",
        subtitle = "They move preferences in opposite directions",
        x = NULL, y = NULL) +
-  theme_minimal(base_size = 11) +
+  theme_minimal(base_size = 12) +
   theme(panel.grid = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 9, colour = "grey20"),
-        plot.title = element_text(face = "bold", size = 11.5),
-        plot.subtitle = element_text(size = 9, colour = GREY),
+        axis.text.y = element_text(size = 11, colour = "grey20"),
+        plot.title = element_text(face = "bold", size = 12),
+        plot.subtitle = element_text(size = 11, colour = GREY),
         plot.margin = margin(6, 10, 6, 6))
 
 ga <- p1 / p2 / p3 + plot_layout(heights = c(0.85, 1.3, 0.9))
 
 ggsave(here::here("paper", "graphical_abstract.png"), ga,
-       width = 6.3, height = 6.4, dpi = 300, bg = "white")
+       width = 6.8, height = 6.6, dpi = 300, bg = "white")
 ggsave(here::here("paper", "graphical_abstract.pdf"), ga,
-       width = 6.3, height = 6.4, device = pdf, bg = "white")
+       width = 6.8, height = 6.6, device = pdf, bg = "white")
 cat("Saved paper/graphical_abstract.png and .pdf\n")
