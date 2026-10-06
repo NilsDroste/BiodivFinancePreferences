@@ -2,7 +2,9 @@
 
 **Nils Droste, Jens Marl Christiansen, and Yohei Mitani**
 
-Replication materials for the paper submitted to *Nature Ecology & Evolution*.
+Replication materials for a study of Swedish citizens' preferences over
+biodiversity financing instruments, based on a preregistered discrete choice
+experiment combined with an incentivised donation experiment.
 
 Pre-registered at AsPredicted: [#273748](https://aspredicted.org/im78mi.pdf) (February 2026) and [#287153](https://aspredicted.org/zs4y9e.pdf) (April 2026).
 
@@ -17,6 +19,7 @@ deposit/         Anonymized respondent-level microdata and the fitted mixed logi
 analysis/        R scripts for all analyses and figures reported in the paper
 design/          DCE design matrix and the participant information sheet
 paper/           Quarto sources for the manuscript and supplementary information
+                 (manuscript.qmd and supplementary.qmd reproduce all reported results)
 preregistration/ The two AsPredicted registrations
 ```
 
