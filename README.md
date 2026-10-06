@@ -1,4 +1,4 @@
-# Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions
+# Citizens prefer mandatory over voluntary biodiversity financing
 
 **Nils Droste, Jens Marl Christiansen, and Yohei Mitani**
 
