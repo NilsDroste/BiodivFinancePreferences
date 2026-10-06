@@ -6,7 +6,7 @@
 # bands following the paper's logic:
 #
 #   1. the setup   - Sweden is where voluntary provision should work best
-#   2. the result  - citizens choose compulsion anyway
+#   2. the result  - citizens choose mandatory instruments anyway
 #   3. the twist   - distrust and underprovision pull in opposite directions
 #
 # Wording note: voluntary instruments are 'ranked last', not 'rejected'. Even at
@@ -66,7 +66,7 @@ p2 <- ggplot(pref, aes(x = utility, y = instrument, fill = type)) +
   annotate("text", x = -0.02, y = 1.58, label = "ranked last",
            colour = VOL, size = 3, fontface = "bold", hjust = 1) +
   scale_x_continuous(limits = c(-0.46, 0.26)) +
-  labs(title = "Citizens choose compulsion anyway",
+  labs(title = "Citizens choose mandatory instruments anyway",
        subtitle = "n = 2,101; preference relative to a tax-financed programme",
        x = NULL, y = NULL) +
   theme_minimal(base_size = 11) +
@@ -81,7 +81,7 @@ p2 <- ggplot(pref, aes(x = utility, y = instrument, fill = type)) +
 mech <- tibble(
   judgement = c("Doubt the state\nwill deliver", "Distrust the state\nwith money"),
   effect    = c(-0.13, 0.26),
-  outcome   = c("more compulsion", "more voluntary")
+  outcome   = c("more mandatory", "more voluntary")
 )
 
 p3 <- ggplot(mech, aes(x = effect, y = judgement, fill = effect > 0)) +
