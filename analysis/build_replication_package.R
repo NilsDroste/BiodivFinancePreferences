@@ -34,23 +34,26 @@ tar <- file.path(tempdir(), "archive.tar")
 system2("git", c("archive", "--format=tar", "-o", shQuote(tar), "HEAD"))
 system2("tar", c("-x", "-f", shQuote(tar), "-C", shQuote(staging)))
 
-drop <- c(
-  # correspondence and submission scaffolding
-  "paper/cover_letter_NEE.md", "paper/cover_letter_NS.md",
-  "paper/Cover_ND.docx", "paper/Cover_NS.docx",
-  "paper/presubmission_OneEarth.md", "paper/si_description.md",
-  # journal-specific variants, superseded by the neutral pair written below
-  "paper/manuscript_NEE.qmd", "paper/manuscript_NEE_anon.qmd",
-  "paper/manuscript_NS.qmd",  "paper/manuscript_OE.qmd",
-  "paper/supplementary_NEE.qmd", "paper/supplementary_NS.qmd",
-  "paper/supplementary_OE.qmd",
-  # presentation artefact for a specific journal's submission format, not a
-  # reported result; the package is meant to stay journal-neutral
-  "analysis/graphical_abstract.R",
-  # repository plumbing
-  ".gitignore"
+# Drop by pattern rather than by name: a fixed list goes stale as soon as a new
+# cover letter or journal variant is added, and the package then silently ships
+# correspondence. Patterns are matched against paths relative to the staging root.
+drop_patterns <- c(
+  "^paper/cover_letter.*",        # correspondence
+  "^paper/Cover_.*\\.docx$",
+  "^paper/presubmission.*",
+  "^paper/si_description\\.md$", # helper for submission form fields
+  "^paper/manuscript_.*\\.qmd$", # journal variants, replaced by manuscript.qmd below
+  "^paper/supplementary_.*\\.qmd$",
+  "^paper/graphical_abstract\\..*", # presentation artefact for one journal format
+  "^analysis/graphical_abstract\\.R$",
+  "^\\.gitignore$"
 )
-unlink(file.path(staging, drop))
+
+staged <- list.files(staging, recursive = TRUE, all.files = TRUE, no.. = TRUE)
+hits   <- staged[Reduce(`|`, lapply(drop_patterns, function(p) grepl(p, staged)))]
+unlink(file.path(staging, hits))
+cat("Dropped", length(hits), "files:", paste(basename(hits), collapse = ", "), "\n")
+
 unlink(file.path(staging, "renv"), recursive = TRUE)
 
 file.copy(CANONICAL_MS, file.path(staging, "paper", "manuscript.qmd"))
