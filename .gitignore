@@ -77,7 +77,13 @@ renv/staging/
 # the next build contain the previous one).
 BiodivFinancePreferences_replication_*.zip
 
-# Generated from paper/front_matter_OE.md by quarto; the .md is the source of
-# truth. Cover_*.docx are deliberately NOT covered here: those are hand-finished
-# with a pasted signature and cannot be regenerated.
+# Generated from paper/front_matter_OE.md by quarto; the .md is the source of truth.
 paper/front_matter_*.docx
+
+# Submission paperwork, hand-finished in Word and signed. It cannot be
+# regenerated from source and carries no analytical content, so it stays out of
+# version control. The cover letter's prose lives in paper/cover_letter_OE.md.
+# Cover_ND.docx remains tracked: it is the pandoc reference-doc supplying the
+# letterhead, and the replication package drops all Cover_*.docx by pattern.
+paper/Cover_OE.docx
+di_form.pdf
