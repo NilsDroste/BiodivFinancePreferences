@@ -1,12 +1,3 @@
-    caption = paste0(
-      "Conditional logit coefficients relative to the tax baseline, split by ",
-      "trust in the state as a steward of conservation funds (Q2-1) and by ",
-      "belief that the state will deliver on its biodiversity commitments ",
-      "(Q14). Respondent-clustered p-values in parentheses. Distrust of the ",
-      "state as a steward shifts preferences toward voluntary instruments; ",
-      "doubt about delivery does not, and if anything strengthens opposition ",
-      "to voluntary donation. The two measures correlate only weakly, r = ",
-      sprintf("%.2f", rho), "."
 ---
 title: "Supplementary Information"
 subtitle: "Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions"
