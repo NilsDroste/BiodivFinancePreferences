@@ -9,7 +9,7 @@
       sprintf("%.2f", rho), "."
 ---
 title: "Supplementary Information"
-subtitle: "Citizens prefer mandatory over voluntary biodiversity financing"
+subtitle: "Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions"
 format:
   pdf:
     number-sections: false

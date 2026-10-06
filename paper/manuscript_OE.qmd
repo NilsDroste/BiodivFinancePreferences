@@ -1,5 +1,5 @@
 ---
-title: "Citizens prefer mandatory over voluntary biodiversity financing"
+title: "Citizens prefer mandatory over voluntary biodiversity financing even under favorable conditions"
 author:
   - name: Nils Droste
     affiliations: Department of Food and Resource Economics, University of Copenhagen
@@ -430,7 +430,7 @@ ggplot(twox2, aes(x = don_grp, y = mean_vp, fill = fill)) +
 
 Pre-registered subgroup models stratified by gender, income, and environmental attitude confirm the preference ordering is broadly consistent across groups (Supplementary Fig. S1). Exploratory analyses reveal that the political divide runs between state-coercive and market/corporate accountability mechanisms: left-bloc voters strongly prefer state tax, centre-right voters prefer mandatory corporate offsetting. Donation coefficients are negative in every political subgroup, though not statistically distinguishable from tax among centre-right ($p = 0.31$) or Sweden Democrat ($p = 0.58$) voters. Certification carries a positive point estimate relative to tax among centre-right voters ($+0.14$), but this is not significant once standard errors are clustered by respondent ($p = 0.06$). Mandatory corporate offsetting ranks first or joint-first in every group, so the cross-partisan consensus concerns the standing of mandatory mechanisms rather than which mandatory instrument is chosen. Low state trust does shift preferences toward voluntary instruments relative to tax: among the least trusting respondents, both donation ($+0.24$, $p = 0.002$) and certification ($+0.28$, $p < 0.001$) are preferred to tax.
 
-Two distinct judgements about the state can be separated, and they act in opposite directions. Trust in the state as a steward of conservation money (Q2\_1) is what moves respondents toward voluntary channels. Belief that the state will actually deliver on its biodiversity commitments (Q14, "Sweden will follow through on its biodiversity policies and targets") does not: respondents who doubt follow-through are *more* opposed to voluntary donation than those who expect it ($-0.41$ against $-0.29$), and no more favourable to certification. The two measures are only weakly related ($r = 0.19$). Perceived underdelivery therefore raises demand for compulsion, while distrust of the state as an agent raises demand for alternatives to it. Mandatory corporate offsetting remains their most preferred instrument ($+0.33$), so low state trust reorders instruments without overturning the mandatory preference.
+Two distinct judgements about the state can be separated, and they act in opposite directions. Trust in the state as a steward of conservation money (Q2\_1) is what moves respondents toward voluntary channels. Belief that the state will actually deliver on its biodiversity commitments (Q14, "Sweden will follow through on its biodiversity policies and targets") does not: respondents who doubt follow-through are *more* opposed to voluntary donation than those who expect it ($-0.41$ against $-0.29$), and no more favourable to certification. The two measures are only weakly related ($r = 0.19$). Perceived underdelivery therefore raises demand for compulsion, while distrust of the state as an agent raises demand for alternatives to it (Fig. 6). Mandatory corporate offsetting remains their most preferred instrument ($+0.33$), so low state trust reorders instruments without overturning the mandatory preference.
 
 ```{r}
 #| label: fig-subgroups
@@ -542,6 +542,72 @@ party_res |>
   theme(panel.grid.minor = element_blank(),
         legend.position = "bottom",
         plot.title = element_text(face = "bold", size = 11))
+```
+
+```{r}
+#| label: fig-state-judgements
+#| fig-cap: "Two judgements about the state move instrument preferences in opposite directions. Conditional logit coefficients relative to the tax baseline (95% CI, standard errors clustered by respondent). (A) Split by trust in the state as a steward of conservation funds: respondents who distrust the state prefer both voluntary instruments to tax. (B) Split by belief that the state will follow through on its biodiversity commitments: respondents who doubt follow-through are, if anything, more firmly opposed to voluntary donation than those who expect it. The two measures correlate only weakly, so underprovision and distrust are distinct and act in opposite directions."
+#| fig-width: 6.5
+#| fig-height: 4.2
+#| eval: true
+
+library(logitr)
+source(here::here("analysis", "cluster_se.R"))
+
+# Reuse the party-subgroup machinery; only the splitting variable changes.
+resp_state <- resp |>
+  left_join(full_data |> select(id, q2_1, q14), by = "id")
+
+fit_state <- function(d, panel, level) {
+  o <- as.integer(factor(paste0(d$id, "_", d$task)))
+  side <- function(px, k) data.frame(
+    obsID = o, respID = d$id, chosen = as.integer(d$choice_num == k), asc = 0L,
+    don   = as.integer(d[[paste0(px, "_source")]] == 1),
+    cert  = as.integer(d[[paste0(px, "_source")]] == 2),
+    off   = as.integer(d[[paste0(px, "_source")]] == 3),
+    ind   = as.integer(d[[paste0(px, "_land")]] == 1),
+    pland = as.integer(d[[paste0(px, "_land")]] == 2),
+    pmon  = as.integer(d[[paste0(px, "_monitor")]] == 1),
+    price = d[[paste0(px, "_price_sek")]] / 1000)
+  sq <- data.frame(obsID = o, respID = d$id,
+                   chosen = as.integer(d$choice_num == 3), asc = 1L,
+                   don = 0, cert = 0, off = 0, ind = 0, pland = 0, pmon = 0, price = 0)
+  L <- rbind(side("a", 1), side("b", 2), sq); L <- L[order(L$obsID), ]
+  m <- logitr(data = L, outcome = "chosen", obsID = "obsID",
+              pars = c("asc","don","cert","off","ind","pland","pmon","price"),
+              numMultiStarts = 3)
+  cf <- coef(m); se <- cluster_se(m, L, L$respID)
+  tibble(panel = panel, level = level,
+         Instrument = c("Donation", "Certification", "Offsetting"),
+         coef = cf[c("don","cert","off")], se = se[c("don","cert","off")])
+}
+
+state_res <- bind_rows(
+  fit_state(filter(resp_state, q2_1 <= 2), "A  Trust in the state as steward of funds", "Low"),
+  fit_state(filter(resp_state, q2_1 >= 4), "A  Trust in the state as steward of funds", "High"),
+  fit_state(filter(resp_state, q14  <= 2), "B  Belief the state will follow through",   "Doubted"),
+  fit_state(filter(resp_state, q14  >= 4), "B  Belief the state will follow through",   "Expected")
+) |>
+  mutate(lo = coef - 1.96 * se, hi = coef + 1.96 * se,
+         level = factor(level, levels = rev(c("Low","High","Doubted","Expected"))),
+         Instrument = factor(Instrument,
+                             levels = c("Donation","Certification","Offsetting")))
+
+ggplot(state_res, aes(x = coef, y = level, colour = Instrument)) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
+  geom_linerange(aes(xmin = lo, xmax = hi),
+                 position = position_dodge(width = 0.6), linewidth = 0.8) +
+  geom_point(position = position_dodge(width = 0.6), size = 3) +
+  facet_wrap(~panel, ncol = 1, scales = "free_y") +
+  scale_colour_manual(values = c(Donation = "#D55E00",
+                                 Certification = "#E69F00",
+                                 Offsetting = "#3b4994"),
+                      name = "Instrument") +
+  labs(x = "Coefficient relative to tax baseline", y = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        strip.text = element_text(face = "bold", size = 10, hjust = 0))
 ```
 
 # Discussion
