@@ -42,6 +42,7 @@ drop_patterns <- c(
   "^paper/Cover_.*\\.docx$",
   "^paper/presubmission.*",
   "^paper/si_description\\.md$", # helper for submission form fields
+  "^paper/front_matter_.*",      # journal front-matter boxes, submitted separately
   "^paper/manuscript_.*\\.qmd$", # journal variants, replaced by manuscript.qmd below
   "^paper/supplementary_.*\\.qmd$",
   "^paper/graphical_abstract\\..*", # presentation artefact for one journal format

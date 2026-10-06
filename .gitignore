@@ -76,3 +76,8 @@ renv/staging/
 # analysis/build_replication_package.R, never committed (committing it makes
 # the next build contain the previous one).
 BiodivFinancePreferences_replication_*.zip
+
+# Generated from paper/front_matter_OE.md by quarto; the .md is the source of
+# truth. Cover_*.docx are deliberately NOT covered here: those are hand-finished
+# with a pasted signature and cannot be regenerated.
+paper/front_matter_*.docx
