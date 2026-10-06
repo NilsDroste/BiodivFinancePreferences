@@ -44,6 +44,9 @@ drop <- c(
   "paper/manuscript_NS.qmd",  "paper/manuscript_OE.qmd",
   "paper/supplementary_NEE.qmd", "paper/supplementary_NS.qmd",
   "paper/supplementary_OE.qmd",
+  # presentation artefact for a specific journal's submission format, not a
+  # reported result; the package is meant to stay journal-neutral
+  "analysis/graphical_abstract.R",
   # repository plumbing
   ".gitignore"
 )

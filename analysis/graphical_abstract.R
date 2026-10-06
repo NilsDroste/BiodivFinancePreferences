@@ -23,6 +23,67 @@
 
 library(tidyverse)
 library(patchwork)
+library(readxl)
+library(here)
+library(logitr)
+source(here("analysis", "cluster_se.R"))
+
+# --- Recompute the numbers shown, rather than hard-coding them ---------------
+# Typed-in values drift silently when the analysis is revised. Everything
+# quantitative below is estimated here from the deposited data; the only
+# hard-coded positions are the two gauge markers in band 1, which are schematic
+# rather than statistics (see comment there).
+
+full_data <- read_csv(here("deposit", "biodivfinance_microdata_anon.csv"),
+                      show_col_types = FALSE)
+price_map  <- c("0" = 492, "1" = 2460, "2" = 4920, "3" = 7380)
+design_raw <- read_excel(here("design", "Trial 3 - factorial grouped, svensk.xlsx"), sheet = 1)
+names(design_raw) <- c("cs","block","a_source","a_src_txt","a_land","a_land_txt",
+                       "a_monitor","a_mon_txt","a_price","a_price_txt",
+                       "b_source","b_src_txt","b_land","b_land_txt",
+                       "b_monitor","b_mon_txt","b_price","b_price_txt")
+design <- design_raw |>
+  select(cs, block, a_source, a_land, a_monitor, a_price,
+         b_source, b_land, b_monitor, b_price) |>
+  group_by(block) |> mutate(task = row_number()) |> ungroup() |>
+  mutate(a_price_sek = price_map[as.character(a_price)],
+         b_price_sek = price_map[as.character(b_price)])
+
+ord1 <- full_data |> filter(ordning == 1) |>
+  select(id, block, q2_1, q14, choice1:choice8) |>
+  pivot_longer(choice1:choice8, names_to = "col", values_to = "choice")
+ord2 <- full_data |> filter(ordning == 2) |>
+  select(id, block, q2_1, q14, choice12, choice22, choice32, choice42,
+         choice52, choice62, choice72, choice82) |>
+  pivot_longer(-c(id, block, q2_1, q14), names_to = "col", values_to = "choice")
+resp <- bind_rows(ord1, ord2) |>
+  filter(!is.na(choice)) |>
+  mutate(task = as.integer(substr(col, 7, 7))) |>
+  left_join(design, by = c("block", "task")) |>
+  mutate(choice_num = case_when(choice == "a" ~ 1L, choice == "b" ~ 2L, TRUE ~ 3L))
+
+fit_cl <- function(d) {
+  o <- as.integer(factor(paste0(d$id, "_", d$task)))
+  side <- function(px, k) data.frame(
+    obsID = o, chosen = as.integer(d$choice_num == k), asc = 0L,
+    don   = as.integer(d[[paste0(px, "_source")]] == 1),
+    cert  = as.integer(d[[paste0(px, "_source")]] == 2),
+    off   = as.integer(d[[paste0(px, "_source")]] == 3),
+    ind   = as.integer(d[[paste0(px, "_land")]] == 1),
+    pland = as.integer(d[[paste0(px, "_land")]] == 2),
+    pmon  = as.integer(d[[paste0(px, "_monitor")]] == 1),
+    price = d[[paste0(px, "_price_sek")]] / 1000)
+  sq <- data.frame(obsID = o, chosen = as.integer(d$choice_num == 3), asc = 1L,
+                   don = 0, cert = 0, off = 0, ind = 0, pland = 0, pmon = 0, price = 0)
+  L <- rbind(side("a", 1), side("b", 2), sq)
+  coef(logitr(data = L[order(L$obsID), ], outcome = "chosen", obsID = "obsID",
+              pars = c("asc","don","cert","off","ind","pland","pmon","price"),
+              numMultiStarts = 3))
+}
+
+cf_all      <- fit_cl(resp)
+cf_distrust <- fit_cl(filter(resp, q2_1 <= 2))   # distrusts the state with money
+cf_doubt    <- fit_cl(filter(resp, q14  <= 2))   # doubts the state will deliver
 
 MAND <- "#3b4994"; VOL <- "#D55E00"; CERT <- "#E69F00"; GREY <- "grey45"
 
@@ -30,7 +91,9 @@ MAND <- "#3b4994"; VOL <- "#D55E00"; CERT <- "#E69F00"; GREY <- "grey45"
 setup <- tibble(
   cond  = factor(c("Interpersonal trust", "Public biodiversity spending"),
                  levels = c("Interpersonal trust", "Public biodiversity spending")),
-  value = c(0.95, 0.12),                      # Sweden's position, 0-1 within Europe
+  # Schematic gauge positions, not statistics: they convey 'near the top' and
+  # 'near the bottom'. The underlying ranks are in the labels beside them.
+  value = c(0.95, 0.12),
   lab   = c("5th of 91 worldwide", "among Europe's lowest")
 )
 
@@ -52,7 +115,7 @@ p1 <- ggplot(setup, aes(x = value, y = fct_rev(cond))) +
 # --- Band 2: the preference ordering -----------------------------------------
 pref <- tibble(
   instrument = c("Mandatory\noffsetting", "Tax", "Certification", "Voluntary\ndonation"),
-  utility    = c(0.146, 0, -0.082, -0.376),
+  utility    = c(cf_all[["off"]], 0, cf_all[["cert"]], cf_all[["don"]]),
   type       = c("Mandatory", "Mandatory", "Voluntary", "Voluntary")
 ) |>
   mutate(instrument = fct_reorder(instrument, utility))
@@ -80,8 +143,8 @@ p2 <- ggplot(pref, aes(x = utility, y = instrument, fill = type)) +
 # --- Band 3: the two judgements about the state ------------------------------
 mech <- tibble(
   judgement = c("Doubt the state\nwill deliver", "Distrust the state\nwith money"),
-  effect    = c(-0.13, 0.26),
-  outcome   = c("more mandatory", "more voluntary")
+  effect    = c(cf_doubt[["don"]], cf_distrust[["don"]]),
+  outcome   = c("more mandatory", "more voluntary")  # donation coefficient vs tax
 )
 
 p3 <- ggplot(mech, aes(x = effect, y = judgement, fill = effect > 0)) +
@@ -90,7 +153,7 @@ p3 <- ggplot(mech, aes(x = effect, y = judgement, fill = effect > 0)) +
   geom_text(aes(label = outcome, hjust = ifelse(mech$effect > 0, -0.1, 1.1)),
             size = 3, colour = GREY) +
   scale_fill_manual(values = c(`TRUE` = VOL, `FALSE` = MAND), guide = "none") +
-  scale_x_continuous(limits = c(-0.52, 0.62)) +
+  scale_x_continuous(limits = c(-0.78, 0.52)) +
   labs(title = "Underprovision and distrust are not the same thing",
        subtitle = "They move preferences in opposite directions",
        x = NULL, y = NULL) +
