@@ -1,0 +1,17 @@
+One Earth
+
+Dear Editors,
+
+Following your encouraging reply to our presubmission inquiry, we submit "Citizens prefer mandatory over voluntary biodiversity financing," by Nils Droste, Jens Marl Christiansen and Yohei Mitani.
+
+The Kunming-Montreal Global Biodiversity Framework leans heavily on voluntary, market-based and non-state finance to mobilise USD 200 billion per year for nature. A substantial evidence base asks whether such instruments can deliver and finds that they struggle to scale, but that work is uniformly supply-side. Voluntary architecture also presupposes something on the demand side: that citizens are willing to route conservation money through voluntary channels rather than requiring the state to compel it. That presupposition has not been tested directly.
+
+Using a preregistered discrete choice experiment (n = 2,101) with an incentivised donation experiment, we find Swedish citizens consistently prefer mandatory financing. Public monitoring commands a willingness-to-pay premium of roughly USD 160 per household per year (95% CI 127 to 195), and donation-financed programmes are valued some USD 250 below an otherwise identical tax-financed one. The standard objection fails on its own terms: strategic free-riding predicts the highest voluntary preference among high-concern non-donors, and we observe the lowest. The citizens who care most, and who give their own money under incentive, are the most opposed to voluntary financing.
+
+Your inquiry response asked how the design distinguishes preferences for mandatory versus voluntary instruments from related considerations such as cost incidence, perceived effectiveness, monitoring and responsibility for biodiversity impacts. The factorial design varies monitoring, land ownership and cost independently of the financing instrument, so those are estimated as separate coefficients. The instrument attribute itself crosses compulsion with incidence, tax and offsetting being mandatory but falling on households and corporates respectively, so the two can be read apart rather than being confounded. Perceived effectiveness is measured separately and after the choice tasks, and is reported as associational validation rather than mediation. We have made this structure explicit in the Results.
+
+That question also led to a finding we had not previously drawn out. Two judgements about the state can be separated, and they act in opposite directions: distrust of the state as a steward of conservation funds shifts preferences toward voluntary instruments, whereas doubt that the state will deliver on its biodiversity commitments does not, and if anything strengthens opposition to voluntary donation. The two correlate only weakly. Underprovision therefore generates demand for compulsion while distrust generates demand for alternatives to the state, which sharpens the cross-national prediction the paper offers.
+
+The study was preregistered (AsPredicted #273748 and #287153); anonymized data and full replication code are public (doi:10.5281/zenodo.22113029), and both manuscript and supplementary information render from the deposited data. Ethics approval: Swedish Ethical Review Authority 2025-04420-01, with informed consent from all participants. The manuscript is not under consideration elsewhere, all authors approve submission, and we declare no competing interests.
+
+Nils Droste

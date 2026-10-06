@@ -38,7 +38,7 @@ format:
   docx:
     number-sections: false
 bibliography: references.bib
-csl: nature.csl
+csl: cell.csl
 execute:
   eval: false
   echo: false
@@ -165,6 +165,22 @@ The single-country design is an intentional feature. A most-likely case study yi
 #| eval: true
 knitr::include_graphics(here::here("paper", "fig_bestcase.pdf"))
 ```
+
+# Highlights
+
+- Swedes prefer mandatory over voluntary biodiversity financing instruments
+- Public monitoring commands a willingness-to-pay premium of USD 160 per year
+- The most committed and most generous citizens are the most anti-voluntary
+- Distrust of the state, not doubt it delivers, drives voluntary preference
+
+# eTOC blurb
+
+Global biodiversity finance leans on voluntary instruments, which presumes
+citizens prefer giving to being compelled. Droste et al. test that in Sweden,
+where voluntary provision should work best, and find the opposite: citizens
+consistently choose mandatory financing, most strongly among those who care most
+and give most. Distrust of the state, rather than doubt that it delivers, is what
+shifts anyone toward voluntary channels.
 
 # Science for society
 

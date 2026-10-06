@@ -30,7 +30,7 @@ format:
         \usepackage{lineno}
         \linenumbers
 bibliography: references.bib
-csl: nature.csl
+csl: cell.csl
 execute:
   eval: true
   echo: false
